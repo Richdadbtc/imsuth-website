@@ -57,6 +57,11 @@ jobs:
           REMOTE_PATH: ${{ secrets.CPANEL_REMOTE_PATH }}
         run: |
           set -euo pipefail
-          test -n "$SSH_HOST" && test -n "$SSH_PORT" && test -n "$SSH_USER" && test -n "$REMOTE_PATH"
-          rsync -az --checksum -e "ssh -p $SSH_PORT" release/ "$SSH_USER@$SSH_HOST:${REMOTE_PATH%/}/"
-
+          SSH_PORT="${SSH_PORT//[[:space:]]/}"
+          SSH_PORT="${SSH_PORT:-22}"
+          test -n "$SSH_HOST" && test -n "$SSH_USER" && test -n "$REMOTE_PATH"
+          if ! [[ "$SSH_PORT" =~ ^[0-9]+$ ]] || (( SSH_PORT < 1 || SSH_PORT > 65535 )); then
+            echo "CPANEL_SSH_PORT must be a number between 1 and 65535."
+            exit 1
+          fi
+          rsync -az --checksum --rsh="ssh -p ${SSH_PORT}" release/ "${SSH_USER}@${SSH_HOST}:${REMOTE_PATH%/}/"

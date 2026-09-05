@@ -9,7 +9,7 @@ The workflow at `.github/workflows/deploy-cpanel.yml` validates the site, create
 In the GitHub repository, open **Settings → Environments**, create an environment named `production`, and add these environment secrets:
 
 - `CPANEL_SSH_HOST` — the cPanel server hostname
-- `CPANEL_SSH_PORT` — normally `22`, or the SSH port supplied by the host
+- `CPANEL_SSH_PORT` — optional; defaults to `22`. Set it only when the host supplies a different numeric SSH port
 - `CPANEL_SSH_USER` — the cPanel account username
 - `CPANEL_SSH_PRIVATE_KEY` — a private deployment key whose public key is authorised in cPanel
 - `CPANEL_SSH_KNOWN_HOSTS` — the verified SSH host-key line supplied by the host
@@ -32,4 +32,3 @@ The website forms remain in development mode until IMSUTH configures an approved
 ## First deployment check
 
 Confirm the homepage, custom 404 page, images, JSON content and PHP endpoints load from the production domain. Check HTTPS, security headers, file permissions and form delivery without using real patient data.
-
