@@ -1,0 +1,62 @@
+name: Deploy IMSUTH website to cPanel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: imsuth-cpanel-production
+  cancel-in-progress: false
+
+jobs:
+  validate-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check out the approved commit
+        uses: actions/checkout@v7
+
+      - name: Validate public website files
+        run: |
+          set -euo pipefail
+          for file in assets/js/*.js; do node --check "$file"; done
+          for file in data/*.json; do python3 -m json.tool "$file" >/dev/null; done
+          python3 -c "import xml.etree.ElementTree as ET; ET.parse('sitemap.xml')"
+          for file in api/*.php; do php -l "$file"; done
+
+      - name: Assemble public release
+        run: |
+          set -euo pipefail
+          mkdir -p release/assets release/data release/api
+          cp index.html about.html departments.html department-details.html services.html service-details.html appointment.html contact.html doctors.html doctor-details.html patients.html facilities.html facility-details.html research.html news.html article.html careers.html privacy.html leadership-profile.html 404.html release/
+          cp robots.txt sitemap.xml .htaccess release/
+          cp -R assets/css assets/images assets/js release/assets/
+          cp data/*.json release/data/
+          cp api/*.php release/api/
+
+      - name: Configure cPanel SSH access
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.CPANEL_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+
+      - name: Deploy release to cPanel
+        env:
+          SSH_HOST: ${{ secrets.CPANEL_SSH_HOST }}
+          SSH_PORT: ${{ secrets.CPANEL_SSH_PORT }}
+          SSH_USER: ${{ secrets.CPANEL_SSH_USER }}
+          REMOTE_PATH: ${{ secrets.CPANEL_REMOTE_PATH }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_HOST" && test -n "$SSH_PORT" && test -n "$SSH_USER" && test -n "$REMOTE_PATH"
+          rsync -az --checksum -e "ssh -p $SSH_PORT" release/ "$SSH_USER@$SSH_HOST:${REMOTE_PATH%/}/"
+

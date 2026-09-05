@@ -1,0 +1,1 @@
+{"careers":[],"schema":{"id":"string","slug":"string","title":"string","department":"string","employmentType":"string","location":"string","summary":"string","requirements":"string[]","applicationInstructions":"string","deadline":"ISO-8601 date","verified":"boolean"},"meta":{"version":1,"visibility":"verified-only","note":"There are currently no published vacancies."}}

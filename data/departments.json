@@ -1,0 +1,10 @@
+{
+  "departments": [
+    {"id":"surgery","name":"Surgery","slug":"surgery","description":"Surgical care across multiple specialties.","services":[],"specialists":[],"clinicSchedule":"To be confirmed","contact":{"phone":"","email":"","location":""},"status":"published"},
+    {"id":"accident-emergency","name":"Accident & Emergency","slug":"accident-emergency","description":"Emergency assessment and care for urgent and critical conditions.","services":[],"specialists":[],"clinicSchedule":"24 hours, every day","contact":{"phone":"","email":"","location":""},"status":"published"},
+    {"id":"paediatrics","name":"Paediatrics","slug":"paediatrics","description":"Healthcare for infants, children and adolescents.","services":[],"specialists":[],"clinicSchedule":"To be confirmed","contact":{"phone":"","email":"","location":""},"status":"published"},
+    {"id":"obstetrics-gynaecology","name":"Obstetrics & Gynaecology","slug":"obstetrics-gynaecology","description":"Maternal, reproductive and women’s healthcare.","services":[],"specialists":[],"clinicSchedule":"To be confirmed","contact":{"phone":"","email":"","location":""},"status":"published"},
+    {"id":"ophthalmology","name":"Ophthalmology","slug":"ophthalmology","description":"Assessment and treatment of eye conditions and visual disorders.","services":[],"specialists":[],"clinicSchedule":"To be confirmed","contact":{"phone":"","email":"","location":""},"status":"published"}
+  ],
+  "meta":{"source":"IMSUTH official website","reviewed":"2026-09-04"}
+}

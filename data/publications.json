@@ -1,0 +1,7 @@
+{
+  "publications": [
+    {"id":"staging-publication-template","slug":"","title":"","authors":[],"date":"","category":"","summary":"","externalUrl":"","pdfUrl":"","verified":false}
+  ],
+  "schema":{"id":"string","slug":"string","title":"string","authors":"string[]","date":"ISO-8601 date","category":"string","summary":"string","externalUrl":"string","pdfUrl":"string","verified":"boolean"},
+  "meta":{"version":1,"visibility":"verified-only","note":"Verified IMSUTH publications will be added after institutional review."}
+}

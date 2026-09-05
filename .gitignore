@@ -1,0 +1,9 @@
+.DS_Store
+**/.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+.idea/
+.vscode/
+assets/images/clinical-services-visual-grid.png

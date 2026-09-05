@@ -1,0 +1,11 @@
+{
+  "services": [
+    {"id":"general-medical-care","name":"General Medical Care","slug":"general-medical-care","description":"Patient-centred diagnosis, treatment and preventive care across a wide range of health conditions.","icon":"stethoscope","image":"assets/images/clinical-services-visual-grid.jpg","imagePanel":1,"status":"published"},
+    {"id":"laboratory-services","name":"Laboratory Services","slug":"laboratory-services","description":"Accurate and timely diagnostic testing that supports informed clinical decisions.","icon":"flask","image":"assets/images/clinical-services-visual-grid.jpg","imagePanel":2,"status":"published"},
+    {"id":"radiological-services","name":"Radiological Services","slug":"radiological-services","description":"Diagnostic imaging services that support precise evaluation and coordinated care.","icon":"scan","image":"assets/images/clinical-services-visual-grid.jpg","imagePanel":3,"status":"published"},
+    {"id":"oxygen-plant","name":"Oxygen Plant","slug":"oxygen-plant","description":"On-site medical oxygen infrastructure supporting emergency, surgical and critical care.","icon":"oxygen","image":"assets/images/clinical-services-visual-grid.jpg","imagePanel":4,"status":"published"},
+    {"id":"kidney-transplant","name":"Kidney Transplant","slug":"kidney-transplant","description":"Specialist renal transplant care delivered through a coordinated multidisciplinary pathway.","icon":"kidney","image":"assets/images/clinical-services-visual-grid.jpg","imagePanel":5,"status":"published"},
+    {"id":"infectious-disease-centre","name":"Infectious Disease Centre","slug":"infectious-disease-centre","description":"Dedicated prevention, diagnosis and treatment of infectious diseases in a specialist setting.","icon":"shield","image":"assets/images/clinical-services-visual-grid.jpg","imagePanel":6,"status":"published"}
+  ],
+  "meta":{"source":"IMSUTH official website","reviewed":"2026-09-04"}
+}

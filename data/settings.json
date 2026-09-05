@@ -1,0 +1,31 @@
+{
+    "siteName": "Imo State University Teaching Hospital",
+    "siteShortName": "IMSUTH",
+    "tagline": "Advanced Healthcare. Teaching Excellence. Compassionate Care.",
+    "url": "https://www.imsuth.org",
+    "description": "Imo State University Teaching Hospital (IMSUTH) is a premier tertiary healthcare institution dedicated to specialist medical care, education, research, and community service.",
+    "contact": {
+        "address": "Orlu, Imo State, Nigeria",
+        "phone": "+234 903 594 9085",
+        "emergencyPhone": "",
+        "email": "info@imsuth.org",
+        "hours": "24/7 Emergency | Mon–Fri 8:00 AM–4:00 PM (Outpatients and specialist clinics)"
+    },
+    "emergency": {
+        "available": true,
+        "phone": "",
+        "note": "Emergency services are available 24 hours a day, 7 days a week."
+    },
+    "social": {
+        "facebook": "",
+        "twitter": "",
+        "linkedin": "",
+        "instagram": ""
+    },
+    "portalUrl": "",
+    "forms": {
+        "mode": "development",
+        "appointmentEndpoint": "/api/appointments.php",
+        "contactEndpoint": "/api/contact.php"
+    }
+}

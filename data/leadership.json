@@ -1,0 +1,21 @@
+{
+  "leaders": [
+    {
+      "id": "kenechi-anderson-uwakwe",
+      "slug": "kenechi-anderson-uwakwe",
+      "name": "Prof. Kenechi Anderson Uwakwe",
+      "role": "Hospital leadership",
+      "photo": "assets/images/Prof. Kenechi Anderson Uwakwe.png",
+      "summary": "Biography, education, professional experience and research profile of Prof. Kenechi Anderson Uwakwe.",
+      "biography": [
+        "Prof. Kenechi Anderson Uwakwe hails from the Umuezemma royal family of Opuoma in Ohaji/Egbema Local Government Area of Imo State. He was born into the family of HRH Eze W. A. C. Uwakwe and the late HRH Ugoeze H. N. Uwakwe.",
+        "He has professional experience across the public and private sectors and has served as the head or a member of committees in different institutions and professional bodies."
+      ],
+      "education": "He attended Community Primary School, Ilupeju, Lagos, and Federal Government College, Okigwe. He obtained his MBBS from Abia State University, Uturu, and completed postgraduate residency training.",
+      "experience": "He has worked in consulting and research capacities for organisations including NACA, UNFPA, the Bill & Melinda Gates Foundation, WHO, UNICEF, IMPRINT, GLRA, IHVN, CCCRN and CARITAS. He has served as an examiner at undergraduate institutions and as a member of postgraduate and undergraduate accreditation teams appointed by regulatory agencies within and outside Nigeria.",
+      "research": "His research interest is epidemiology, particularly the epidemiology of communicable diseases. He has authored more than ninety peer-reviewed articles.",
+      "verified": true
+    }
+  ],
+  "meta": {"source": "Biography supplied for IMSUTH website publication", "visibility": "verified-only"}
+}

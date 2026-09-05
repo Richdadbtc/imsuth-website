@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH="$HOME/public_html/"
+    - /bin/mkdir -p "$DEPLOYPATH" "$DEPLOYPATH/assets" "$DEPLOYPATH/data" "$DEPLOYPATH/api"
+    - /bin/cp index.html about.html departments.html department-details.html services.html service-details.html appointment.html contact.html doctors.html doctor-details.html patients.html facilities.html facility-details.html research.html news.html article.html careers.html privacy.html leadership-profile.html 404.html "$DEPLOYPATH"
+    - /bin/cp robots.txt sitemap.xml .htaccess "$DEPLOYPATH"
+    - /bin/cp -R assets/css assets/images assets/js "$DEPLOYPATH/assets/"
+    - /bin/cp data/careers.json data/departments.json data/doctors.json data/facilities.json data/leadership.json data/news.json data/patient-info.json data/publications.json data/research.json data/services.json data/settings.json "$DEPLOYPATH/data/"
+    - /bin/cp api/appointments.php api/bootstrap.php api/contact.php "$DEPLOYPATH/api/"
+
