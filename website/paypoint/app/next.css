@@ -53,3 +53,18 @@ body.dark-theme .imported-overview{--source-bg:#0f1a22;--source-card:#16252f;--s
 @media(max-width:760px){.source-overview-grid{grid-template-columns:1fr}.source-overview-body{padding:14px 12px}.source-overview-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.source-value{font-size:20px}.source-overview-nav{padding-left:8px;padding-right:8px}}
 
 .catalogue-setup{display:grid;gap:16px}.catalogue-setup h1{margin:0}.catalogue-setup .finance-card{display:grid;gap:12px}.catalogue-setup label{display:grid;gap:6px}.catalogue-buttons{display:flex;flex-wrap:wrap;gap:10px}.catalogue-setup .catalogue-confirm{display:flex;align-items:center;gap:10px}.catalogue-setup input[type=checkbox]{width:18px;height:18px;flex:none}.catalogue-setup td{white-space:normal;min-width:100px}.catalogue-setup td:first-child{min-width:60px}.catalogue-setup [aria-busy=true]{opacity:.8}
+
+/* Compact payment entry follows the collection officer's field order. */
+.compact-record-layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(230px,1fr);gap:20px;align-items:start;margin-bottom:20px}
+.compact-record-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:24px;align-items:end}
+.compact-record-grid label{display:flex;flex-direction:column;gap:8px;min-width:0}
+.compact-record-grid input,.compact-record-grid select,.compact-record-grid textarea{width:100%;min-height:48px;border:1px solid var(--line,#c9dce8);border-radius:9px;padding:10px 12px;font:inherit;background:var(--card,#fff);color:inherit;box-sizing:border-box}
+.compact-record-grid textarea{height:48px;resize:vertical}
+.compact-record-grid [data-rp-results]{display:flex;flex-direction:column;gap:5px}
+.compact-record-grid [data-rp-selection-status]{font-size:12px}
+.compact-record-submit{min-height:48px}
+.compact-record-note{line-height:1.6;margin-top:20px}
+.compact-record-setup{margin-top:12px}
+body.dark-theme .compact-record-grid input,body.dark-theme .compact-record-grid select,body.dark-theme .compact-record-grid textarea{background:#172a35;border-color:#2c4957;color:#e4edf3}
+@media(max-width:1100px){.compact-record-layout{grid-template-columns:1fr}.compact-record-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.compact-record-grid{grid-template-columns:1fr}}
