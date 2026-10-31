@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.env*
+!.env.example
+verification
+*.log
+index.html
+*-qa.md
+design-qa.md
+static/paypoint/*.js

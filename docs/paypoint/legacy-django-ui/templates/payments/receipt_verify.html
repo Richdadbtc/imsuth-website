@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}Receipt verification — IMSUTH{% endblock %}
+{% block content %}<section class="auth-card"><p class="eyebrow">Receipt verification</p><h1>Receipt confirmed</h1><p>Receipt <strong>{{ receipt.receipt_number }}</strong> was issued by IMSUTH for <strong>{{ receipt.currency }} {{ receipt.amount }}</strong>.</p><p>Status: <span class="status">{{ receipt.payment.get_status_display }}</span></p><p>Issued {{ receipt.issued_at|date:"d M Y, H:i" }}.</p></section>{% endblock %}

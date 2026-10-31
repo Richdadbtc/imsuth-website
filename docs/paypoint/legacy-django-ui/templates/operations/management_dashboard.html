@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Management Dashboard — IMSUTH PayPoint{% endblock %}
+{% block content %}
+<div class="management-dashboard">
+  <header class="management-welcome">
+    <div><h1>Welcome, {{ user.get_full_name|default:user.username }}</h1><p class="management-subtitle">Management Dashboard</p><p>Overview of hospital revenue, transactions and key activities</p></div>
+    <form class="management-date" method="get" aria-label="Dashboard date range">
+      <div><strong>Reporting period</strong><span>{{ date_from|default:today|date:"d M Y" }} — {{ date_to|default:today|date:"d M Y" }}</span></div>
+      <button class="button button-secondary" type="button" data-dashboard-filter-toggle aria-expanded="false">Change dates</button>
+      <div class="management-date-fields" data-dashboard-filter hidden><label>From <input type="date" name="from" value="{{ request.GET.from }}"></label><label>To <input type="date" name="to" value="{{ request.GET.to }}"></label><button class="button button-primary" type="submit">Apply</button></div>
+    </form>
+  </header>
+
+  <section class="management-metrics" aria-label="Revenue summary">
+    <article class="management-metric metric-green"><span>Today's Revenue</span><strong>₦{{ today_total|floatformat:2 }}</strong><small>Confirmed payments today</small></article>
+    <article class="management-metric metric-blue"><span>This Week</span><strong>₦{{ week_total|floatformat:2 }}</strong><small>From Monday</small></article>
+    <article class="management-metric metric-purple"><span>This Month</span><strong>₦{{ month_total|floatformat:2 }}</strong><small>Confirmed this month</small></article>
+    <article class="management-metric metric-orange"><span>Total Transactions</span><strong>{{ transaction_count }}</strong><small>Confirmed transactions</small></article>
+    <article class="management-metric metric-red"><span>Outstanding Invoices</span><strong>{{ pending_invoices }}</strong><small>Issued or partly paid</small></article>
+  </section>
+
+  <div class="management-chart-grid">
+    <section class="management-card revenue-chart-card">
+      <div class="management-card-head"><div><p class="management-kicker">Confirmed collections</p><h2>Revenue Overview</h2></div><div class="chart-period-controls" aria-label="Revenue chart period"><button type="button" class="active" data-chart-period="daily">Daily</button><button type="button" data-chart-period="weekly">Weekly</button><button type="button" data-chart-period="monthly">Monthly</button></div></div>
+      <svg class="native-revenue-chart" data-revenue-chart viewBox="0 0 760 245" role="img" aria-labelledby="revenue-chart-title revenue-chart-description"><title id="revenue-chart-title">Confirmed revenue for the last seven days</title><desc id="revenue-chart-description">Bar chart of confirmed payment revenue by day.</desc></svg>
+      {{ revenue_series|json_script:"revenue-series" }}
+      <div class="channel-legend"><span class="channel-cash">Cash</span><span class="channel-bank">Bank Transfer</span><span class="channel-pos">POS</span><span class="channel-online">Online</span></div>
+      <details class="chart-alternative"><summary>View chart data as a table</summary><table><thead><tr><th>Date</th><th>Confirmed revenue</th></tr></thead><tbody>{% for row in daily_revenue %}<tr><td>{{ row.date|date:"d M Y" }}</td><td>NGN {{ row.total }}</td></tr>{% endfor %}</tbody></table></details>
+    </section>
+
+    <section class="management-card department-card">
+      <div class="management-card-head"><div><p class="management-kicker">This period</p><h2>Revenue by Department</h2></div></div>
+      <div class="department-chart-wrap"><svg class="native-department-chart" data-department-chart viewBox="0 0 190 190" role="img" aria-label="Revenue proportions by department"></svg><div class="department-chart-total"><strong>₦{{ department_total|floatformat:2 }}</strong><span>Period revenue</span></div></div>
+      <div class="department-list" data-department-data>
+        {% for row in by_department %}<div data-label="{{ row.invoice__department__name|default:"Unassigned" }}" data-value="{{ row.total }}" data-percentage="{{ row.percentage }}"><span class="department-dot dot-{{ forloop.counter }}"></span><strong>{{ row.invoice__department__name|default:"Unassigned" }}</strong><span>{{ row.percentage }}%</span><small>₦{{ row.total|floatformat:2 }}</small></div>{% empty %}<p class="management-empty">No confirmed department collections for this period.</p>{% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <div class="management-lower-grid">
+    <section class="management-card transactions-card">
+      <div class="management-card-head"><h2>Recent Transactions</h2><a href="{% url 'transaction-list' %}">View all</a></div>
+      <div class="management-table-wrap"><table class="management-table"><thead><tr><th>Reference</th><th>Patient</th><th>Department</th><th>Amount</th><th>Method</th><th>Status</th><th>Date &amp; time</th></tr></thead><tbody>
+        {% for payment in recent_transactions %}<tr><td><a href="{% url 'payment-detail' payment.pk %}">{{ payment.reference }}</a></td><td>{{ payment.invoice.patient.patient_id }}</td><td>{{ payment.invoice.department.name }}</td><td>{{ payment.currency }} {{ payment.amount }}</td><td>{{ payment.get_channel_display }}</td><td><span class="status status-confirmed">Verified</span></td><td>{{ payment.confirmed_at|date:"d/m/Y H:i" }}</td></tr>{% empty %}<tr><td colspan="7" class="management-empty">No confirmed transactions yet.</td></tr>{% endfor %}
+      </tbody></table></div>
+    </section>
+    <aside class="management-card approvals-card">
+      <div class="management-card-head"><h2>Pending Actions</h2><a href="{% url 'finance-workspace' %}">View all</a></div>
+      <a href="{% url 'transaction-list' %}"><span>Payment verifications<small>Awaiting confirmation or review</small></span><strong>{{ payment_reviews }}</strong></a>
+      <a href="{% url 'finance-workspace' %}"><span>Approval requests<small>Pending finance decision</small></span><strong>{{ pending_approvals }}</strong></a>
+      <a href="{% url 'finance-workspace' %}"><span>Refund requests<small>Approved, awaiting execution</small></span><strong>{{ refunds_pending }}</strong></a>
+      <a href="{% url 'finance-workspace' %}"><span>Reversal requests<small>Approved, awaiting execution</small></span><strong>{{ reversals_pending }}</strong></a>
+      {% if tariff_reviews %}<a href="{% url 'tariff-list' %}"><span>Tariff updates<small>Awaiting authorised approval</small></span><strong>{{ tariff_reviews }}</strong></a>{% endif %}
+    </aside>
+  </div>
+
+  <section class="management-quick-stats" aria-label="Today's operational summary">
+    <article><span>New Patient Registrations</span><strong>{{ new_patients_today }}</strong><small>Today</small></article>
+    <article><span>Invoices Created</span><strong>{{ invoices_today }}</strong><small>Today</small></article>
+    <article><span>Payments Verified</span><strong>{{ verified_payments_today }}</strong><small>Today</small></article>
+    <a class="management-action-card" href="{% url 'reconciliation-list' %}"><span>Reconciliation Discrepancies</span><strong>{{ unmatched }}</strong><small>Require review</small></a>
+  </section>
+</div>
+{% endblock %}

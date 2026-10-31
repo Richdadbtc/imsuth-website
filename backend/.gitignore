@@ -1,0 +1,14 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+.coverage
+htmlcov/
+staticfiles/
+media/
+*.log
+
+/deployment/secrets/
+/deployment/staging.env
+/deployment/production.env

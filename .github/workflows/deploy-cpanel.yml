@@ -21,9 +21,11 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Validate public website files
+        working-directory: website
         run: |
           set -euo pipefail
           for file in assets/js/*.js; do node --check "$file"; done
+          for file in paypoint/config.js paypoint/static/paypoint/*.js; do node --check "$file"; done
           for file in data/*.json; do python3 -m json.tool "$file" >/dev/null; done
           python3 -c "import xml.etree.ElementTree as ET; ET.parse('sitemap.xml')"
           for file in api/*.php; do php -l "$file"; done
@@ -31,12 +33,14 @@ jobs:
       - name: Assemble public release
         run: |
           set -euo pipefail
-          mkdir -p release/assets release/data release/api
-          cp index.html about.html departments.html department-details.html services.html service-details.html appointment.html contact.html doctors.html doctor-details.html patients.html facilities.html facility-details.html research.html news.html article.html careers.html privacy.html leadership-profile.html 404.html release/
-          cp robots.txt sitemap.xml .htaccess release/
-          cp -R assets/css assets/images assets/js release/assets/
-          cp data/*.json release/data/
-          cp api/*.php release/api/
+          mkdir -p release/assets release/data release/api release/paypoint
+          cp website/index.html website/about.html website/departments.html website/department-details.html website/services.html website/service-details.html website/appointment.html website/contact.html website/doctors.html website/doctor-details.html website/patients.html website/facilities.html website/facility-details.html website/research.html website/news.html website/article.html website/careers.html website/privacy.html website/leadership-profile.html website/admin.html website/404.html release/
+          cp website/robots.txt website/sitemap.xml website/.htaccess release/
+          cp -R website/assets/css website/assets/images website/assets/js release/assets/
+          cp website/data/*.json release/data/
+          cp website/api/*.php release/api/
+          cp website/paypoint/index.html website/paypoint/config.js release/paypoint/
+          cp -R website/paypoint/static release/paypoint/
 
       - name: Configure cPanel SSH access
         env:

@@ -1,0 +1,92 @@
+[
+  {
+    "route": "patient-directory",
+    "heading": "Patients",
+    "error": 0
+  },
+  {
+    "route": "billing",
+    "heading": "Invoices",
+    "error": 0
+  },
+  {
+    "route": "payments",
+    "heading": "Transactions",
+    "error": 0
+  },
+  {
+    "route": "payments-receipt-verification",
+    "heading": "Receipt Verification",
+    "error": 0
+  },
+  {
+    "route": "finance-refunds",
+    "heading": "Refund Requests",
+    "error": 0
+  },
+  {
+    "route": "finance-approvals",
+    "heading": "Approval Queue",
+    "error": 0
+  },
+  {
+    "route": "finance-reconciliation",
+    "heading": "Bank Reconciliation",
+    "error": 0
+  },
+  {
+    "route": "admin-notifications",
+    "heading": "Notifications Management",
+    "error": 0
+  },
+  {
+    "route": "admin-settings",
+    "heading": "System Settings",
+    "error": 0
+  },
+  {
+    "route": "reports-revenue",
+    "heading": "Revenue Reports",
+    "error": 0
+  },
+  {
+    "route": "reports-patients",
+    "heading": "Patient Registration Report",
+    "error": 0
+  },
+  {
+    "route": "reports-system",
+    "heading": "System Activity Report",
+    "error": 0
+  },
+  {
+    "route": "help-support",
+    "heading": "Help & Support",
+    "error": 0
+  },
+  {
+    "route": "admin-departments",
+    "heading": "IMSUTH Revenue Control",
+    "error": 0
+  },
+  {
+    "route": "admin-services",
+    "heading": "IMSUTH Revenue Control",
+    "error": 0
+  },
+  {
+    "route": "cash-points",
+    "heading": "IMSUTH Revenue Control",
+    "error": 0
+  },
+  {
+    "route": "alerts",
+    "heading": "IMSUTH Revenue Control",
+    "error": 0
+  },
+  {
+    "route": "users-audit",
+    "heading": "IMSUTH Revenue Control",
+    "error": 0
+  }
+]

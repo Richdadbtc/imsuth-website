@@ -1,0 +1,60 @@
+=== final-regression ===
+..
+----------------------------------------------------------------------
+Ran 103 tests in 61.445s
+
+OK
+Destroying test database for alias 'default'...
+Found 103 test(s).
+System check identified no issues (0 silenced).
+
+=== focused-postgresql ===
+...........
+----------------------------------------------------------------------
+Ran 54 tests in 18.496s
+
+OK
+Destroying test database for alias 'default'...
+Found 54 test(s).
+System check identified no issues (0 silenced).
+
+=== concurrency ===
+..
+----------------------------------------------------------------------
+Ran 3 tests in 3.803s
+
+OK
+Destroying test database for alias 'default'...
+Found 3 test(s).
+System check identified no issues (0 silenced).
+
+=== check ===
+System check identified no issues (0 silenced).
+
+=== drift ===
+No changes detected
+
+=== static ===
+1 static file copied to '/Users/mac/Documents/imsuth/backend/staticfiles', 180 unmodified.
+
+=== schema ===
+/Users/mac/Documents/imsuth/backend/apps/common/revenue_api.py:222: Warning [CashOrderViewSet > CashOrderSerializer]: unable to resolve type hint for function "get_requested_by_name". Consider using a type hint or @extend_schema_field. Defaulting to string.
+/Users/mac/Documents/imsuth/backend/apps/common/revenue_api.py:222: Warning [CashOrderViewSet > CashOrderSerializer]: unable to resolve type hint for function "get_decided_by_name". Consider using a type hint or @extend_schema_field. Defaulting to string.
+/Users/mac/Documents/imsuth/backend/apps/common/revenue_api.py:125: Warning [CashPointViewSet > CashPointSerializer]: unable to resolve type hint for function "get_assigned_officer_name". Consider using a type hint or @extend_schema_field. Defaulting to string.
+/Users/mac/Documents/imsuth/backend/apps/common/revenue_api.py:144: Warning [CashPointViewSet]: could not derive type of path parameter "evidence_id" because model "apps.common.revenue_models.CashPoint" contained no such field. Consider annotating parameter with @extend_schema. Defaulting to "string".
+/Users/mac/Documents/imsuth/backend/apps/common/revenue_api.py:293: Warning [DepartmentDeskViewSet]: could not derive type of path parameter "reference" because model "apps.payments.models.Receipt" contained no such field. Consider annotating parameter with @extend_schema. Defaulting to "string".
+/Users/mac/Documents/imsuth/backend/apps/common/revenue_api.py:293: Warning [DepartmentDeskViewSet]: could not derive type of path parameter "item_id" because model "apps.payments.models.Receipt" contained no such field. Consider annotating parameter with @extend_schema. Defaulting to "string".
+Warning: enum naming encountered a non-optimally resolvable collision for fields named "status". The same name has been used for multiple choice sets in multiple components. The collision was resolved with "StatusE94Enum". add an entry to ENUM_NAME_OVERRIDES to fix the naming.
+Warning: enum naming encountered a non-optimally resolvable collision for fields named "status". The same name has been used for multiple choice sets in multiple components. The collision was resolved with "Status31bEnum". add an entry to ENUM_NAME_OVERRIDES to fix the naming.
+Warning: operationId "api_v1_dashboard_retrieve" has collisions [('/api/v1/dashboard/', 'get'), ('/api/v1/dashboard/{metric}/', 'get')]. resolving with numeral suffixes.
+Warning: operationId "api_v1_department_desk_receipts_retrieve" has collisions [('/api/v1/department-desk/receipts/', 'get'), ('/api/v1/department-desk/receipts/{reference}/', 'get')]. resolving with numeral suffixes.
+Warning: operationId "report_data" has collisions [('/api/v1/reports/{report}/', 'get'), ('/paypoint/api/v1/reports/{report}/', 'get')]. resolving with numeral suffixes.
+Warning: operationId "paypoint_api_v1_dashboard_retrieve" has collisions [('/paypoint/api/v1/dashboard/', 'get'), ('/paypoint/api/v1/dashboard/{metric}/', 'get')]. resolving with numeral suffixes.
+Warning: operationId "paypoint_api_v1_department_desk_receipts_retrieve" has collisions [('/paypoint/api/v1/department-desk/receipts/', 'get'), ('/paypoint/api/v1/department-desk/receipts/{reference}/', 'get')]. resolving with numeral suffixes.
+
+Schema generation summary:
+Warnings: 21 (13 unique)
+Errors:   0 (0 unique)
+
+=== JavaScript and diff checks ===
+All three ES6 modules passed node --input-type=module --check via stdin; git diff --check exited 0.

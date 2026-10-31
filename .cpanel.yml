@@ -2,10 +2,10 @@
 deployment:
   tasks:
     - export DEPLOYPATH="$HOME/public_html/"
-    - /bin/mkdir -p "$DEPLOYPATH" "$DEPLOYPATH/assets" "$DEPLOYPATH/data" "$DEPLOYPATH/api"
-    - /bin/cp index.html about.html departments.html department-details.html services.html service-details.html appointment.html contact.html doctors.html doctor-details.html patients.html facilities.html facility-details.html research.html news.html article.html careers.html privacy.html leadership-profile.html 404.html "$DEPLOYPATH"
-    - /bin/cp robots.txt sitemap.xml .htaccess "$DEPLOYPATH"
-    - /bin/cp -R assets/css assets/images assets/js "$DEPLOYPATH/assets/"
-    - /bin/cp data/careers.json data/departments.json data/doctors.json data/facilities.json data/leadership.json data/news.json data/patient-info.json data/publications.json data/research.json data/services.json data/settings.json "$DEPLOYPATH/data/"
-    - /bin/cp api/appointments.php api/bootstrap.php api/contact.php "$DEPLOYPATH/api/"
-
+    - /bin/mkdir -p "$DEPLOYPATH" "$DEPLOYPATH/assets" "$DEPLOYPATH/data" "$DEPLOYPATH/api" "$DEPLOYPATH/paypoint"
+    - /bin/cp website/index.html website/about.html website/departments.html website/department-details.html website/services.html website/service-details.html website/appointment.html website/contact.html website/doctors.html website/doctor-details.html website/patients.html website/facilities.html website/facility-details.html website/research.html website/news.html website/article.html website/careers.html website/privacy.html website/leadership-profile.html website/admin.html website/404.html "$DEPLOYPATH"
+    - /bin/cp website/robots.txt website/sitemap.xml website/.htaccess "$DEPLOYPATH"
+    - /bin/cp -R website/assets/css website/assets/images website/assets/js "$DEPLOYPATH/assets/"
+    - /bin/cp website/data/careers.json website/data/departments.json website/data/doctors.json website/data/facilities.json website/data/leadership.json website/data/news.json website/data/patient-info.json website/data/publications.json website/data/research.json website/data/services.json website/data/settings.json "$DEPLOYPATH/data/"
+    - /bin/cp website/api/appointments.php website/api/bootstrap.php website/api/contact.php "$DEPLOYPATH/api/"
+    - /bin/cp -R website/paypoint/index.html website/paypoint/config.js website/paypoint/static "$DEPLOYPATH/paypoint/"

@@ -1,0 +1,66 @@
+[
+  {
+    "screen": "Overview",
+    "active": [
+      "Overview"
+    ],
+    "focus": "Record payment",
+    "focusTag": "A"
+  },
+  {
+    "screen": "Record payment",
+    "active": [
+      "Record payment"
+    ],
+    "focus": "Department desk",
+    "focusTag": "A"
+  },
+  {
+    "screen": "Department desk",
+    "active": [
+      "Department desk"
+    ],
+    "focus": "Departments",
+    "focusTag": "A"
+  },
+  {
+    "screen": "Departments",
+    "active": [
+      "Departments"
+    ],
+    "focus": "Services and prices",
+    "focusTag": "A"
+  },
+  {
+    "screen": "Services and prices",
+    "active": [
+      "Services and prices"
+    ],
+    "focus": "Cash points and orders",
+    "focusTag": "A"
+  },
+  {
+    "screen": "Cash points and orders",
+    "active": [
+      "Cash points and orders"
+    ],
+    "focus": "Alerts",
+    "focusTag": "A"
+  },
+  {
+    "screen": "Alerts",
+    "active": [
+      "Alerts"
+    ],
+    "focus": "Users and audit",
+    "focusTag": "A"
+  },
+  {
+    "screen": "Users and audit",
+    "active": [
+      "Users and audit"
+    ],
+    "focus": "Add User",
+    "focusTag": "BUTTON"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-25",
+  "postgresql_tests": 119,
+  "failures": 0,
+  "schema_paths": 133,
+  "schema_operations": 179,
+  "schema_warnings": 0,
+  "schema_errors": 0,
+  "production_check_errors": 0,
+  "production_check_warnings": [
+    "security.W005",
+    "security.W021"
+  ],
+  "docker_runtime_verified": false,
+  "vps_verified": false,
+  "strict_csp_browser_errors": []
+}

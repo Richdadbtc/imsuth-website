@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>IMSUTH PayPoint</title>
+  <link rel="icon" href="static/images/hospital%20logo.png">
+  <link rel="stylesheet" href="static/paypoint/app.css?v=20261011-4">
+  <link rel="stylesheet" href="static/paypoint/frontend.css?v=20261025-ready1">
+  <link rel="stylesheet" href="static/paypoint/layout-fixes.css?v=20261025-ready1">
+  <link rel="stylesheet" href="static/paypoint/target-dashboard.css?v=20261011-6">
+  <link rel="stylesheet" href="static/paypoint/target-polish.css?v=20261025-ready1">
+  <script src="config.js?v=20261025-ready1"></script>
+  <script type="module" src="static/paypoint/frontend.js?v=20261025-ready1"></script>
+</head>
+<body class="paypoint-static-ui">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <main id="main">
+    <section class="static-login" data-login-view hidden>
+      <div class="static-login-visual">
+        <img class="login-campus" src="static/images/imsuth-campus.jpg" alt="IMSUTH hospital campus">
+        <div class="login-story">
+          <div class="login-hospital-brand"><img src="static/images/hospital%20logo.png" alt="IMSUTH crest"><div><strong>IMO STATE UNIVERSITY<br>TEACHING HOSPITAL</strong><span>ORLU, IMO STATE</span></div></div>
+          <div class="login-product"><b>Pay<span>Point</span></b><p>Hospital Revenue Management System</p></div>
+          <h1>Secure Payments<br>for Better Healthcare</h1>
+          <p class="login-intro">IMSUTH PayPoint helps the hospital track, manage and monitor payments in one secure platform, supporting transparency, accountability and improved service delivery.</p>
+          <div class="login-features"><article><i>▣</i><div><b>Secure Payments</b><p>Multiple payment channels with payment verification</p></div></article><article><i>▥</i><div><b>Revenue Reporting</b><p>Track collections and generate reports</p></div></article><article><i>✓</i><div><b>Transparent Records</b><p>Payment records for accountability</p></div></article><article><i>♙</i><div><b>Improved Services</b><p>Support better patient care</p></div></article></div>
+        </div>
+        <div class="login-values"><span>♥ &nbsp; Patients First</span><span>♙ &nbsp; Accountability</span><span>▥ &nbsp; A Healthier Tomorrow</span></div>
+      </div>
+      <div class="static-login-panel">
+        <div class="login-tools"><button type="button" data-login-theme aria-label="Switch to dark theme" aria-pressed="false">☾</button><label><span class="sr-only">Language</span><select aria-label="Language"><option>EN</option></select></label></div>
+        <form class="auth-card" data-login-form>
+          <div class="login-hospital-brand login-card-brand"><img class="login-logo" src="static/images/hospital%20logo.png" alt="Imo State University Teaching Hospital crest"><div><strong>IMO STATE UNIVERSITY<br>TEACHING HOSPITAL</strong><span>ORLU, IMO STATE</span></div></div>
+          <div class="login-product"><b>Pay<span>Point</span></b><p>Hospital Revenue Management System</p></div>
+          <h1>Welcome Back</h1><p class="lede">Sign in to your account to continue</p>
+          <div class="alert alert-error" data-login-error role="alert" hidden></div>
+          <label class="field">Staff Username<span class="login-input-wrap"><i aria-hidden="true">✉</i><input name="username" autocomplete="username" placeholder="Enter your staff username" required></span></label>
+          <label class="field">Password<span class="login-input-wrap"><i aria-hidden="true">♙</i><input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button type="button" data-login-reveal aria-label="Show password" aria-pressed="false">◉</button></span></label>
+          <div class="login-options"><label><input type="checkbox" name="remember_username">Remember staff username</label><button type="button" data-login-forgot>Forgot password?</button></div>
+          <button class="button button-primary button-full" type="submit">Sign In <span aria-hidden="true">→</span></button>
+          <div class="login-divider"><span>or</span></div>
+          <button type="button" class="login-qr" disabled title="QR sign-in is not configured" data-login-help="QR sign-in is not connected. Please sign in with your staff username and password.">▦ &nbsp; Sign in with QR Code</button>
+          <p class="login-support">Need help? <button type="button" data-login-help="Contact your hospital ICT department using your established internal support directory. A public support address has not been configured.">Contact Support</button></p>
+          <p data-login-message class="login-feedback" role="status" hidden></p>
+          <p class="auth-notice">For authorised IMSUTH staff only. Activity is monitored and audited.</p>
+        </form>
+      </div>
+    </section>
+
+    <div class="app-shell" data-app-view hidden>
+      <aside class="sidebar" aria-label="Application navigation">
+        <a class="brand" href="#dashboard"><img class="brand-logo" src="static/images/hospital%20logo.png" alt=""><span><strong>IMSUTH <b>PayPoint</b></strong><small>Hospital Revenue Management System</small></span></a>
+        <nav class="side-nav" data-navigation aria-label="PayPoint sections"></nav>
+        <div class="sidebar-quick static-sidebar-quick">
+          <p>Quick actions</p>
+          <a href="#patient-registration">＋ Register Patient</a>
+          <a href="#billing-create">▤ Create Invoice</a>
+          <a href="#payments-verify">▣ Verify Payment</a>
+          <a href="#payments-receipt-reprints">▧ Print Receipt</a>
+        </div>
+        <div class="sidebar-foot"><img src="static/images/hospital%20logo.png" alt=""><span><strong>IMSUTH</strong><small>IMO STATE UNIVERSITY<br>TEACHING HOSPITAL</small><em><i></i> Online</em></span></div>
+      </aside>
+      <div class="workspace">
+        <header class="topbar">
+          <button class="icon-button menu-toggle" type="button" aria-label="Toggle menu">☰</button>
+          <label class="top-search"><b>⌕</b><input type="search" aria-label="Filter the current page" placeholder="Filter the current page" data-page-search></label>
+          <div class="environment"><span data-environment-label></span><b data-environment-copy></b></div>
+          <div class="top-actions"><button class="notification-trigger" type="button" aria-label="Notifications">♧<b>…</b></button><div class="user-avatar" aria-hidden="true">●</div><button class="user-menu-trigger" aria-label="Account menu" type="button" aria-expanded="false" aria-controls="user-menu"><span class="user-summary"><strong data-user-name></strong><small data-user-role></small></span><b>⌄</b></button><div class="user-menu" id="user-menu" hidden><a href="#my-profile">My Profile</a><a href="#change-password">Change Password</a><a href="#help-support">Help &amp; Support</a><button type="button" data-logout>Logout</button></div></div>
+        </header>
+        <div class="page-shell" data-page-content aria-live="polite"></div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

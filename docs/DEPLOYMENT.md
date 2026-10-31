@@ -8,9 +8,9 @@ For cPanel GitHub automation and the required GitHub secrets, see `docs/CPANEL-D
 - `IMSUTH_FORM_WEBHOOK_URL` — HTTPS endpoint owned or approved by IMSUTH
 - `IMSUTH_FORM_WEBHOOK_TOKEN` — secret stored only in the hosting environment
 
-Change `forms.mode` in `data/settings.json` to `production` only after the secure receiver, retention rules and incident owner are approved and an end-to-end test succeeds.
+Change `forms.mode` in `website/data/settings.json` to `production` only after the secure receiver, retention rules and incident owner are approved and an end-to-end test succeeds.
 
-The form endpoints require PHP 8.1 or newer with the cURL and mbstring extensions. Adjust the PHP-FPM socket in `deployment/nginx.conf.example` to match the production host. Copy the variable names from `deployment/forms.env.example` into the host's protected environment; never publish real tokens in this project.
+The form endpoints require PHP 8.1 or newer with the cURL and mbstring extensions. Adjust the PHP-FPM socket in `website/deployment/nginx.conf.example` to match the production host. Copy the variable names from `website/deployment/forms.env.example` into the host's protected environment; never publish real tokens in this project.
 
 ## Pre-deployment
 

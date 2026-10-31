@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Patients — IMSUTH PayPoint{% endblock %}
+{% block content %}
+<div class="patient-management">
+  <header class="patient-page-head"><div><h1>Patients</h1><p>Manage patient records, registration and billing history</p></div><a class="button button-primary" href="{% url 'patient-create' %}">+ Register Patient</a></header>
+
+  <section class="patient-kpis" aria-label="Patient registry summary">
+    <article><span>Total Patients</span><strong>{{ total_patients }}</strong><small>All registered records</small></article>
+    <article><span>New This Month</span><strong>{{ new_this_month }}</strong><small>Registered this month</small></article>
+    <article><span>Active Patients</span><strong>{{ active_patients }}</strong><small>Currently active records</small></article>
+    <article><span>Pending Records</span><strong>{{ pending_records }}</strong><small>Possible duplicate review</small></article>
+  </section>
+
+  <section class="patient-directory-card">
+    <form method="get" class="patient-filters">
+      <div class="field patient-search-field"><label for="patient-search">Search patients</label><input id="patient-search" name="q" value="{{ request.GET.q }}" placeholder="Patient name, ID or phone number"></div>
+      <div class="field"><label for="patient-department">Department</label><select id="patient-department" name="department"><option value="">All departments</option>{% for department in departments %}<option value="{{ department.pk }}"{% if request.GET.department == department.pk|stringformat:"s" %} selected{% endif %}>{{ department.name }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="patient-status">Status</label><select id="patient-status" name="status"><option value="">All statuses</option>{% for value,label in patient_statuses %}<option value="{{ value }}"{% if request.GET.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+      <button class="button button-secondary" type="submit">Apply filters</button>
+      {% if request.GET.q or request.GET.status or request.GET.department %}<a class="button button-quiet" href="{% url 'patient-list' %}">Clear</a>{% endif %}
+    </form>
+    <div class="patient-table-wrap"><table class="patient-table"><thead><tr><th>Patient ID</th><th>Full Name</th><th>Date of Birth</th><th>Gender</th><th>Phone Number</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+      {% for patient in patients %}<tr><td><a class="record-id" href="{% url 'patient-detail' patient.pk %}">{{ patient.patient_id }}</a></td><td><strong>{{ patient.full_name }}</strong><small>Registered {{ patient.created_at|date:"d M Y" }}</small></td><td>{{ patient.date_of_birth|date:"d M Y"|default:"Not recorded" }}</td><td>{{ patient.get_sex_display|default:"Not recorded" }}</td><td>{{ patient.phone|default:"Not recorded" }}</td><td><span class="status status-{{ patient.status }}">{{ patient.get_status_display }}</span></td><td><div class="table-actions"><a href="{% url 'patient-detail' patient.pk %}">View</a><a href="{% url 'patient-edit' patient.pk %}">Edit</a></div></td></tr>
+      {% empty %}<tr><td colspan="7" class="management-empty">No patients match the selected filters. Check the details before registering a new record.</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% include "includes/pagination.html" %}
+  </section>
+</div>
+{% endblock %}

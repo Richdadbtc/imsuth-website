@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": ".next",
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/paypoint",
+      "permanent": false
+    }
+  ],
+  "env": {
+    "DJANGO_API_ORIGIN": "https://api.imsuth.site"
+  }
+}

@@ -1,0 +1,70 @@
+.paypoint-static-ui .sidebar {
+  overflow: hidden;
+}
+
+.paypoint-static-ui .sidebar-foot {
+  width: 100%;
+  min-height: 118px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.paypoint-static-ui .sidebar-foot > img {
+  display: block;
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+  max-width: 58px;
+  max-height: 58px;
+  object-fit: contain;
+}
+
+.paypoint-static-ui .sidebar-foot > span {
+  min-width: 0;
+}
+
+.paypoint-static-ui .sidebar-foot strong,
+.paypoint-static-ui .sidebar-foot small,
+.paypoint-static-ui .sidebar-foot em {
+  display: block;
+}
+
+.paypoint-static-ui .sidebar-foot em {
+  margin-top: .35rem;
+  color: #dbe9ef;
+  font-size: .7rem;
+  font-style: normal;
+}
+
+.paypoint-static-ui .sidebar-foot i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: .3rem;
+  border-radius: 50%;
+  background: #20ce86;
+}
+
+.paypoint-static-ui .table-wrap,
+.paypoint-static-ui .management-table-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.paypoint-static-ui .metric-grid strong {
+  font-size: clamp(1.25rem, 1.9vw, 1.8rem);
+  white-space: nowrap;
+}
+
+@media (max-height: 760px) and (min-width: 901px) {
+  .paypoint-static-ui .sidebar-foot {
+    min-height: 78px;
+    padding-block: .55rem;
+  }
+
+  .paypoint-static-ui .sidebar-foot > img {
+    width: 42px;
+    height: 42px;
+  }
+}

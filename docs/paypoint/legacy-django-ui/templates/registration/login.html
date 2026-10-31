@@ -1,0 +1,39 @@
+{% extends "base.html" %}{% load static %}{% block title %}Staff sign in — IMSUTH PayPoint{% endblock %}{% block content %}
+<div class="login-screen">
+  <section class="login-visual" aria-label="IMSUTH campus">
+    <img src="{% static 'images/imsuth-campus.jpg' %}" alt="IMSUTH hospital campus">
+    <div class="login-visual-shade" aria-hidden="true"></div>
+    <div class="login-visual-content">
+      <p class="login-wordmark"><strong>IMSUTH</strong> PayPoint</p>
+      <h1>Hospital Revenue Management System</h1>
+      <p>Secure, transparent and efficient payment management for quality healthcare services.</p>
+      <ul class="login-benefits" aria-label="System benefits">
+        <li><strong>Secure</strong><span>Payments</span></li>
+        <li><strong>Accurate</strong><span>Records</span></li>
+        <li><strong>Real-time</strong><span>Reporting</span></li>
+        <li><strong>Better</strong><span>Healthcare</span></li>
+      </ul>
+    </div>
+  </section>
+  <section class="login-panel">
+    <div class="login-card">
+      <header class="login-branding">
+        <img src="{% static 'images/hospital logo.png' %}" alt="Imo State University Teaching Hospital crest">
+        <p><strong>IMSUTH</strong><span>PayPoint</span></p>
+        <small>Hospital Revenue Management System</small>
+      </header>
+      <div class="login-divider" aria-hidden="true"></div>
+      <div class="login-heading"><h1>Welcome Back</h1><p>Sign in to your account to continue</p></div>
+      {% if form.errors %}<div class="alert alert-error" role="alert">The username or password was not recognised. Please try again.</div>{% endif %}
+      {% if next and user.is_authenticated %}<div class="alert alert-warning" role="alert">Your account does not have access to that page.</div>{% endif %}
+      <form method="post" class="login-form" data-submit-state>{% csrf_token %}
+        <div class="field login-field"><label for="id_username">Username <span aria-hidden="true">*</span></label><div class="input-shell"><span class="input-icon" aria-hidden="true">ID</span><input id="id_username" name="username" autocomplete="username" placeholder="Enter your username" required autofocus></div></div>
+        <div class="field login-field"><label for="id_password">Password <span aria-hidden="true">*</span></label><div class="input-shell"><span class="input-icon" aria-hidden="true">••</span><input id="id_password" type="password" name="password" autocomplete="current-password" placeholder="Enter your password" required><button class="password-toggle" type="button" data-password-toggle aria-controls="id_password" aria-pressed="false">Show</button></div></div>
+        <div class="login-options"><label class="remember-control"><input type="checkbox" name="remember_me" value="1"> <span>Remember me for this workday</span></label><a href="{% url 'password_reset' %}">Forgot your password?</a></div>
+        <input type="hidden" name="next" value="{{ next }}"><button class="button button-primary login-submit" type="submit" data-loading-label="Signing in…">Sign In <span aria-hidden="true">→</span></button>
+      </form>
+      <div class="login-security"><strong aria-hidden="true">i</strong><p>This system is for authorised IMSUTH staff only.<br>All activities are monitored and audited.</p></div>
+    </div>
+  </section>
+</div>
+{% endblock %}

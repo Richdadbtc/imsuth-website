@@ -1,0 +1,58 @@
+[
+  {
+    "screen": "record-payment",
+    "active": [
+      "Record payment"
+    ],
+    "scroll": 390,
+    "width": 390
+  },
+  {
+    "screen": "department-desk",
+    "active": [
+      "Department desk"
+    ],
+    "scroll": 390,
+    "width": 390
+  },
+  {
+    "screen": "departments",
+    "active": [
+      "Departments"
+    ],
+    "scroll": 390,
+    "width": 390
+  },
+  {
+    "screen": "services",
+    "active": [
+      "Services and prices"
+    ],
+    "scroll": 390,
+    "width": 390
+  },
+  {
+    "screen": "cash",
+    "active": [
+      "Cash points and orders"
+    ],
+    "scroll": 390,
+    "width": 390
+  },
+  {
+    "screen": "alerts",
+    "active": [
+      "Alerts"
+    ],
+    "scroll": 390,
+    "width": 390
+  },
+  {
+    "screen": "users",
+    "active": [
+      "Users and audit"
+    ],
+    "scroll": 390,
+    "width": 390
+  }
+]

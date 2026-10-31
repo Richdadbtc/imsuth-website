@@ -1,0 +1,371 @@
+{
+  "version": "2026-10-28.1",
+  "status": "proposed-unverified",
+  "notice": "Inactive placeholders only; hospital review is required. No services, tariffs or prices are included.",
+  "entries": [
+    {
+      "kind": "department",
+      "code": "GOPD",
+      "name": "General Outpatient Department (GOPD)",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "MED",
+      "name": "Internal Medicine",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "SUR",
+      "name": "General Surgery",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "OBS",
+      "name": "Obstetrics & Gynaecology",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "PED",
+      "name": "Paediatrics",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "EME",
+      "name": "Accident & Emergency",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "ORT",
+      "name": "Orthopaedics & Trauma",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "ENT",
+      "name": "Ear, Nose & Throat (ENT)",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "OPH",
+      "name": "Ophthalmology",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "DEN",
+      "name": "Dental & Maxillofacial Surgery",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "DER",
+      "name": "Dermatology",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "PSY",
+      "name": "Psychiatry & Mental Health",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "URO",
+      "name": "Urology",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "ANA",
+      "name": "Anaesthesia",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "ICU",
+      "name": "Intensive Care Unit (ICU)",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "RAD",
+      "name": "Radiology & Imaging",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "LAB",
+      "name": "Medical Laboratory Services",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "HIS",
+      "name": "Histopathology",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "BBT",
+      "name": "Blood Bank & Transfusion",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "PHA",
+      "name": "Pharmacy",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "PHY",
+      "name": "Physiotherapy",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "NUT",
+      "name": "Nutrition & Dietetics",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "NUR",
+      "name": "Nursing Services",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "FAM",
+      "name": "Family Medicine",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "PUB",
+      "name": "Public Health & Community Medicine",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "INF",
+      "name": "Infectious Diseases",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "REN",
+      "name": "Renal Unit / Dialysis",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "END",
+      "name": "Endoscopy Unit",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "THR",
+      "name": "Operating Theatre",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "WARD",
+      "name": "Wards & Inpatient Services",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "REC",
+      "name": "Medical Records",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "NHIA",
+      "name": "Health Insurance / NHIA",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "SOC",
+      "name": "Social Welfare",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "MOR",
+      "name": "Mortuary Services",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "EDU",
+      "name": "Medical Education & Training",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "ADM",
+      "name": "Hospital Administration",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "OCC",
+      "name": "Occupational Therapy",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "SLT",
+      "name": "Speech & Language Therapy",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "BIO",
+      "name": "Medical Equipment & Biomedical Services",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "SPC",
+      "name": "Special Clinics",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "category",
+      "code": "IMAGING",
+      "name": "Imaging",
+      "department_code": "RAD",
+      "parent_code": ""
+    },
+    {
+      "kind": "category",
+      "code": "XRAY",
+      "name": "X-ray",
+      "department_code": "RAD",
+      "parent_code": "IMAGING"
+    },
+    {
+      "kind": "category",
+      "code": "ULTRASOUND",
+      "name": "Ultrasound",
+      "department_code": "RAD",
+      "parent_code": "IMAGING"
+    },
+    {
+      "kind": "category",
+      "code": "LABORATORY",
+      "name": "Laboratory",
+      "department_code": "LAB",
+      "parent_code": ""
+    },
+    {
+      "kind": "category",
+      "code": "HAEMATOLOGY",
+      "name": "Haematology",
+      "department_code": "LAB",
+      "parent_code": "LABORATORY"
+    },
+    {
+      "kind": "category",
+      "code": "MICROBIOLOGY",
+      "name": "Microbiology",
+      "department_code": "LAB",
+      "parent_code": "LABORATORY"
+    },
+    {
+      "kind": "category",
+      "code": "OBSTETRICS",
+      "name": "Obstetrics",
+      "department_code": "OBS",
+      "parent_code": ""
+    },
+    {
+      "kind": "category",
+      "code": "GYNAECOLOGY",
+      "name": "Gynaecology",
+      "department_code": "OBS",
+      "parent_code": ""
+    },
+    {
+      "kind": "category",
+      "code": "PHARMACY",
+      "name": "Pharmacy",
+      "department_code": "PHA",
+      "parent_code": ""
+    },
+    {
+      "kind": "category",
+      "code": "SURGERY",
+      "name": "Surgery",
+      "department_code": "SUR",
+      "parent_code": ""
+    },
+    {
+      "kind": "category",
+      "code": "REGISTRATION",
+      "name": "Registration",
+      "department_code": "REC",
+      "parent_code": ""
+    },
+    {
+      "kind": "category",
+      "code": "MED-REPORTS",
+      "name": "Medical Reports",
+      "department_code": "REC",
+      "parent_code": ""
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>{% block title %}IMSUTH PayPoint{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'paypoint/app.css' %}?v=20261011-3">
+  <script defer src="{% static 'paypoint/app.js' %}?v=20261011-2"></script>
+</head>
+<body class="{% if user.is_authenticated %}app-body{% else %}auth-body{% endif %}">
+<a class="skip-link" href="#main">Skip to content</a>
+{% if user.is_authenticated %}
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="Application navigation">
+    <a class="brand" href="{% url 'dashboard' %}">
+      <img class="brand-logo" src="{% static 'images/hospital logo.png' %}" alt="">
+      <span><strong>IMSUTH <b>PayPoint</b></strong><small>Hospital Revenue Management System</small></span>
+    </a>
+    <nav class="side-nav">
+      <a href="{% url 'dashboard' %}"><span aria-hidden="true">⌂</span>Dashboard</a>
+      {% if user.role == 'front_desk' or user.role == 'super_admin' %}
+      <a href="{% url 'patient-list' %}"><span aria-hidden="true">◎</span>Patients</a>
+      {% else %}
+      <span class="nav-disabled" aria-disabled="true"><span aria-hidden="true">◎</span>Patients</span>
+      {% endif %}
+      <a href="{% url 'invoice-list' %}"><span aria-hidden="true">▤</span>Billing</a>
+      {% if user.role == 'cashier' or user.role == 'finance' or user.role == 'auditor' or user.role == 'management' %}
+      <a href="{% url 'transaction-list' %}"><span aria-hidden="true">▣</span>Payments</a>
+      {% else %}
+      <span class="nav-disabled" aria-disabled="true"><span aria-hidden="true">▣</span>Payments</span>
+      {% endif %}
+      {% if user.role == 'finance' or user.role == 'auditor' or user.role == 'management' %}
+      <a href="{% url 'finance-workspace' %}"><span aria-hidden="true">₦</span>Finance</a>
+      {% else %}
+      <span class="nav-disabled" aria-disabled="true"><span aria-hidden="true">₦</span>Finance</span>
+      {% endif %}
+      {% if user.role == 'super_admin' %}
+      <a href="{% url 'staff-list' %}"><span aria-hidden="true">⚙</span>Administration</a>
+      {% else %}
+      <span class="nav-disabled" aria-disabled="true"><span aria-hidden="true">⚙</span>Administration</span>
+      {% endif %}
+      {% if user.role == 'finance' or user.role == 'auditor' or user.role == 'management' %}
+      <a href="{% url 'management-dashboard' %}"><span aria-hidden="true">▥</span>Reports</a>
+      {% else %}
+      <span class="nav-disabled" aria-disabled="true"><span aria-hidden="true">▥</span>Reports</span>
+      {% endif %}
+    </nav>
+    {% if user.role == 'management' or user.role == 'finance' or user.role == 'auditor' %}
+    <div class="sidebar-quick">
+      <p>Quick actions</p>
+      <a href="{% url 'management-dashboard' %}">Revenue dashboard</a>
+      <a href="{% url 'finance-workspace' %}">Review approvals</a>
+      <a href="{% url 'reconciliation-list' %}">Reconciliation</a>
+      <a href="{% url 'revenue-export' %}">Export report</a>
+    </div>
+    {% endif %}
+    <div class="sidebar-foot">
+      <img src="{% static 'images/hospital logo.png' %}" alt="">
+      <span><strong>IMSUTH</strong><small>IMO STATE UNIVERSITY<br>TEACHING HOSPITAL</small><em><i></i> Online</em></span>
+    </div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <button class="icon-button menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false"><span class="sr-only">Toggle menu</span>☰</button>
+      <button class="icon-button sidebar-collapse" type="button" aria-controls="sidebar" aria-expanded="true"><span class="sr-only">Collapse sidebar</span>☰</button>
+      <label class="top-search"><span class="sr-only">Search navigation</span><b aria-hidden="true">⌕</b><input type="search" placeholder="Search pages, patients, invoices, receipts…" data-nav-search><small data-nav-search-status aria-live="polite"></small></label>
+      <div class="environment"><span>STAGING</span>Synthetic data only</div>
+      <div class="top-actions">
+        <a class="icon-button notification-button" href="{% url 'notification-list' %}" aria-label="{{ unread_notification_count }} unread notifications"><span aria-hidden="true">●</span>{% if unread_notification_count %}<b>{{ unread_notification_count }}</b>{% endif %}</a>
+        <details class="profile-menu">
+          <summary class="user-summary"><strong>{{ user.get_full_name|default:user.username }}</strong><small>{{ user.get_role_display }}</small></summary>
+          <div><a href="{% url 'profile' %}">My profile</a><a href="{% url 'password_change' %}">Change password</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form></div>
+        </details>
+      </div>
+    </header>
+    <main id="main" class="page-shell" tabindex="-1">
+      {% if messages %}<div class="message-stack" aria-live="polite">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}" data-toast>{{ message }}<button type="button" aria-label="Dismiss notification" data-dismiss-toast>×</button></div>{% endfor %}</div>{% endif %}
+      {% block breadcrumbs %}{% endblock %}
+{% else %}
+<header class="auth-header"><div class="brand"><img class="brand-logo" src="{% static 'images/hospital logo.png' %}" alt=""><span><strong>IMSUTH</strong><small>PayPoint</small></span></div><span class="secure-label">Secure staff access</span></header>
+<main id="main" class="auth-shell">
+{% endif %}
+{% block content %}{% endblock %}
+{% if user.is_authenticated %}</main></div></div>{% else %}</main>{% endif %}
+</body>
+</html>

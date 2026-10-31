@@ -1,0 +1,31 @@
+# Host-level TLS terminator. Replace the hostname, certificate paths and allowlist
+# only after the staging deployment change is approved.
+server {
+    listen 443 ssl http2;
+    server_name staging-paypoint.imsuth.org;
+
+    ssl_certificate /etc/letsencrypt/live/staging-paypoint.imsuth.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/staging-paypoint.imsuth.org/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_tickets off;
+
+    # Require both network restriction and reviewer credentials.
+    allow 127.0.0.1; # Replace/add approved VPN or office egress ranges.
+    deny all;
+    auth_basic "IMSUTH PayPoint staging";
+    auth_basic_user_file /etc/nginx/staging-paypoint.htpasswd;
+
+    location /paypoint/ {
+        proxy_pass http://127.0.0.1:18080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}
+
+server {
+    listen 80;
+    server_name staging-paypoint.imsuth.org;
+    return 301 https://$host$request_uri;
+}

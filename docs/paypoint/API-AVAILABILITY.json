@@ -1,0 +1,853 @@
+{
+  "date": "2026-10-25",
+  "canonical_prefix": "/api/v1/",
+  "equivalent_frontend_prefix": "/paypoint/api/v1/",
+  "path_count": 133,
+  "operation_count": 179,
+  "endpoints": [
+    {
+      "path": "/api/v1/alerts/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/alerts/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/alerts/{id}/assign/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/alerts/{id}/resolve/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/alerts/{id}/start-review/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/alerts/analytics/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/alerts/assignees/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/alerts/summary/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/approvals/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/approvals/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/approvals/{id}/decide/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/approvals/{id}/history/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/attachments/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/audit-events/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/audit-events/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/audit-logs/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/audit-logs/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/audit-logs/summary/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/capabilities/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-orders/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-orders/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-orders/{id}/approve/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-orders/{id}/reject/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-orders/approval-limits/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-points/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-points/{id}/",
+      "methods": [
+        "GET",
+        "PATCH"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-points/{id}/collections/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-points/{id}/collections/{evidence_id}/attachment/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-points/{id}/summary/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/cash-points/officers/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/dashboard/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/dashboard/{metric}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/department-desk/activity/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/department-desk/receipts/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/department-desk/receipts/{reference}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/department-desk/receipts/{reference}/verify/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/department-desk/service-items/{item_id}/deliver/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/department-desk/services/pending/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/department-desk/summary/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/departments/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/departments/{id}/",
+      "methods": [
+        "GET",
+        "PATCH"
+      ]
+    },
+    {
+      "path": "/api/v1/departments/{id}/collections/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/departments/{id}/services/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/departments/{id}/staff/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/departments/{id}/summary/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/departments/{id}/transactions/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/departments/{id}/trends/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/departments/analytics/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/discrepancies/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/discrepancies/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/discrepancies/{id}/request_resolution/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/help/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/inbox/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/inbox/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/inbox/{id}/read/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/inbox/unread-count/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/integrations/{operation}/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/invoices/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/invoices/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/invoices/{id}/balance/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/invoices/{id}/corrections/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/notifications/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/notifications/{id}/",
+      "methods": [
+        "GET",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ]
+    },
+    {
+      "path": "/api/v1/notifications/{id}/enqueue/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/patients/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/patients/{id}/",
+      "methods": [
+        "GET",
+        "PATCH"
+      ]
+    },
+    {
+      "path": "/api/v1/patients/search/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/payments/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/payments/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/payments/{id}/retry/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/payments/{id}/verification-status/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/payments/{id}/verify/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/payments/test-webhook/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/profile/",
+      "methods": [
+        "GET",
+        "PATCH"
+      ]
+    },
+    {
+      "path": "/api/v1/profile/deactivate/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/profile/password/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/profile/photo/",
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "path": "/api/v1/receipt-reprints/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/receipt-reprints/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/receipts/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/receipts/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/receipts/{id}/print/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/receipts/verify/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/reconciliation-batches/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/reconciliation-batches/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/reconciliation-batches/import/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/refunds/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/refunds/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/reports/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/reports/{report}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/reversals/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/reversals/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/roles/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/roles/{id}/",
+      "methods": [
+        "GET",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ]
+    },
+    {
+      "path": "/api/v1/roles/{id}/assign/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/roles/permission-choices/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/services/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/services/{id}/",
+      "methods": [
+        "GET",
+        "PATCH"
+      ]
+    },
+    {
+      "path": "/api/v1/services/{id}/tariff/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/services/{id}/tariff-proposals/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/services/{id}/tariffs/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/services/categories/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/services/price-history/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/session/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/session/login/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/session/logout/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/session/recovery/complete/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/session/recovery/request/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/session/recovery/verify/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/settings/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/settings/{section}/",
+      "methods": [
+        "GET",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ]
+    },
+    {
+      "path": "/api/v1/settlements/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/settlements/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/staff/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/staff/{id}/",
+      "methods": [
+        "GET",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ]
+    },
+    {
+      "path": "/api/v1/staff/{id}/deactivate/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/support-tickets/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/support-tickets/{id}/",
+      "methods": [
+        "GET",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ]
+    },
+    {
+      "path": "/api/v1/support-tickets/{id}/attachments/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/support-tickets/{id}/reply/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/tariff-proposals/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/tariff-proposals/{id}/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/tariff-proposals/{id}/approve/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/tariff-proposals/{id}/reject/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/tariffs/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/tariffs/{id}/",
+      "methods": [
+        "GET",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ]
+    },
+    {
+      "path": "/api/v1/tariffs/{id}/approve/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/users/",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/users/{id}/",
+      "methods": [
+        "GET",
+        "PATCH"
+      ]
+    },
+    {
+      "path": "/api/v1/users/{id}/activate/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/users/{id}/deactivate/",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "path": "/api/v1/users/{id}/permissions/",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "path": "/api/v1/users/role_choices/",
+      "methods": [
+        "GET"
+      ]
+    }
+  ]
+}

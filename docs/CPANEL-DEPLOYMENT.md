@@ -27,7 +27,7 @@ When cPanel clones a GitHub repository, use **Git Version Control → Manage →
 
 ## Production form activation
 
-The website forms remain in development mode until IMSUTH configures an approved HTTPS receiver. Configure the protected server variables documented in `docs/DEPLOYMENT.md`, test on staging, and only then change `forms.mode` in `data/settings.json` to `production`.
+The website forms remain in development mode until IMSUTH configures an approved HTTPS receiver. Configure the protected server variables documented in `docs/DEPLOYMENT.md`, test on staging, and only then change `forms.mode` in `website/data/settings.json` to `production`.
 
 ## First deployment check
 

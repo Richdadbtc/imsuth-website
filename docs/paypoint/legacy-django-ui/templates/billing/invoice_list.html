@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Billing — IMSUTH PayPoint{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><span>Collections</span><span>/</span><strong>Invoices</strong></nav><div class="page-heading"><div><p class="eyebrow">Billing</p><h1>Invoices</h1><p>Authoritative amounts are calculated from approved tariff versions.</p></div>{% if user.role == 'front_desk' or user.role == 'cashier' or user.role == 'finance' or user.role == 'super_admin' %}<a class="button button-primary" href="{% url 'invoice-create' %}">New invoice</a>{% endif %}</div>
+<form method="get" class="filter-bar"><div class="field"><label for="invoice-search">Search invoices</label><input id="invoice-search" name="q" value="{{ request.GET.q }}" placeholder="Invoice, payment reference or patient"></div><button class="button button-secondary" type="submit">Search</button></form>
+<div class="table-wrap"><table class="data-table"><thead><tr><th>Invoice</th><th>Patient</th><th>Department</th><th>Total</th><th>Balance</th><th>Status</th></tr></thead><tbody>
+{% for invoice in invoices %}<tr><td><a href="{% url 'invoice-detail' invoice.pk %}">{{ invoice.invoice_number }}</a><small class="block">{{ invoice.payment_reference }}</small></td><td>{{ invoice.patient.patient_id }}<small class="block">{{ invoice.patient.last_name }}, {{ invoice.patient.first_name }}</small></td><td>{{ invoice.department.name }}</td><td>{{ invoice.currency }} {{ invoice.total_amount }}</td><td><strong>{{ invoice.currency }} {{ invoice.outstanding_balance }}</strong></td><td><span class="status status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></td></tr>{% empty %}<tr><td colspan="6" class="empty-state">No matching invoices.</td></tr>{% endfor %}
+</tbody></table></div>
+{% include "includes/pagination.html" %}
+{% endblock %}

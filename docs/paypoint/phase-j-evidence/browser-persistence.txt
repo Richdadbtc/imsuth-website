@@ -1,0 +1,10 @@
+49 objects imported automatically (use -v 2 for details).
+
+User edit preserved department: UAT Cashier Edited JLAB uat-cashier@example.invalid
+Service edit preserved metadata: Laboratory Per Service Synthetic browser edit retained after refresh.
+Cash approvals: [('Synthetic browser request', 'pending'), ('Synthetic pending request', 'approved')]
+Cash evidence with attachments: 1
+Confirmed/pending: 4 31
+Official receipts: 4 Delivery records: 1
+Alert statuses: [('J-ALERT-TWO', 'open'), ('J-ALERT-ONE', 'resolved')]
+Sensitive value in audit: False

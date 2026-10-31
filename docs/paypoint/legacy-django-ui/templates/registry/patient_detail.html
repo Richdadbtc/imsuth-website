@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ patient.patient_id }} — IMSUTH PayPoint{% endblock %}
+{% block content %}
+<div class="patient-profile">
+  <nav class="breadcrumbs"><a href="{% url 'patient-list' %}">Patients</a><span>/</span><strong>{{ patient.patient_id }}</strong></nav>
+  <header class="patient-profile-head">
+    <div class="patient-avatar" aria-hidden="true">{{ patient.initials }}</div>
+    <div><p class="eyebrow">Patient profile</p><h1>{{ patient.full_name }}</h1><p class="record-id">{{ patient.patient_id }}</p></div>
+    <span class="status status-{{ patient.status }}">{{ patient.get_status_display }}</span>
+    <a class="button button-secondary" href="{% url 'patient-edit' patient.pk %}">Edit Patient</a>
+  </header>
+
+  <div class="patient-profile-layout">
+    <section class="patient-profile-main">
+      <div class="patient-tabs" role="tablist" aria-label="Patient information">
+        <button type="button" role="tab" aria-selected="true" aria-controls="patient-overview" data-patient-tab="patient-overview">Overview</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="patient-billing" data-patient-tab="patient-billing">Billing History <span>{{ invoice_total }}</span></button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="patient-invoices" data-patient-tab="patient-invoices">Invoices</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="patient-payments" data-patient-tab="patient-payments">Payments <span>{{ payment_total }}</span></button>
+      </div>
+
+      <div class="patient-tab-panel" id="patient-overview" role="tabpanel">
+        <h2>Patient Information</h2><dl class="profile-details">
+          <div><dt>Full name</dt><dd>{{ patient.full_name }}</dd></div>
+          <div><dt>Date of birth</dt><dd>{{ patient.date_of_birth|date:"d M Y"|default:"Not recorded" }}</dd></div>
+          <div><dt>Approximate age</dt><dd>{{ patient.approximate_age|default:"Not recorded" }}</dd></div>
+          <div><dt>Gender</dt><dd>{{ patient.get_sex_display|default:"Not recorded" }}</dd></div>
+          <div><dt>Phone number</dt><dd>{{ patient.phone|default:"Not recorded" }}</dd></div>
+          <div><dt>Email address</dt><dd>{{ patient.email|default:"Not recorded" }}</dd></div>
+          <div class="wide"><dt>Address</dt><dd>{{ patient.address|default:"Not recorded" }}</dd></div>
+          <div class="wide"><dt>Emergency contact</dt><dd>{{ patient.emergency_contact|default:"Not recorded" }}</dd></div>
+          <div><dt>Registered by</dt><dd>{{ patient.registered_by.get_full_name|default:patient.registered_by.username }}</dd></div>
+          <div><dt>Registration date</dt><dd>{{ patient.created_at|date:"d M Y, H:i" }}</dd></div>
+        </dl>
+      </div>
+
+      <div class="patient-tab-panel" id="patient-billing" role="tabpanel" hidden>
+        <div class="management-card-head"><h2>Billing History</h2><a href="{% url 'invoice-create' %}?patient={{ patient.pk }}">Create invoice</a></div>
+        <div class="patient-table-wrap"><table class="patient-table"><thead><tr><th>Invoice</th><th>Department</th><th>Total</th><th>Balance</th><th>Status</th></tr></thead><tbody>{% for invoice in invoices %}<tr><td><a href="{% url 'invoice-detail' invoice.pk %}">{{ invoice.invoice_number }}</a></td><td>{{ invoice.department.name }}</td><td>{{ invoice.currency }} {{ invoice.total_amount }}</td><td>{{ invoice.currency }} {{ invoice.outstanding_balance }}</td><td><span class="status status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></td></tr>{% empty %}<tr><td colspan="5" class="management-empty">No billing history.</td></tr>{% endfor %}</tbody></table></div>
+      </div>
+
+      <div class="patient-tab-panel" id="patient-invoices" role="tabpanel" hidden>
+        <div class="management-card-head"><h2>Invoices</h2><a href="{% url 'invoice-create' %}?patient={{ patient.pk }}">New invoice</a></div>
+        <div class="patient-table-wrap"><table class="patient-table"><thead><tr><th>Invoice</th><th>Issued</th><th>Amount</th><th>Paid</th><th>Status</th></tr></thead><tbody>{% for invoice in invoices %}<tr><td><a href="{% url 'invoice-detail' invoice.pk %}">{{ invoice.invoice_number }}</a></td><td>{{ invoice.issued_at|date:"d M Y" }}</td><td>{{ invoice.currency }} {{ invoice.total_amount }}</td><td>{{ invoice.currency }} {{ invoice.amount_paid }}</td><td><span class="status status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></td></tr>{% empty %}<tr><td colspan="5" class="management-empty">No invoices created.</td></tr>{% endfor %}</tbody></table></div>
+      </div>
+
+      <div class="patient-tab-panel" id="patient-payments" role="tabpanel" hidden>
+        <h2>Payments</h2><div class="patient-table-wrap"><table class="patient-table"><thead><tr><th>Reference</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead><tbody>{% for payment in payments %}<tr><td><a href="{% url 'payment-detail' payment.pk %}">{{ payment.reference }}</a></td><td>{{ payment.currency }} {{ payment.amount }}</td><td>{{ payment.get_channel_display }}</td><td><span class="status status-{{ payment.status }}">{{ payment.get_status_display }}</span></td><td>{{ payment.created_at|date:"d M Y, H:i" }}</td></tr>{% empty %}<tr><td colspan="5" class="management-empty">No payments recorded.</td></tr>{% endfor %}</tbody></table></div>
+      </div>
+    </section>
+
+    <aside class="patient-profile-side">
+      <section class="management-card"><h2>Quick Actions</h2><a class="button button-primary button-full" href="{% url 'invoice-create' %}?patient={{ patient.pk }}">Create Invoice</a><a class="button button-secondary button-full" href="#patient-invoices" data-open-patient-tab="patient-invoices">View All Invoices</a><a class="button button-secondary button-full" href="#patient-payments" data-open-patient-tab="patient-payments">View All Payments</a></section>
+      <section class="management-card"><h2>Record Status</h2><dl class="detail-list"><div><dt>Status</dt><dd>{{ patient.get_status_display }}</dd></div><div><dt>Invoices</dt><dd>{{ invoice_total }}</dd></div><div><dt>Payments</dt><dd>{{ payment_total }}</dd></div><div><dt>Last updated</dt><dd>{{ patient.updated_at|date:"d M Y" }}</dd></div></dl></section>
+    </aside>
+  </div>
+</div>
+{% endblock %}

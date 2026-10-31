@@ -1,0 +1,15 @@
+.git
+.env
+.venv
+__pycache__
+*.pyc
+*.sqlite3
+*.log
+htmlcov
+media
+staticfiles
+deployment/*.env
+
+deployment/secrets/
+**/*.pem
+**/*.key

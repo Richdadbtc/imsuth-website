@@ -1,0 +1,97 @@
+[
+  {
+    "route": "admin-departments",
+    "heading": "Departments",
+    "errors": 0
+  },
+  {
+    "route": "admin-services",
+    "heading": "Services and Prices",
+    "errors": 0
+  },
+  {
+    "route": "cash-points",
+    "heading": "Cash Points and Orders",
+    "errors": 0
+  },
+  {
+    "route": "alerts",
+    "heading": "Alerts",
+    "errors": 0
+  },
+  {
+    "route": "users-audit",
+    "heading": "Users and Audit",
+    "errors": 0
+  },
+  {
+    "route": "admin-roles",
+    "heading": "Roles & Permissions",
+    "errors": 0
+  },
+  {
+    "route": "admin-tariffs",
+    "heading": "Tariff Management",
+    "errors": 0
+  },
+  {
+    "route": "admin-settings",
+    "heading": "System Settings",
+    "errors": 0
+  },
+  {
+    "route": "admin-notifications",
+    "heading": "Notifications Management",
+    "errors": 0
+  },
+  {
+    "route": "finance-approvals",
+    "heading": "Approval Queue",
+    "errors": 0
+  },
+  {
+    "route": "finance-reconciliation",
+    "heading": "Bank Reconciliation",
+    "errors": 0
+  },
+  {
+    "route": "payments-receipt-verification",
+    "heading": "Receipt Verification",
+    "errors": 0
+  },
+  {
+    "route": "reports-revenue",
+    "heading": "Revenue Reports",
+    "errors": 0
+  },
+  {
+    "route": "reports-daily",
+    "heading": "Daily Collection Report",
+    "errors": 0
+  },
+  {
+    "route": "reports-channel",
+    "heading": "Payment Channel Report",
+    "errors": 0
+  },
+  {
+    "route": "reports-patients",
+    "heading": "Patient Registration Report",
+    "errors": 0
+  },
+  {
+    "route": "reports-system",
+    "heading": "System Activity Report",
+    "errors": 0
+  },
+  {
+    "route": "my-profile",
+    "heading": "User Profile & Account Settings",
+    "errors": 0
+  },
+  {
+    "route": "help-support",
+    "heading": "Help & Support",
+    "errors": 0
+  }
+]

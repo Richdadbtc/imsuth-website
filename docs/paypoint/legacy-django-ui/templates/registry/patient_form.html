@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit {{ object.patient_id }}{% else %}Register patient{% endif %} — IMSUTH PayPoint{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'patient-list' %}">Patients</a><span>/</span><strong>{% if object %}Edit patient{% else %}New registration{% endif %}</strong></nav>
+<div class="page-heading"><div><p class="eyebrow">Front desk</p><h1>{% if object %}Edit Patient Details{% else %}Register a Patient{% endif %}</h1><p>{% if object %}Authorised changes are recorded in the patient audit history.{% else %}Search for an existing patient first. Required fields are marked.{% endif %}</p></div></div>
+{% if not object %}<div class="workflow"><span class="active">1 Patient</span><span>2 Service</span><span>3 Invoice</span><span>4 Payment</span><span>5 Receipt</span></div>{% endif %}
+<form method="post" class="panel form-panel" data-submit-state>{% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="form-grid">{% for field in form %}<div class="field {% if field.name == 'address' %}span-2{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span aria-hidden="true"> *</span>{% endif %}</label>{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>{% endfor %}</div>
+  <div class="form-actions"><a class="button button-secondary" href="{% if object %}{% url 'patient-detail' object.pk %}{% else %}{% url 'patient-list' %}{% endif %}">Cancel</a><button class="button button-primary" type="submit" data-loading-label="Saving…">{% if object %}Save Changes{% else %}Save Patient{% endif %}</button></div>
+</form>
+{% endblock %}

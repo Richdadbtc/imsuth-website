@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /docs/
-Disallow: /deployment/
-
-Sitemap: https://www.imsuth.org/sitemap.xml

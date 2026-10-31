@@ -1,0 +1,70 @@
+ERROR: test_admin_staff_and_catalogue_controls_are_role_restricted (apps.common.test_complete_frontend.CompleteFrontendTests.test_admin_staff_and_catalogue_controls_are_role_restricted)
+Missing name: staff-list
+
+ERROR: test_authenticated_catalogue_profile_and_print_screens_render (apps.common.test_complete_frontend.CompleteFrontendTests.test_authenticated_catalogue_profile_and_print_screens_render)
+Missing name: department-list
+
+ERROR: test_billing_correction_creates_request_without_mutating_invoice (apps.common.test_complete_frontend.CompleteFrontendTests.test_billing_correction_creates_request_without_mutating_invoice)
+Missing name: billing-correction
+
+ERROR: test_finance_can_create_immutable_tariff_version (apps.common.test_complete_frontend.CompleteFrontendTests.test_finance_can_create_immutable_tariff_version)
+Missing name: tariff-create
+
+ERROR: test_management_dashboard_renders_live_native_chart_data (apps.common.test_complete_frontend.CompleteFrontendTests.test_management_dashboard_renders_live_native_chart_data)
+Missing name: management-dashboard
+
+ERROR: test_multi_line_invoice_is_calculated_by_backend_tariffs (apps.common.test_complete_frontend.CompleteFrontendTests.test_multi_line_invoice_is_calculated_by_backend_tariffs)
+Missing name: invoice-create
+
+ERROR: test_patient_directory_filters_and_metrics_render (apps.common.test_complete_frontend.CompleteFrontendTests.test_patient_directory_filters_and_metrics_render)
+Missing name: patient-list
+
+ERROR: test_patient_edit_creates_audit_revision (apps.common.test_complete_frontend.CompleteFrontendTests.test_patient_edit_creates_audit_revision)
+Missing name: patient-edit
+
+ERROR: test_reconciliation_import_and_notification_are_user_scoped (apps.common.test_complete_frontend.CompleteFrontendTests.test_reconciliation_import_and_notification_are_user_scoped)
+Missing name: notification-list
+
+ERROR: test_cashier_can_initiate_but_not_confirm_payment (apps.common.test_phase_h_ui.PhaseHUITests.test_cashier_can_initiate_but_not_confirm_payment)
+Missing name: invoice-pay
+
+ERROR: test_core_templates_render_at_mobile_safe_markup (apps.common.test_phase_h_ui.PhaseHUITests.test_core_templates_render_at_mobile_safe_markup)
+Missing name: dashboard
+
+ERROR: test_front_desk_can_register_patient_and_generate_invoice (apps.common.test_phase_h_ui.PhaseHUITests.test_front_desk_can_register_patient_and_generate_invoice)
+Missing name: patient-create
+
+ERROR: test_login_and_password_reset_templates_render (apps.common.test_phase_h_ui.PhaseHUITests.test_login_and_password_reset_templates_render)
+Missing name: login
+
+ERROR: test_login_remember_me_controls_session_lifetime (apps.common.test_phase_h_ui.PhaseHUITests.test_login_remember_me_controls_session_lifetime)
+Missing name: login
+
+ERROR: test_role_restricted_screens_are_enforced_server_side (apps.common.test_phase_h_ui.PhaseHUITests.test_role_restricted_screens_are_enforced_server_side)
+Missing name: patient-list
+
+ERROR: test_financial_dashboard_role_matrix (apps.common.test_staging_readiness.SevenRolePermissionTests.test_financial_dashboard_role_matrix) (role='super_admin')
+Missing name: management-dashboard
+
+ERROR: test_financial_dashboard_role_matrix (apps.common.test_staging_readiness.SevenRolePermissionTests.test_financial_dashboard_role_matrix) (role='management')
+Missing name: management-dashboard
+
+ERROR: test_financial_dashboard_role_matrix (apps.common.test_staging_readiness.SevenRolePermissionTests.test_financial_dashboard_role_matrix) (role='finance')
+Missing name: management-dashboard
+
+ERROR: test_financial_dashboard_role_matrix (apps.common.test_staging_readiness.SevenRolePermissionTests.test_financial_dashboard_role_matrix) (role='auditor')
+Missing name: management-dashboard
+
+ERROR: test_financial_dashboard_role_matrix (apps.common.test_staging_readiness.SevenRolePermissionTests.test_financial_dashboard_role_matrix) (role='department_supervisor')
+Missing name: management-dashboard
+
+ERROR: test_financial_dashboard_role_matrix (apps.common.test_staging_readiness.SevenRolePermissionTests.test_financial_dashboard_role_matrix) (role='front_desk')
+Missing name: management-dashboard
+
+ERROR: test_financial_dashboard_role_matrix (apps.common.test_staging_readiness.SevenRolePermissionTests.test_financial_dashboard_role_matrix) (role='cashier')
+Missing name: management-dashboard
+
+ERROR: test_complete_synthetic_revenue_workflow (apps.common.test_staging_readiness.SyntheticEndToEndWorkflowTests.test_complete_synthetic_revenue_workflow)
+Missing name: management-dashboard
+
+Each name is handled in the documented compatibility inventory; obsolete behavior is tested through its current authenticated API.
