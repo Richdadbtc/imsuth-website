@@ -68,3 +68,5 @@ body.dark-theme .imported-overview{--source-bg:#0f1a22;--source-card:#16252f;--s
 body.dark-theme .compact-record-grid input,body.dark-theme .compact-record-grid select,body.dark-theme .compact-record-grid textarea{background:#172a35;border-color:#2c4957;color:#e4edf3}
 @media(max-width:1100px){.compact-record-layout{grid-template-columns:1fr}.compact-record-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.compact-record-grid{grid-template-columns:1fr}}
+
+.compact-record-department-status{grid-column:1/-1;padding:12px;border-left:3px solid #ec9b25;background:var(--card,#f4f8fb);line-height:1.5}
