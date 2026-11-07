@@ -8,13 +8,16 @@ export function apiPath(path) {
   if(url.origin!=='https://paypoint.invalid'||!url.pathname.startsWith(API_BASE))throw new Error('Invalid API destination.');
   return url.pathname+url.search;
 }
-async function request(path,options={}) {
+async function request(path,options={},csrfRetried=false) {
   const method=(options.method||'GET').toUpperCase(),headers=new Headers(options.headers);
   if(options.body && !(options.body instanceof FormData))headers.set('Content-Type','application/json');
-  if(!['GET','HEAD','OPTIONS'].includes(method))headers.set('X-CSRFToken',csrf());
+  const unsafe=!['GET','HEAD','OPTIONS'].includes(method);
+  if(unsafe&&!csrf())await getSession();
+  if(unsafe)headers.set('X-CSRFToken',csrf());
   const response=await fetch(apiPath(path),{...options,method,headers,credentials:'same-origin',cache:'no-store'});
   if(!response.ok){let body;try{body=await response.json();}catch{}
-    const error=new Error([describe(body?.detail),describe(body?.errors||(body?.detail?null:body))].filter(Boolean).join(' ')||`Request failed (${response.status}).`);
+if(unsafe&&!csrfRetried&&response.status===403&&/^CSRF Failed:/i.test(body?.detail||'')){sessionCsrf='';await getSession();return request(path,options,true);}
+        const error=new Error([describe(body?.detail),describe(body?.errors||(body?.detail?null:body))].filter(Boolean).join(' ')||`Request failed (${response.status}).`);
     error.status=response.status;
     if(response.status===401||(response.status===403&&body?.detail==='Authentication credentials were not provided.'))window.dispatchEvent(new Event('paypoint-session-expired'));
     throw error;
@@ -23,6 +26,6 @@ async function request(path,options={}) {
 }
 export async function api(path,options={}) {const response=await request(path,options);return response.status===204?null:response.headers.get('content-type')?.includes('application/json')?response.json():null;}
 export const getSession=async()=>{const session=await api('session/');sessionCsrf=session?.csrf_token||'';return session;};
-export const login=async(username,password)=>{await getSession();const session=await api('session/login/',{method:'POST',body:JSON.stringify({username,password})});sessionCsrf=session?.csrf_token||'';return session;};
+export const login=async(username,password)=>{await getSession();const session=await api('session/login/',{method:'POST',body:JSON.stringify({username,password})});sessionCsrf=session?.csrf_token||'';if(!sessionCsrf)await getSession();return session;};
 export const logout=()=>api('session/logout/',{method:'POST'});
 export async function download(path,filename) {const response=await request(path),url=URL.createObjectURL(await response.blob()),anchor=document.createElement('a');anchor.href=url;anchor.download=filename;document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
