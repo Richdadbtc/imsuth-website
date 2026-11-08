@@ -39,10 +39,11 @@ class CatalogueSetupTests(TestCase):
         self.assertEqual(AuditEvent.objects.filter(action='catalogue.placeholder.imported').count(),52)
 
     def test_report_and_dry_run_are_read_only(self):
+        before=AuditEvent.objects.count()
         for mode in ['--report','--dry-run']:
             output=io.StringIO();call_command('seed_hospital_catalogue',mode,stdout=output)
             self.assertTrue(json.loads(output.getvalue())['read_only'])
-        self.assertFalse(Department.objects.exists());self.assertFalse(AuditEvent.objects.exists());self.assertFalse(Sequence.objects.exists())
+        self.assertFalse(Department.objects.exists());self.assertEqual(AuditEvent.objects.count(),before);self.assertFalse(Sequence.objects.exists())
 
     def test_existing_identity_code_and_status_are_preserved(self):
         dep=Department.objects.create(code='OLD-RAD',name='Radiology & Imaging',is_active=True)
@@ -51,9 +52,10 @@ class CatalogueSetupTests(TestCase):
         self.assertEqual(dep.catalogue_categories.count(),3)
 
     def test_conflict_rolls_back_entire_import(self):
+        before=AuditEvent.objects.count()
         Department.objects.create(code='RAD',name='Unrelated department')
         with self.assertRaises(ValidationError):self.load()
-        self.assertEqual(Department.objects.count(),1);self.assertFalse(DepartmentCategory.objects.exists());self.assertFalse(AuditEvent.objects.exists())
+        self.assertEqual(Department.objects.count(),1);self.assertFalse(DepartmentCategory.objects.exists());self.assertEqual(AuditEvent.objects.count(),before)
 
     def test_normalized_database_duplicates_block_import(self):
         Department.objects.create(code='FIRST',name='Existing name')

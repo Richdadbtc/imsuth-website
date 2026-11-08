@@ -14,14 +14,14 @@ class ServiceDelivery(TimeStampedModel):
 class CashPoint(TimeStampedModel):
     name = models.CharField(max_length=120, unique=True)
     location = models.CharField(max_length=200)
-    department = models.ForeignKey('catalogue.Department', on_delete=models.PROTECT)
-    assigned_officer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    daily_limit = models.DecimalField(max_digits=19, decimal_places=2)
+    department = models.ForeignKey('catalogue.Department', on_delete=models.PROTECT, null=True, blank=True)
+    assigned_officer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True)
+    daily_limit = models.DecimalField(max_digits=19, decimal_places=2, null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ('name',)
-        constraints = [models.CheckConstraint(condition=models.Q(daily_limit__gt=0), name='cash_point_limit_positive')]
+        constraints = [models.CheckConstraint(condition=models.Q(daily_limit__isnull=True) | models.Q(daily_limit__gt=0), name='cash_point_limit_positive')]
 
 
 class CashApprovalLimit(TimeStampedModel):

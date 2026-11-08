@@ -122,21 +122,36 @@ class AlertViewSet(viewsets.ReadOnlyModelViewSet):
     def resolve(self,request,pk=None): return self.transition(request,'resolve')
 
 
+def scoped_cash_points(queryset,user):
+    if user.role in GLOBAL_ROLES:return queryset
+    if user.role not in {'cashier','department_supervisor','front_desk'}:return queryset.none()
+    criteria=Q(department__isnull=True)
+    if user.department_id:criteria|=Q(department_id=user.department_id)
+    return queryset.filter(criteria)
+
+
+def scoped_cash_orders(queryset,user):
+    if user.role in GLOBAL_ROLES:return queryset
+    criteria=Q(cash_point__department__isnull=True,requested_by=user)
+    if user.department_id:criteria|=Q(cash_point__department_id=user.department_id)
+    return queryset.filter(criteria)
+
+
 class CashPointSerializer(serializers.ModelSerializer):
     department_name=serializers.CharField(source="department.name",read_only=True)
     assigned_officer_name=serializers.SerializerMethodField()
-    def get_assigned_officer_name(self,obj) -> str:return obj.assigned_officer.get_full_name() or obj.assigned_officer.username
+    def get_assigned_officer_name(self,obj) -> str:return (obj.assigned_officer.get_full_name() or obj.assigned_officer.username) if obj.assigned_officer else 'Recorded per payment'
     class Meta:
         model=CashPoint
         fields='__all__'
         read_only_fields=('id','created_at','updated_at')
     def validate_daily_limit(self,value):
-        if value<=0: raise ValidationError('Limit must be positive.')
+        if value is not None and value<=0: raise ValidationError('Limit must be positive.')
         return value
     def validate(self,data):
         user=data.get('assigned_officer',getattr(self.instance,'assigned_officer',None))
         department=data.get('department',getattr(self.instance,'department',None))
-        if user and (not user.is_active or user.role not in {'cashier','finance'} or user.department_id!=department.pk):
+        if user and (not user.is_active or user.role not in {'cashier','finance'} or (department is not None and user.department_id!=department.pk)):
             raise ValidationError('Assigned officer must be an active cashier/finance officer in this department.')
         return data
 
@@ -148,7 +163,7 @@ class CashPointViewSet(viewsets.ModelViewSet):
     http_method_names=('get','post','patch','head','options')
     filterset_fields=('department','is_active','assigned_officer')
     search_fields=('name','location','department__name')
-    def get_queryset(self): return scoped(super().get_queryset(),self.request.user)
+    def get_queryset(self): return scoped_cash_points(super().get_queryset(),self.request.user)
     @action(detail=False)
     def officers(self,request):
         require_writer(request.user)
@@ -162,7 +177,7 @@ class CashPointViewSet(viewsets.ModelViewSet):
     @action(detail=True)
     def summary(self,request,pk=None):
         point=self.get_object()
-        rows=dated(Payment.objects.filter(Q(cash_evidence__cash_point=point)|Q(recorded_context__cash_point=point),status='confirmed',channel='cash',currency='NGN'),request.query_params,'confirmed_at')
+        rows=dated(scoped(Payment.objects.filter(Q(cash_evidence__cash_point=point)|Q(recorded_context__cash_point=point),status='confirmed',channel='cash',currency='NGN'),request.user,'invoice__department_id'),request.query_params,'confirmed_at')
         return Response({'cash_point':str(point.pk),'daily_limit':point.daily_limit,'collections':rows.aggregate(n=Sum('amount'))['n'] or 0,'transactions':rows.count(),'currency':'NGN','note':'Confirmed cash payments with explicit point evidence; not a bank deposit or settlement total.'})
     @action(detail=True,methods=['get','post'])
     @transaction.atomic
@@ -171,7 +186,9 @@ class CashPointViewSet(viewsets.ModelViewSet):
         if request.method=='POST':
             require_writer(request.user)
             payment_id=serializers.UUIDField().run_validation(request.data.get('payment'))
-            payment=Payment.objects.select_for_update().filter(pk=payment_id,invoice__department=point.department,channel='cash',status='confirmed').first()
+            payments=scoped(Payment.objects.select_for_update().filter(pk=payment_id,channel='cash',status='confirmed'),request.user,'invoice__department_id')
+            if point.department_id:payments=payments.filter(invoice__department_id=point.department_id)
+            payment=payments.first()
             if not payment: raise ValidationError('Evidence requires a confirmed cash payment in this department.')
             reference=serializers.CharField(min_length=5,max_length=160).run_validation(request.data.get('evidence_reference'))
             old=CashCollectionEvidence.objects.filter(payment=payment).first()
@@ -181,7 +198,7 @@ class CashPointViewSet(viewsets.ModelViewSet):
             obj=CashCollectionEvidence.objects.create(cash_point=point,payment=payment,recorded_by=request.user,evidence_reference=reference)
             AuditEvent.record('cash_collection.evidence_recorded',actor=request.user,obj=obj)
             return Response({'id':str(obj.pk)},status=201)
-        rows=dated(point.collection_evidence.select_related('payment'),request.query_params)
+        rows=dated(scoped(point.collection_evidence.select_related('payment'),request.user,'payment__invoice__department_id'),request.query_params)
         page=self.paginate_queryset(rows.order_by('-created_at'))
         return self.get_paginated_response([{'id':str(r.pk),'payment':str(r.payment_id),'amount':r.payment.amount,'currency':r.payment.currency,'payment_status':r.payment.status,'evidence_reference':r.evidence_reference,'has_attachment':bool(r.attachment_id),'bank_settled':None,'note':'Bank settlement is not certified by this evidence.'} for r in page])
 
@@ -240,20 +257,20 @@ class CashOrderViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes=[permissions.IsAuthenticated]
     filterset_fields=('cash_point','status','requested_by')
     search_fields=('purpose','cash_point__name')
-    def get_queryset(self): return dated(scoped(super().get_queryset(),self.request.user,'cash_point__department_id'),self.request.query_params)
+    def get_queryset(self): return dated(scoped_cash_orders(super().get_queryset(),self.request.user),self.request.query_params)
     @transaction.atomic
     def create(self,request):
         if request.user.role not in WRITERS|{'cashier'}: raise PermissionDenied()
         data=self.get_serializer(data=request.data);data.is_valid(raise_exception=True);v=data.validated_data
         point=CashPoint.objects.select_for_update().get(pk=v['cash_point'].pk)
-        if not scoped(CashPoint.objects.filter(pk=point.pk),request.user).exists(): raise PermissionDenied()
+        if not scoped_cash_points(CashPoint.objects.filter(pk=point.pk),request.user).exists(): raise PermissionDenied()
         old=CashOrder.objects.filter(idempotency_key=v['idempotency_key']).first()
         if old:
             if old.requested_by_id!=request.user.pk or old.cash_point_id!=point.pk or old.amount!=v['amount'] or old.purpose!=v['purpose'] or old.description!=v.get('description',''): raise ValidationError('Idempotency key already belongs to another request.')
             return Response(self.get_serializer(old).data)
         if not point.is_active: raise ValidationError('Cash point is inactive.')
         reserved=point.orders.filter(created_at__date=timezone.localdate(),status__in=['pending','approved']).aggregate(n=Sum('amount'))['n'] or Decimal('0')
-        if reserved+v['amount']>point.daily_limit: raise ValidationError('Cash point daily authorization limit exceeded.')
+        if point.daily_limit is not None and reserved+v['amount']>point.daily_limit: raise ValidationError('Cash point daily authorization limit exceeded.')
         try:
             obj=data.save(requested_by=request.user)
         except IntegrityError as exc:

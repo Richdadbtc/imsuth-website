@@ -484,7 +484,7 @@ async function enhancedRecordPaymentPreview(capture) {
 async function enhancedDepartmentDesk() {
   const departments=[];let url='departments/?page_size=100';
   for(let page=1;url;page++){const data=await api('departments/?page_size=100&page='+page);departments.push(...list(data).filter(d=>d.is_active!==false));url=data.next;}
-  content.innerHTML=`<div class="department-desk-page"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><label>Period<select data-desk-period><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="today">Today</option><option value="all">All records</option></select></label></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment">Record payment</a><a href="#patients" aria-current="page">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit">Users and audit</a></nav><div class="desk-check-layout"><section class="finance-card"><h2>Department desk: check a receipt before giving a service</h2><form data-desk-search><label>Department you are at<select name="department" required>${departments.map(d=>`<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join('')}</select></label><label>Receipt number<input name="receipt" required maxlength="120" placeholder="Enter official receipt number"></label><button class="pending-verify" type="submit" ${departments.length?'':'disabled'}>Check receipt</button><p>Only receipts for the selected department can be checked here. A receipt can be printed again, but each service can only be marked delivered once.</p></form><p data-desk-message role="status"></p></section><section class="finance-card" data-desk-result aria-live="polite"><h2>Receipt check</h2><p>Check a receipt to see patient, payment and service details.</p></section></div><section class="finance-card"><h2 data-desk-title>Department receipts</h2><div data-desk-list></div><div class="pending-pagination"><span data-desk-count></span><div><button class="pending-outline" data-desk-prev>Previous</button><span data-desk-page></span><button class="pending-outline" data-desk-next>Next</button></div></div></section></div>`;
+  content.innerHTML=`<div class="department-desk-page"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><label>Period<select data-desk-period><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="today">Today</option><option value="all">All records</option></select></label></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment">Record payment</a><a href="#patients" aria-current="page">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit">Users and audit</a></nav><div class="desk-check-layout"><section class="finance-card"><h2>Department desk: check a receipt before giving a service</h2><form data-desk-search><label>Department you are at<select name="department"><option value="">All departments (shared)</option>${departments.map(d=>`<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join('')}</select></label><label>Receipt number<input name="receipt" required maxlength="120" placeholder="Enter official receipt number"></label><button class="pending-verify" type="submit" ${departments.length?'':'disabled'}>Check receipt</button><p>Only receipts for the selected department can be checked here. A receipt can be printed again, but each service can only be marked delivered once.</p></form><p data-desk-message role="status"></p></section><section class="finance-card" data-desk-result aria-live="polite"><h2>Receipt check</h2><p>Check a receipt to see patient, payment and service details.</p></section></div><section class="finance-card"><h2 data-desk-title>Department receipts</h2><div data-desk-list></div><div class="pending-pagination"><span data-desk-count></span><div><button class="pending-outline" data-desk-prev>Previous</button><span data-desk-page></span><button class="pending-outline" data-desk-next>Next</button></div></div></section></div>`;
   const root=content.querySelector('.department-desk-page'),form=root.querySelector('[data-desk-search]'),department=form.elements.department,period=root.querySelector('[data-desk-period]'),result=root.querySelector('[data-desk-result]'),message=text=>root.querySelector('[data-desk-message]').textContent=text;
   let page=1,listVersion=0,checkVersion=0,selected=null,hasNext=false,hasPrevious=false;
   const query=()=>'?department='+encodeURIComponent(department.value);
@@ -1284,9 +1284,9 @@ async function cashPointsAndOrders() {
   const liveLimits = list(await api('cash-orders/approval-limits/'));
   const points = (await loadAll('cash-points')).map(p => ({
     ...p,
-    department: p.department_name || p.department,
-    officer: p.assigned_officer_name || String(p.assigned_officer),
-    limit: Number(p.daily_limit),
+    department: p.department_name || p.department || 'All departments',
+    officer: p.assigned_officer_name || (p.assigned_officer ? String(p.assigned_officer) : 'Recorded per payment'),
+    limit: p.daily_limit===null?null:Number(p.daily_limit),
     collected: null,
     active: p.is_active
   }));
@@ -1326,7 +1326,7 @@ async function cashPointsAndOrders() {
       pending = scoped.filter(i => i.status === 'pending'),
       metric = (label, value, note, icon, colour) => `<article><i class="${colour}">${icon}</i><div><span>${label}</span><strong>${escapeHtml(value)}</strong><small>${note}</small></div></article>`;
     content.querySelector('[data-cp-kpis]').innerHTML = metric('Total Cash Points', points.filter(i => i.active).length, 'Active collection points', '▤', 'blue') + metric('Total Cash Orders', scoped.length, 'Selected period', '▤', 'purple') + metric('Approved Amount', moneyWhole(sum(scoped.filter(i => i.status === 'approved'))), 'Authorized orders; not cash collected', '₦', 'green') + metric('Pending Approval', pending.length, moneyWhole(sum(pending)), '◷', 'orange');
-    content.querySelector('[data-cp-points]').innerHTML = `<div class="table-wrap"><table class="data-table finance-data-table cp-points-table"><thead><tr>${['#', 'Cash Point Name', 'Location', 'Department', 'Assigned Officer', 'Daily Limit (₦)', "Today's Collection (₦)", 'Status', 'Actions'].map(t => `<th>${t}</th>`).join('')}</tr></thead><tbody>${points.map((i, k) => `<tr><td>${k + 1}</td><td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.location)}</td><td>${escapeHtml(i.department)}</td><td>${escapeHtml(i.officer)}</td><td>${moneyWhole(i.limit)}</td><td>${i.collected === null ? 'Unavailable' : moneyWhole(i.collected)}</td><td><span class="overview-payment-badge ${i.active ? 'verified' : 'failed'}">${i.active ? 'Active' : 'Inactive'}</span></td><td><button type="button" class="pending-outline" data-cp-point="${i.id}">View</button></td></tr>`).join('') || '<tr><td colspan="9" class="finance-empty">Cash point data is not connected.</td></tr>'}</tbody></table></div>`;
+    content.querySelector('[data-cp-points]').innerHTML = `<div class="table-wrap"><table class="data-table finance-data-table cp-points-table"><thead><tr>${['#', 'Cash Point Name', 'Location', 'Department', 'Assigned Officer', 'Daily Limit (₦)', "Today's Collection (₦)", 'Status', 'Actions'].map(t => `<th>${t}</th>`).join('')}</tr></thead><tbody>${points.map((i, k) => `<tr><td>${k + 1}</td><td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.location)}</td><td>${escapeHtml(i.department)}</td><td>${escapeHtml(i.officer)}</td><td>${i.limit===null?'Unlimited':moneyWhole(i.limit)}</td><td>${i.collected === null ? 'Unavailable' : moneyWhole(i.collected)}</td><td><span class="overview-payment-badge ${i.active ? 'verified' : 'failed'}">${i.active ? 'Active' : 'Inactive'}</span></td><td><button type="button" class="pending-outline" data-cp-point="${i.id}">View</button></td></tr>`).join('') || '<tr><td colspan="9" class="finance-empty">Cash point data is not connected.</td></tr>'}</tbody></table></div>`;
     content.querySelector('[data-cp-orders]').innerHTML = ordersTable(scoped.slice(0, 5));
     const selected = form.elements.namedItem('point').value;
     content.querySelector('[data-cp-select]').innerHTML = '<option value="">Select cash point</option>' + points.filter(i => i.active).map(i => `<option value="${i.id}">${escapeHtml(i.name)}</option>`).join('');
@@ -1349,12 +1349,12 @@ async function cashPointsAndOrders() {
       amount = Number(values.amount),
       purpose = (values.purpose || '').trim(),
       message = content.querySelector('[data-cp-message]');
-    if (!cashPoint?.active || !Number.isFinite(amount) || amount <= 0 || amount > cashPoint.limit || Math.abs(amount * 100 - Math.round(amount * 100)) > 0.00001 || purpose.length < 3) {
+    if (!cashPoint?.active || !Number.isFinite(amount) || amount <= 0 || (cashPoint.limit!==null&&amount > cashPoint.limit) || Math.abs(amount * 100 - Math.round(amount * 100)) > 0.00001 || purpose.length < 3) {
       message.textContent = 'Choose an active cash point, enter a positive amount within its daily limit with up to two decimal places, and a purpose of at least three characters.';
       return;
     }
     const reserved = sum(orders.filter(i => i.point === cashPoint.id && i.status !== 'rejected' && orderDay(i) === today));
-    if (reserved + amount > cashPoint.limit) {
+    if (reserved + (cashPoint.limit!==null&&amount > cashPoint.limit)) {
       message.textContent = 'This request would exceed the daily limit after today’s existing orders.';
       return;
     }
@@ -1395,7 +1395,7 @@ async function cashPointsAndOrders() {
       orderButton = t.closest('[data-cp-order]');
     if (pointButton) {
       const i = point(pointButton.dataset.cpPoint);
-      if (i) open(`<h2>${escapeHtml(i.name)}</h2>${detail([['Location', i.location], ['Department', i.department], ['Assigned Officer', i.officer], ['Daily Limit', moneyWhole(i.limit)], ['Today’s Verified Collection', moneyWhole(i.collected)]])}<p>Collection evidence and bank deposit are recorded separately.</p>`);
+      if (i) open(`<h2>${escapeHtml(i.name)}</h2>${detail([['Location', i.location], ['Department', i.department], ['Assigned Officer', i.officer], ['Daily Limit', i.limit===null?'Unlimited':moneyWhole(i.limit)], ['Today’s Verified Collection', moneyWhole(i.collected)]])}<p>Collection evidence and bank deposit are recorded separately.</p>`);
     }
     if (orderButton) {
       const i = orders.find(i => i.id === orderButton.dataset.cpOrder);
@@ -1406,7 +1406,7 @@ async function cashPointsAndOrders() {
   content.querySelector('[data-cp-add]').addEventListener('click', async () => {
     try {
       const [departments, officers] = await Promise.all([loadAll('departments'), api('cash-points/officers/')]);
-      open(`<h2>Add Cash Point</h2><form data-cp-create class="cp-order-form"><label>Name<input name="name" required maxlength="120"></label><label>Location<input name="location" required maxlength="200"></label><label>Department<select name="department" required>${departments.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join('')}</select></label><label>Assigned Officer<select name="officer" required>${officers.map(o => `<option value="${o.id}">${escapeHtml(o.name)}</option>`).join('')}</select></label><label>Approved Daily Limit (₦)<input name="limit" type="number" required min="0.01" step="0.01"></label><p>The assigned officer must belong to the selected department. Use an approved hospital limit.</p><p data-cp-create-message role="status"></p><button class="pending-verify">Create Cash Point</button></form>`);
+      open(`<h2>Add Cash Point</h2><form data-cp-create class="cp-order-form"><label>Name<input name="name" required maxlength="120"></label><label>Location<input name="location" required maxlength="200"></label><label>Department<select name="department" required>${departments.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join('')}</select></label><label>Assigned Officer<select name="officer"><option value="">Shared — staff recorded per payment</option>${officers.map(o => `<option value="${o.id}">${escapeHtml(o.name)}</option>`).join('')}</select></label><label>Approved Daily Limit (₦)<input name="limit" type="number" placeholder="Leave blank for unlimited" min="0.01" step="0.01"></label><p>Leave the department blank for a shared point and the limit blank for unlimited collections. Each payment records its staff member.</p><p data-cp-create-message role="status"></p><button class="pending-verify">Create Cash Point</button></form>`);
     } catch (error) {
       open(`<p>${escapeHtml(error.message)}</p>`);
     }
@@ -1442,9 +1442,9 @@ async function cashPointsAndOrders() {
           body: JSON.stringify({
             name: values.name,
             location: values.location,
-            department: values.department,
-            assigned_officer: values.officer,
-            daily_limit: values.limit,
+            department: values.department || null,
+            assigned_officer: values.officer || null,
+            daily_limit: values.limit || null,
             is_active: true
           })
         });

@@ -18,7 +18,7 @@ from apps.payments.models import Payment, Receipt
 from apps.payments.serializers import PaymentSerializer
 from apps.auditlog.models import AuditEvent
 from .models import CashPoint, CashOrder, RecordedPayment, Alert
-from .revenue_api import scoped
+from .revenue_api import scoped_cash_points, scoped_cash_orders, scoped
 
 
 class CaptureInput(serializers.Serializer):
@@ -49,14 +49,14 @@ class RecordPaymentView(APIView):
     permission_classes=[permissions.IsAuthenticated]
 
     def get(self,request):
-        points=scoped(CashPoint.objects.filter(is_active=True),request.user)
-        orders=scoped(CashOrder.objects.filter(status='approved',cash_point__is_active=True),request.user,'cash_point__department_id')
+        points=scoped_cash_points(CashPoint.objects.filter(is_active=True),request.user)
+        orders=scoped_cash_orders(CashOrder.objects.filter(status='approved',cash_point__is_active=True),request.user)
         receipts=scoped(Receipt.objects.select_related('payment','invoice__patient','invoice__department').prefetch_related('invoice__items__delivery'),request.user,'invoice__department_id').order_by('-issued_at')[:10]
         latest=[]
         for receipt in receipts:
             items=list(receipt.invoice.items.all());used=sum(hasattr(item,'delivery') for item in items)
             latest.append({'id':str(receipt.pk),'receipt_number':receipt.receipt_number,'patient_name':str(receipt.invoice.patient),'service':', '.join(item.description for item in items),'department':receipt.invoice.department.name,'amount':receipt.amount,'payment_status':receipt.payment.status,'service_status':'Used' if items and used==len(items) else 'Partially used' if used else 'Not yet used','issued_at':receipt.issued_at})
-        return Response({'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id)} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
+        return Response({'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
 
     def post(self,request):
         if request.user.role not in {'super_admin','finance','cashier'}: raise PermissionDenied('Only collection officers and finance administrators may record payments.')
@@ -64,9 +64,9 @@ class RecordPaymentView(APIView):
         fingerprint=hashlib.sha256(json.dumps(data,sort_keys=True,default=str).encode()).hexdigest()
         try:
             with transaction.atomic():
-                point=scoped(CashPoint.objects.select_for_update().filter(pk=data['cash_point'],is_active=True),request.user).first()
+                point=scoped_cash_points(CashPoint.objects.select_for_update().filter(pk=data['cash_point'],is_active=True),request.user).first()
                 if not point: raise ValidationError({'cash_point':'Select an active cash point within your access scope.'})
-                if request.user.role=='cashier' and point.assigned_officer_id!=request.user.pk: raise PermissionDenied('This cash point is assigned to another officer.')
+                if request.user.role=='cashier' and point.department_id is not None and point.assigned_officer_id!=request.user.pk: raise PermissionDenied('This cash point is assigned to another officer.')
                 old=RecordedPayment.objects.select_related('payment__invoice').filter(idempotency_key=str(data['idempotency_key'])).first()
                 if old:
                     if old.created_by_id!=request.user.pk or old.fingerprint!=fingerprint: raise ValidationError('This request key belongs to a different submission.')
@@ -96,7 +96,7 @@ class RecordPaymentView(APIView):
                     if used+data['amount']>order.amount:raise ValidationError({'cash_order':'The approved order amount has insufficient remaining capacity.'})
                 if data['channel']=='cash':
                     used=sum(active.filter(cash_point=point,payment__channel='cash',created_at__date=timezone.localdate()).values_list('entered_total',flat=True),Decimal('0'))
-                    if used+data['amount']>point.daily_limit:raise ValidationError({'cash_point':'This cash point daily collection limit would be exceeded.'})
+                    if point.daily_limit is not None and used+data['amount']>point.daily_limit:raise ValidationError({'cash_point':'This cash point daily collection limit would be exceeded.'})
                 payment=Payment.create_intent(invoice=invoice,channel=data['channel'],initiated_by=request.user,idempotency_key='record:'+str(data['idempotency_key']))
                 payment.submitted_reference=data['submitted_reference'];payment.reported_paid_at=data['reported_paid_at'];payment.remarks=data['remarks'];payment.save(update_fields=['submitted_reference','reported_paid_at','remarks','updated_at'])
                 context=RecordedPayment.objects.create(idempotency_key=str(data['idempotency_key']),fingerprint=fingerprint,created_by=request.user,cash_point=point,cash_order=order,payment=payment,approved_total=approved,entered_total=data['amount'],override_reason=data['override_reason'])

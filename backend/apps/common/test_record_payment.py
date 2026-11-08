@@ -93,3 +93,29 @@ class RecordPaymentTests(TestCase):
         response=self.client.get('/api/v1/dashboard/overview-coverage/').data
         self.assertEqual(response['cash_under_orders']['amount'],Decimal('100'))
         self.assertFalse(response['insurance']['configured']);self.assertIsNone(response['insurance']['nhis'])
+
+    def test_shared_unlimited_points_are_available_without_expanding_patient_scope(self):
+        from apps.common.models import CashPoint
+        names={'Main cash-point 1','Main cash-point 2','A&E Cash-point'}
+        points=CashPoint.objects.filter(name__in=names)
+        self.assertEqual(points.count(),3)
+        self.assertTrue(all(p.department_id is None and p.daily_limit is None for p in points))
+        shared=points.first();self.data['cash_point']=str(shared.pk)
+        listing=self.client.get('/api/v1/record-payment/');self.assertEqual(listing.status_code,200)
+        self.assertTrue(names.issubset({p['name'] for p in listing.data['cash_points']}))
+        result=self.post();self.assertEqual(result.status_code,201,result.data)
+        context=RecordedPayment.objects.get();self.assertEqual(context.created_by_id,self.cashier.pk)
+        self.data['idempotency_key']=str(uuid4());self.data['submitted_reference']='SYN-SHARED-OTHER';self.data['department']=str(self.other.pk)
+        self.assertEqual(self.post().status_code,400)
+
+    def test_shared_cash_orders_are_unlimited_but_private_to_requester(self):
+        from apps.common.models import CashPoint
+        shared=CashPoint.objects.get(name='Main cash-point 1')
+        order=CashOrder.objects.create(cash_point=shared,requested_by=self.cashier,amount='5000000',purpose='Synthetic shared order',idempotency_key='synthetic-unlimited-order',status='approved')
+        visible=self.client.get('/api/v1/record-payment/').data['cash_orders']
+        self.assertIn(str(order.pk),[o['id'] for o in visible])
+        self.client.force_authenticate(self.supervisor)
+        self.assertNotIn(str(order.pk),[o['id'] for o in self.client.get('/api/v1/record-payment/').data['cash_orders']])
+        self.client.force_authenticate(self.finance)
+        response=self.client.post('/api/v1/cash-points/',{'name':'Synthetic unlimited point','location':'Test location','department':None,'assigned_officer':None,'daily_limit':None},format='json')
+        self.assertEqual(response.status_code,201,response.data);self.assertIsNone(response.data['daily_limit'])
