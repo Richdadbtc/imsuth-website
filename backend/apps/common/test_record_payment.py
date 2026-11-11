@@ -119,3 +119,37 @@ class RecordPaymentTests(TestCase):
         self.client.force_authenticate(self.finance)
         response=self.client.post('/api/v1/cash-points/',{'name':'Synthetic unlimited point','location':'Test location','department':None,'assigned_officer':None,'daily_limit':None},format='json')
         self.assertEqual(response.status_code,201,response.data);self.assertIsNone(response.data['daily_limit'])
+
+    def test_manual_service_and_patient_discounts_are_server_calculated(self):
+        from apps.catalogue.models import Service, TariffVersion
+        service_count=Service.objects.count();tariff_count=TariffVersion.objects.count()
+        for category,net in [('regular','3000.00'),('nhis','2700.00'),('imshia','2700.00')]:
+            with self.subTest(category=category):
+                self.data.pop('service',None)
+                self.data.update(service_description='Entered consultation',patient_type=category,base_amount='3000.00',amount=net,channel='pos',idempotency_key=str(uuid4()),submitted_reference='SYN-MANUAL-'+category)
+                response=self.post();self.assertEqual(response.status_code,201,response.data)
+                context=RecordedPayment.objects.get(payment_id=response.data['payment']['id']);item=context.payment.invoice.items.get()
+                self.assertEqual(str(context.payment.amount),net);self.assertEqual(context.patient_type,category)
+                self.assertTrue(item.is_manual);self.assertIsNone(item.service_id);self.assertIsNone(item.tariff_version_id)
+                self.assertEqual(item.description,'Entered consultation');self.assertEqual(context.base_total,Decimal('3000'))
+                self.assertEqual(context.discount_total,Decimal('3000')-Decimal(net))
+                self.assertFalse(response.data['receipt_issued'])
+                self.assertEqual(self.post().status_code,200)
+        self.assertEqual(Service.objects.count(),service_count);self.assertEqual(TariffVersion.objects.count(),tariff_count)
+
+    def test_manual_discount_tampering_and_invalid_types_roll_back(self):
+        before=Invoice.objects.count();self.data.pop('service')
+        self.data.update(service_description='Entered service',base_amount='100',amount='50',patient_type='nhis',channel='pos')
+        self.assertEqual(self.post().status_code,400)
+        self.data.update(amount='90',patient_type='unapproved')
+        self.assertEqual(self.post().status_code,400)
+        self.data.update(patient_type='regular',service_description='')
+        self.assertEqual(self.post().status_code,400)
+        self.assertEqual(Invoice.objects.count(),before)
+
+    def test_catalogue_service_uses_tariff_for_discount_not_submitted_base(self):
+        self.data.update(patient_type='nhis',base_amount='50000',amount='90',channel='pos')
+        response=self.post();self.assertEqual(response.status_code,201,response.data)
+        context=RecordedPayment.objects.get();self.assertEqual(context.base_total,Decimal('100'))
+        self.assertEqual(context.discount_total,Decimal('10'));self.assertEqual(context.approved_total,Decimal('90'))
+        self.assertFalse(Alert.objects.filter(alert_type='service_price_change').exists())

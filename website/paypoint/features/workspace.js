@@ -263,7 +263,7 @@ async function enhancedRecordPaymentPreview(capture) {
     }
     return items;
   };
-  const [patients, departments, services, tariffs, payments] = await Promise.all([Promise.resolve([]), ...['departments', 'services', 'tariffs'].map(fetchAll), Promise.resolve([])]);
+  const [patients, departments, services, tariffs, payments] = await Promise.all([Promise.resolve([]), fetchAll('departments'), Promise.resolve([]), Promise.resolve([]), Promise.resolve([])]);
   let cataloguePreview=null,catalogueUnavailable=false;
   if(user.role==='super_admin'){
     try{cataloguePreview=await api('catalogue-setup/');}
@@ -283,17 +283,17 @@ async function enhancedRecordPaymentPreview(capture) {
     field = (label, name, type = 'text', attrs = '') => `<label>${label}<input type="${type}" name="${name}" ${attrs}></label>`,
     now = new Date(),
     localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-  content.innerHTML = `<div class="record-payment-preview compact-record-payment"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><span class="record-preview-label">Record Payment</span></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment" aria-current="page">Record payment</a><a href="#patients">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit">Users and audit</a></nav><div class="compact-record-layout"><form class="finance-card record-preview-form" data-rp-form><h2>Record a payment and issue a receipt</h2><div class="compact-record-grid"><label>Cash point<select name="cash_point" required>${options(capture.cash_points,'Select cash point')}</select></label><label>Department paid for<select name="department" required>${departmentOptions()}</select></label><label>Service paid for<select name="service" required disabled><option value="">Select department first</option></select></label><p class="compact-record-department-status" data-rp-department-status role="status" hidden></p><label>Patient name<input name="patient_query" required autocomplete="off" placeholder="Search registered patient" aria-describedby="patient-selection-status"><span id="patient-selection-status" data-rp-selection-status>Type at least 2 characters, then select a patient.</span><span data-rp-results aria-live="polite"></span></label><label>Patient type<select name="category"><option value="self_pay">Regular (full price)</option><option disabled>NHIS — approved tariff not configured</option><option disabled>IMSHIA — approved tariff not configured</option></select></label><label>Amount to pay (₦)<input name="paid" type="number" min="0.01" step="0.01" required placeholder="Select service for approved price"></label><label>Reason, if the amount differs from the price list<textarea name="override_reason" maxlength="500"></textarea></label><label>Payment channel<select name="channel"><option value="pos">POS/card</option><option value="bank_transfer">Bank transfer</option><option value="online">Online payment</option><option value="cash">Cash</option></select></label><label>Reference (card slip, transfer, bank teller or USSD)<input name="reference" required maxlength="120"></label><label>Cash standing order (cash only)<select name="cash_order" disabled><option value="">None</option></select></label><button type="submit" class="pending-verify compact-record-submit" ${capture.can_record?'':'disabled'}>Issue receipt</button></div><p class="compact-record-note">The amount fills in from the approved price list. Changing it requires a reason and raises a review flag. An official receipt is issued after payment verification. Insurance discounts require approved tariffs.</p><p data-rp-message role="status"></p><details class="compact-record-setup"><summary>Department and category setup status</summary>${catalogueNotice}</details><input type="hidden" name="quantity" value="1"><input type="hidden" name="occurred" value="${localDate}"><input type="hidden" name="remarks" value="">${['patient_name','phone','dob','gender','address','next_of_kin','kin_phone'].map(name=>`<input type="hidden" name="${name}">`).join('')}<div hidden><span data-rp-total></span><span data-rp-fees></span><span data-rp-service></span><span data-rp-service-line></span><span data-rp-patient></span><button type="button" data-rp-search>Search</button></div></form><aside class="finance-card" data-rp-receipt-card><h2>Receipt</h2><div data-rp-receipt>The receipt appears here after verification.</div></aside></div><section class="finance-card"><h2>Latest receipts</h2><div data-rp-recent></div></section></div>`;
+  content.innerHTML = `<div class="record-payment-preview compact-record-payment"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><span class="record-preview-label">Record Payment</span></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment" aria-current="page">Record payment</a><a href="#patients">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit">Users and audit</a></nav><div class="compact-record-layout"><form class="finance-card record-preview-form" data-rp-form><h2>Record a payment and issue a receipt</h2><div class="compact-record-grid"><label>Cash point<select name="cash_point" required>${options(capture.cash_points,'Select cash point')}</select></label><label>Department paid for<select name="department" required>${departmentOptions()}</select></label><label>Service paid for<input name="service" required maxlength="200" placeholder="Enter service paid for" disabled></label><p class="compact-record-department-status" data-rp-department-status role="status" hidden></p><label>Patient name<input name="patient_query" required autocomplete="off" placeholder="Search registered patient" aria-describedby="patient-selection-status"><span id="patient-selection-status" data-rp-selection-status>Type at least 2 characters, then select a patient.</span><span data-rp-results aria-live="polite"></span></label><label>Patient type<select name="category"><option value="self_pay">Regular (full price)</option><option value="nhis">NHIS (10% discount)</option><option value="imshia">IMSHIA (10% discount)</option></select></label><label>Full service amount (₦)<input name="paid" type="number" min="0.01" step="0.01" required placeholder="Enter full amount before discount"></label><label>Reason, if the amount differs from the price list<textarea name="override_reason" maxlength="500"></textarea></label><label>Payment channel<select name="channel"><option value="pos">POS/card</option><option value="bank_transfer">Bank transfer</option><option value="online">Online payment</option><option value="cash">Cash</option></select></label><label>Reference (card slip, transfer, bank teller or USSD)<input name="reference" required maxlength="120"></label><label>Cash standing order (cash only)<select name="cash_order" disabled><option value="">None</option></select></label><button type="submit" class="pending-verify compact-record-submit" ${capture.can_record&&capture.manual_service_entry?'':'disabled'}>Issue receipt</button></div><p class="compact-record-note"><span data-rp-price-summary>Regular patients pay the full entered price. NHIS and IMSHIA receive 10% off.</span> Manual service entries and prices are flagged for review. An official receipt is issued only after payment verification.</p><p data-rp-message role="status"></p><details class="compact-record-setup"><summary>Department and category setup status</summary>${catalogueNotice}</details><input type="hidden" name="quantity" value="1"><input type="hidden" name="occurred" value="${localDate}"><input type="hidden" name="remarks" value="">${['patient_name','phone','dob','gender','address','next_of_kin','kin_phone'].map(name=>`<input type="hidden" name="${name}">`).join('')}<div hidden><span data-rp-total></span><span data-rp-fees></span><span data-rp-service></span><span data-rp-service-line></span><span data-rp-patient></span><button type="button" data-rp-search>Search</button></div></form><aside class="finance-card" data-rp-receipt-card><h2>Receipt</h2><div data-rp-receipt>The receipt appears here after verification.</div></aside></div><section class="finance-card"><h2>Latest receipts</h2><div data-rp-recent></div></section></div>`;
   const root = content.querySelector('.record-payment-preview'),
     form = content.querySelector('[data-rp-form]'),
     el = name => form.elements.namedItem(name),
     details = entries => `<dl class="record-detail-list">${entries.map(([label, value]) => `<div><dt>${label}</dt><dd>${escapeHtml(value || 'Not supplied')}</dd></div>`).join('')}</dl>`,
-    total = () => unit === null ? 0 : Math.round(unit * Number(el('quantity').value || 0) * 100) / 100;
+    total = () => {const cents=Math.round(Number(el('paid').value||0)*100);return (cents-(el('category').value==='self_pay'?0:Math.round(cents*0.10)))/100;};
   const fees = () => {
-    const amount = total();
-    content.querySelector('[data-rp-total]').textContent = moneyWhole(Number(el('paid').value||amount));
-    content.querySelector('[data-rp-fees]').innerHTML = details([['Service Amount', unit === null ? 'Not supplied' : moneyWhole(unit)], ['Quantity', el('quantity').value], ['Subtotal', moneyWhole(amount)], ['Entered Amount',moneyWhole(Number(el('paid').value||amount))], ['Price Difference',moneyWhole(Number(el('paid').value||amount)-amount)]]);
+    const gross=Number(el('paid').value||0),net=total(),discount=Math.round((gross-net)*100)/100;
+    content.querySelector('[data-rp-price-summary]').textContent=`Full amount: ${money(gross)} · Discount (${el('category').value==='self_pay'?'0':'10'}%): ${money(discount)} · Amount to pay: ${money(net)}.`;
   };
+  if(!capture.manual_service_entry)content.querySelector('[data-rp-message]').textContent='The backend must be updated before manual services and patient-type discounts can be recorded.';
   let latestReceipts=capture.receipts;
   const recent = () => {
     content.querySelector('[data-rp-recent]').innerHTML = `<div class="table-wrap"><table class="data-table finance-data-table record-recent-table"><thead><tr><th>Receipt</th><th>Patient</th><th>Service</th><th>Department</th><th>Amount paid</th><th>Service status</th><th>Actions</th></tr></thead><tbody>${latestReceipts.map(i=>`<tr><td>${escapeHtml(i.receipt_number)}</td><td>${escapeHtml(i.patient_name)}</td><td>${escapeHtml(i.service)}</td><td>${escapeHtml(i.department)}</td><td>${moneyWhole(i.amount)}</td><td>${escapeHtml(i.payment_status==='confirmed'?i.service_status:i.payment_status)}</td><td>${i.payment_status==='confirmed'?`<a class="pending-outline" target="_blank" rel="noopener" href="/paypoint/api/v1/receipts/${encodeURIComponent(i.id)}/print/">Print receipt</a>`:'Receipt unavailable'}</td></tr>`).join('')||'<tr><td colspan="7">No official receipts issued yet.</td></tr>'}</tbody></table></div>`;
@@ -319,19 +319,7 @@ async function enhancedRecordPaymentPreview(capture) {
     content.querySelector('[data-rp-patient]').innerHTML = details([['Patient ID', patient.patient_id], ['Full Name', fullName(patient)], ['Gender', patient.sex], ['Date of Birth', patient.date_of_birth], ['Phone Number', patient.phone], ['Address', patient.address], ['Emergency Contact', patient.emergency_contact], ['Next of Kin Phone', patient.next_of_kin_phone]]);
     clearReceipt();
   };
-  const chooseService = () => {
-    service = services.find(i => String(i.id) === el('service').value) || null;
-    const time = Date.now(),
-      matches = tariffs.filter(t => service && String(t.service) === String(service.id) && t.is_approved && t.currency === 'NGN' && Date.parse(t.effective_from) <= time && (!t.effective_until || Date.parse(t.effective_until) > time)).sort((a, b) => Date.parse(b.effective_from) - Date.parse(a.effective_from));
-    unit = matches.length ? Number(matches[0].amount) : null;
-    content.querySelector('[data-rp-service]').innerHTML = service ? details([['Service Name', service.name], ['Service Code', service.code], ['Unit Price', unit === null ? 'No single approved current NGN tariff' : moneyWhole(unit)], ['Patient Category', 'Self Pay']]) : '<p class="finance-empty">No service selected.</p>';
-    content.querySelector('[data-rp-service-line]').textContent = service ? `${service.name} · ${unit === null ? 'Approved pricing unavailable' : moneyWhole(unit) + ' per unit'} · Self Pay · No discount` : 'No service selected';
-    el('paid').value=unit===null?'':total().toFixed(2);
-    el('override_reason').value='';
-    el('override_reason').required=false;
-    fees();
-    clearReceipt();
-  };
+  const chooseService = () => {service=el('service').value.trim()?{name:el('service').value.trim()}:null;fees();clearReceipt();};
   let patientSearchSequence=0;
   root.addEventListener('click', async event => {
     if (event.target.closest('[data-rp-search]')) {
@@ -356,20 +344,19 @@ async function enhancedRecordPaymentPreview(capture) {
   el('department').addEventListener('change', () => {
     const department=departments.find(d=>String(d.id)===el('department').value);
     const inactive=department?.is_active===false;
-    const availableServices=inactive?[]:services.filter(i => String(i.department) === el('department').value && i.is_active !== false);
-    el('service').innerHTML = options(availableServices, !department?'Select department first':inactive?'Department activation required':availableServices.length?'Select service':'No active services configured');
-    el('service').disabled = !department||!availableServices.length;
-    el('service').value = '';
+    el('service').disabled=!department||inactive;
+    el('service').value='';el('paid').value='';
     const status=root.querySelector('[data-rp-department-status]');
     status.hidden=!department;
-    status.innerHTML=inactive?`${escapeHtml(department.name)} is imported but inactive. Activate it through ${user.role==='super_admin'?'<a href="#admin-catalogue-setup">Hospital Catalogue Setup</a>':'your Super Administrator'} before recording a payment.`:department&&!availableServices.length?`No active services are configured for ${escapeHtml(department.name)}.${user.role==='super_admin'?' <a href="#admin-services">Configure services and approved prices</a>.':''}`:'';
+    status.innerHTML=inactive?`${escapeHtml(department.name)} is imported but inactive. Activate it through ${user.role==='super_admin'?'<a href="#admin-catalogue-setup">Hospital Catalogue Setup</a>':'your Super Administrator'} before recording a payment.`:'';
     if(!status.textContent)status.hidden=true;
-    form.querySelector('[type=submit]').disabled=!capture.can_record||inactive;
+    form.querySelector('[type=submit]').disabled=!capture.can_record||!capture.manual_service_entry||inactive;
     chooseService();
   });
-  el('service').addEventListener('change', chooseService);
+  el('service').addEventListener('input', chooseService);
+  el('category').addEventListener('change',()=>{fees();clearReceipt();});
   el('quantity').addEventListener('input', () => {
-    el('paid').value=unit===null?'':total().toFixed(2);
+    fees();
     el('override_reason').required=false;
     fees();
     clearReceipt();
@@ -389,17 +376,17 @@ async function enhancedRecordPaymentPreview(capture) {
     el('cash_order').innerHTML='<option value="">None</option>'+(enabled?capture.cash_orders.filter(o=>String(o.cash_point)===el('cash_point').value).map(o=>`<option value="${escapeHtml(o.id)}">${escapeHtml(o.purpose)} · ${moneyWhole(o.amount)}</option>`).join(''):'');
   };
   el('cash_point').addEventListener('change',updateOrders);el('channel').addEventListener('change',updateOrders);
-  el('paid').addEventListener('input',()=>{fees();el('override_reason').required=Math.round(Number(el('paid').value)*100)!==Math.round(total()*100);clearReceipt();});
+  el('paid').addEventListener('input',()=>{fees();el('override_reason').required=false;clearReceipt();});
   form.addEventListener('submit', async event => {
     event.preventDefault();
     const message = content.querySelector('[data-rp-message]'),
       amount = total(),
       quantity = Number(el('quantity').value),
-      paid = Number(el('paid').value),
+      paid = total(),
       reference = el('reference').value.trim();
     if(departments.find(d=>String(d.id)===el('department').value)?.is_active===false){message.textContent='This department is inactive. Complete department activation before recording payments.';return;}
-    if (!patient || !service || unit === null || !Number.isInteger(quantity) || quantity < 1 || quantity > 100 || !reference || !el('cash_point').value || !Number.isFinite(paid) || paid<=0 || (Math.round(paid * 100) !== Math.round(amount * 100) && el('override_reason').value.trim().length<5)) {
-      message.textContent = 'Select a cash point, patient and approved service, enter a reference and positive amount, and provide a reason of at least five characters for any price change.';
+    if (!patient || !el('service').value.trim() || !Number.isInteger(quantity) || quantity < 1 || quantity > 100 || !reference || !el('cash_point').value || !Number.isFinite(paid) || paid<=0) {
+      message.textContent = 'Select a cash point and patient, enter the service description, reference and a positive full service amount.';
       return;
     }
     if (!el('occurred').value || !Number.isFinite(Date.parse(el('occurred').value)) || Date.parse(el('occurred').value) > Date.now() + 60000) {
@@ -413,14 +400,14 @@ async function enhancedRecordPaymentPreview(capture) {
         el('occurred').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
         const key = form.dataset.requestKey || (form.dataset.requestKey = crypto.randomUUID());
         const recorded=await api('record-payment/',{method:'POST',body:JSON.stringify({
-          patient:patient.id,department:el('department').value,service:service.id,quantity,
+          patient:patient.id,department:el('department').value,service_description:el('service').value.trim(),patient_type:el('category').value==='self_pay'?'regular':el('category').value,base_amount:Number(el('paid').value).toFixed(2),quantity,
           cash_point:el('cash_point').value,cash_order:el('cash_order').value||null,
           amount:paid.toFixed(2),override_reason:el('override_reason').value.trim(),channel:el('channel').value,
           submitted_reference:reference,reported_paid_at:new Date(el('occurred').value).toISOString(),
           remarks:el('remarks').value.trim(),idempotency_key:key
         })});
         const {invoice,payment}=recorded;
-        content.querySelector('[data-rp-receipt]').innerHTML=details([['Invoice',invoice.invoice_number],['Patient',fullName(patient)],['Department',departments.find(d=>String(d.id)===el('department').value)?.name],['Service',service.name],['Amount',moneyWhole(payment.amount)],['Payment status',payment.status]])+'<p>Payment recorded. An official receipt has not been issued; verification is pending.</p>';
+        content.querySelector('[data-rp-receipt]').innerHTML=details([['Invoice',invoice.invoice_number],['Patient',fullName(patient)],['Department',departments.find(d=>String(d.id)===el('department').value)?.name],['Service',el('service').value.trim()],['Amount',moneyWhole(payment.amount)],['Payment status',payment.status]])+'<p>Payment recorded. An official receipt has not been issued; verification is pending.</p>';
         message.textContent = `Payment attempt ${payment.reference} recorded. Status: ${payment.status}. Amount due: ${moneyWhole(invoice.outstanding_balance)}. Reference submission does not verify payment; no paid receipt has been issued.`;
         payments.unshift(payment);
         if(recorded.price_changed)message.textContent+=' The price change has been flagged for review.';

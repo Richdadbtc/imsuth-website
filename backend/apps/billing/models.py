@@ -122,9 +122,14 @@ class Invoice(TimeStampedModel):
 
 
 class InvoiceItem(TimeStampedModel):
+    is_manual = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=(models.Q(is_manual=True, service__isnull=True, tariff_version__isnull=True) | models.Q(is_manual=False, service__isnull=False, tariff_version__isnull=False)), name="invoice_item_source_consistent")]
+
     invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT, related_name="items")
-    service = models.ForeignKey("catalogue.Service", on_delete=models.PROTECT)
-    tariff_version = models.ForeignKey("catalogue.TariffVersion", on_delete=models.PROTECT)
+    service = models.ForeignKey("catalogue.Service", on_delete=models.PROTECT, null=True, blank=True)
+    tariff_version = models.ForeignKey("catalogue.TariffVersion", on_delete=models.PROTECT, null=True, blank=True)
     service_code = models.CharField(max_length=32)
     description = models.CharField(max_length=200)
     quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
