@@ -113,7 +113,8 @@ def print_receipt(self,request,pk=None):
     AuditEvent.record('receipt.print_viewed',actor=request.user,obj=obj)
     paper=request.query_params.get('paper','a4')
     if paper not in {'a4','thermal'}:raise APIValidationError('Choose A4 or thermal paper.')
-    html=render_to_string('paypoint/receipt.html',{'receipt':obj,'items':obj.invoice.items.all(),'thermal':paper=='thermal'})
+    from .receipt_assets import receipt_images
+    html=render_to_string('paypoint/receipt.html',{'receipt':obj,'items':obj.invoice.items.all(),'thermal':paper=='thermal',**receipt_images(obj)})
     response=HttpResponse(html);response['Cache-Control']='private, no-store';return response
 
 ReceiptViewSet.print_receipt=print_receipt
