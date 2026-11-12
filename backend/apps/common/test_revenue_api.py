@@ -114,7 +114,7 @@ class RevenueControlTests(TestCase):
     def test_reference_submission_does_not_confirm(self):
         self.client.force_authenticate(self.cashier)
         invoice=Invoice.create_from_items(patient=self.patient,department=self.dep,item_requests=[{'service':self.service}],created_by=self.cashier)
-        response=self.post('payments',{'invoice':str(invoice.pk),'channel':'pos','idempotency_key':'reference-only','submitted_reference':'SYNTHETIC-REFERENCE'})
+        response=self.post('payments',{'invoice':str(invoice.pk),'channel':'pos','idempotency_key':'reference-only','submitted_reference':'09FG2611042341124813CY0W7'})
         self.assertEqual(response.status_code,201,response.data)
         self.assertEqual(response.data['status'],'awaiting_offline_verification')
         self.assertFalse(Receipt.objects.filter(payment_id=response.data['id']).exists())

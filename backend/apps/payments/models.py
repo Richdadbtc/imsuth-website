@@ -117,6 +117,8 @@ class Receipt(TimeStampedModel):
     def save(self, *args, **kwargs):
         if self.pk and Receipt.objects.filter(pk=self.pk).exists():
             raise ValidationError("Official receipts are immutable.")
+        from .slip_reference import validate_slip_reference
+        validate_slip_reference(self.payment.submitted_reference,self.payment.channel)
         if self.payment.status != Payment.Status.CONFIRMED:
             raise ValidationError("A receipt requires a confirmed payment.")
         return super().save(*args, **kwargs)

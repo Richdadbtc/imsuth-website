@@ -110,6 +110,9 @@ def print_receipt(self,request,pk=None):
     obj=self.get_object()
     if obj.payment.status != Payment.Status.CONFIRMED:
         raise APIValidationError('The underlying payment is not currently confirmed.')
+    from .slip_reference import validate_slip_reference
+    try:validate_slip_reference(obj.payment.submitted_reference,obj.payment.channel)
+    except ValidationError as error:raise APIValidationError(error.messages) from error
     AuditEvent.record('receipt.print_viewed',actor=request.user,obj=obj)
     paper=request.query_params.get('paper','a4')
     if paper not in {'a4','thermal'}:raise APIValidationError('Choose A4 or thermal paper.')

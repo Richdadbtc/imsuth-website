@@ -23,6 +23,12 @@ from .revenue_api import scoped_cash_points, scoped_cash_orders, scoped
 
 
 class CaptureInput(serializers.Serializer):
+    def validate(self,data):
+        from apps.payments.slip_reference import validate_slip_reference
+        try:data['submitted_reference']=validate_slip_reference(data['submitted_reference'],data['channel'])
+        except DjangoValidationError as error:raise serializers.ValidationError({'submitted_reference':error.messages}) from error
+        return data
+
     patient = serializers.UUIDField()
     department = serializers.UUIDField()
     service = serializers.UUIDField(required=False,allow_null=True,default=None)

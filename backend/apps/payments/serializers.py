@@ -24,6 +24,12 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = ("id", "invoice", "reference", "idempotency_key", "channel", "provider", "provider_reference", "submitted_reference", "reported_paid_at", "remarks", "amount", "currency", "status", "created_at", "confirmed_at", "collected_by_id", "collected_by_name", "patient_name", "department_id", "department", "invoice_number", "receipt_number", "receipt_id", "service_summary")
         read_only_fields = ("id", "reference", "provider", "provider_reference", "amount", "currency", "status", "created_at", "confirmed_at")
 
+    def validate(self,data):
+        from .slip_reference import validate_slip_reference
+        try:data['submitted_reference']=validate_slip_reference(data.get('submitted_reference',getattr(self.instance,'submitted_reference','')),data.get('channel',getattr(self.instance,'channel','')))
+        except DjangoValidationError as error:raise serializers.ValidationError({'submitted_reference':error.messages}) from error
+        return data
+
     def validate_reported_paid_at(self,value):
         from django.utils import timezone
         from datetime import timedelta
