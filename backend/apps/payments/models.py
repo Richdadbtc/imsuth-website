@@ -34,6 +34,7 @@ class Payment(TimeStampedModel):
     channel = models.CharField(max_length=32, choices=Channel.choices)
     provider = models.CharField(max_length=64, blank=True)
     provider_reference = models.CharField(max_length=120, blank=True, db_index=True)
+    cash_receiver = models.CharField(max_length=100, blank=True)
     submitted_reference = models.CharField(max_length=120, blank=True)
     reported_paid_at = models.DateTimeField(null=True,blank=True)
     remarks = models.CharField(max_length=500,blank=True)

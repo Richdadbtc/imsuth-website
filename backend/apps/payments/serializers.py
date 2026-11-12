@@ -21,8 +21,8 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         extra_kwargs = {'idempotency_key': {'validators': []}}
         model = Payment
-        fields = ("id", "invoice", "reference", "idempotency_key", "channel", "provider", "provider_reference", "submitted_reference", "reported_paid_at", "remarks", "amount", "currency", "status", "created_at", "confirmed_at", "collected_by_id", "collected_by_name", "patient_name", "department_id", "department", "invoice_number", "receipt_number", "receipt_id", "service_summary")
-        read_only_fields = ("id", "reference", "provider", "provider_reference", "amount", "currency", "status", "created_at", "confirmed_at")
+        fields = ("id", "invoice", "reference", "idempotency_key", "channel", "provider", "provider_reference", "cash_receiver", "submitted_reference", "reported_paid_at", "remarks", "amount", "currency", "status", "created_at", "confirmed_at", "collected_by_id", "collected_by_name", "patient_name", "department_id", "department", "invoice_number", "receipt_number", "receipt_id", "service_summary")
+        read_only_fields = ("cash_receiver", "id", "reference", "provider", "provider_reference", "amount", "currency", "status", "created_at", "confirmed_at")
 
     def validate(self,data):
         from .slip_reference import validate_slip_reference

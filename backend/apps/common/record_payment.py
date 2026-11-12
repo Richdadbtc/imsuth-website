@@ -27,6 +27,12 @@ class CaptureInput(serializers.Serializer):
         from apps.payments.slip_reference import validate_slip_reference
         try:data['submitted_reference']=validate_slip_reference(data['submitted_reference'],data['channel'])
         except DjangoValidationError as error:raise serializers.ValidationError({'submitted_reference':error.messages}) from error
+        from apps.payments.cash_receivers import CASH_RECEIVERS
+        if data['channel']=='cash':
+            if data['cash_receiver'] not in CASH_RECEIVERS:raise serializers.ValidationError({'cash_receiver':'Select an approved cash receiver.'})
+            data['submitted_reference']=''
+        elif data['cash_receiver']:raise serializers.ValidationError({'cash_receiver':'A cash receiver applies only to cash payments.'})
+        elif not data['submitted_reference']:raise serializers.ValidationError({'submitted_reference':'Enter the payment reference.'})
         return data
 
     patient = serializers.UUIDField()
@@ -41,7 +47,8 @@ class CaptureInput(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=19, decimal_places=2, min_value=Decimal('0.01'))
     override_reason = serializers.CharField(max_length=500, allow_blank=True, default='')
     channel = serializers.ChoiceField(choices=Payment.Channel.choices)
-    submitted_reference = serializers.CharField(max_length=120)
+    cash_receiver = serializers.CharField(max_length=100,allow_blank=True,default='')
+    submitted_reference = serializers.CharField(max_length=120,allow_blank=True,default='')
     reported_paid_at = serializers.DateTimeField()
     remarks = serializers.CharField(max_length=500, allow_blank=True, default='')
     idempotency_key = serializers.UUIDField()
@@ -66,7 +73,8 @@ class RecordPaymentView(APIView):
         for receipt in receipts:
             items=list(receipt.invoice.items.all());used=sum(hasattr(item,'delivery') for item in items)
             latest.append({'id':str(receipt.pk),'receipt_number':receipt.receipt_number,'patient_name':str(receipt.invoice.patient),'service':', '.join(item.description for item in items),'department':receipt.invoice.department.name,'amount':receipt.amount,'payment_status':receipt.payment.status,'service_status':'Used' if items and used==len(items) else 'Partially used' if used else 'Not yet used','issued_at':receipt.issued_at})
-        return Response({'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
+        from apps.payments.cash_receivers import CASH_RECEIVERS
+        return Response({'cash_receivers':CASH_RECEIVERS,'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
 
     def post(self,request):
         if request.user.role not in {'super_admin','finance','cashier'}: raise PermissionDenied('Only collection officers and finance administrators may record payments.')
@@ -81,7 +89,7 @@ class RecordPaymentView(APIView):
                 if old:
                     if old.created_by_id!=request.user.pk or old.fingerprint!=fingerprint: raise ValidationError('This request key belongs to a different submission.')
                     return Response(capture_payload(old))
-                if Payment.objects.filter(channel=data['channel'],submitted_reference=data['submitted_reference']).exists():raise ValidationError({'submitted_reference':'This payment reference has already been recorded. Check the existing transaction.'})
+                if data['channel']!='cash' and Payment.objects.filter(channel=data['channel'],submitted_reference=data['submitted_reference']).exists():raise ValidationError({'submitted_reference':'This payment reference has already been recorded. Check the existing transaction.'})
                 department=scoped(Department.objects.filter(pk=data['department'],is_active=True),request.user,'pk').first()
                 if not department: raise ValidationError({'department':'Select an active permitted department.'})
                 from .api import RevenuePatientViewSet
@@ -127,9 +135,9 @@ class RecordPaymentView(APIView):
                     used=sum(active.filter(cash_point=point,payment__channel='cash',created_at__date=timezone.localdate()).values_list('entered_total',flat=True),Decimal('0'))
                     if point.daily_limit is not None and used+data['amount']>point.daily_limit:raise ValidationError({'cash_point':'This cash point daily collection limit would be exceeded.'})
                 payment=Payment.create_intent(invoice=invoice,channel=data['channel'],initiated_by=request.user,idempotency_key='record:'+str(data['idempotency_key']))
-                payment.submitted_reference=data['submitted_reference'];payment.reported_paid_at=data['reported_paid_at'];payment.remarks=data['remarks'];payment.save(update_fields=['submitted_reference','reported_paid_at','remarks','updated_at'])
+                payment.cash_receiver=data['cash_receiver'];payment.submitted_reference=data['submitted_reference'];payment.reported_paid_at=data['reported_paid_at'];payment.remarks=data['remarks'];payment.save(update_fields=['cash_receiver','submitted_reference','reported_paid_at','remarks','updated_at'])
                 context=RecordedPayment.objects.create(idempotency_key=str(data['idempotency_key']),fingerprint=fingerprint,created_by=request.user,cash_point=point,cash_order=order,payment=payment,patient_type=data['patient_type'],base_total=base,discount_total=discount,approved_total=approved,entered_total=data['amount'],override_reason=data['override_reason'])
-                AuditEvent.record('payment.recorded_at_point',actor=request.user,obj=payment,request=request,metadata={'cash_point':str(point.pk),'cash_order':str(order.pk) if order else None,'patient_type':data['patient_type'],'base_total':str(base),'discount_total':str(discount),'manual_service':manual,'service_description':data['service_description'] if manual else service.name,'approved_total':str(approved),'entered_total':str(data['amount']),'override_reason':data['override_reason']})
+                AuditEvent.record('payment.recorded_at_point',actor=request.user,obj=payment,request=request,metadata={'cash_receiver':payment.cash_receiver,'cash_point':str(point.pk),'cash_order':str(order.pk) if order else None,'patient_type':data['patient_type'],'base_total':str(base),'discount_total':str(discount),'manual_service':manual,'service_description':data['service_description'] if manual else service.name,'approved_total':str(approved),'entered_total':str(data['amount']),'override_reason':data['override_reason']})
                 if manual or approved!=data['amount']:
                     Alert.objects.create(department=department,alert_type='service_price_change',severity='medium',description='Manual service and officer-entered full price require review.' if manual else 'Recorded payment differs from the approved tariff; review the recorded reason.',related_type='payments.Payment',related_id=str(payment.pk))
                 return Response(capture_payload(context),status=201)
