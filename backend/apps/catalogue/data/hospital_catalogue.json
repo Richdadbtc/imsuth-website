@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-28.1",
+  "version": "2026-11-12.1",
   "status": "proposed-unverified",
   "notice": "Inactive placeholders only; hospital review is required. No services, tariffs or prices are included.",
   "entries": [
@@ -280,6 +280,34 @@
       "kind": "department",
       "code": "SPC",
       "name": "Special Clinics",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "MIC",
+      "name": "Microbiology",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "NICU",
+      "name": "NICU",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "OXY",
+      "name": "Oxygen Plant",
+      "department_code": "",
+      "parent_code": ""
+    },
+    {
+      "kind": "department",
+      "code": "KIT",
+      "name": "Kitchen",
       "department_code": "",
       "parent_code": ""
     },

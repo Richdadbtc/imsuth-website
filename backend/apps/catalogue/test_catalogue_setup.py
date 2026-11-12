@@ -28,15 +28,15 @@ class CatalogueSetupTests(TestCase):
         return apply(self.data,self.keys,self.maker,'Verified proposal import')
 
     def test_master_is_nonbillable_and_idempotent(self):
-        self.assertEqual(len(self.data['entries']),52)
-        self.assertEqual(self.load()['created_count'],52)
-        self.assertEqual(Department.objects.count(),40)
+        self.assertEqual(len(self.data['entries']),56)
+        self.assertEqual(self.load()['created_count'],56)
+        self.assertEqual(Department.objects.count(),44)
         self.assertEqual(DepartmentCategory.objects.count(),12)
         self.assertFalse(Department.objects.filter(is_active=True).exists())
         self.assertFalse(DepartmentCategory.objects.filter(is_active=True).exists())
         self.assertFalse(Service.objects.exists());self.assertFalse(TariffVersion.objects.exists())
         self.assertEqual(self.load()['created_count'],0)
-        self.assertEqual(AuditEvent.objects.filter(action='catalogue.placeholder.imported').count(),52)
+        self.assertEqual(AuditEvent.objects.filter(action='catalogue.placeholder.imported').count(),56)
 
     def test_report_and_dry_run_are_read_only(self):
         before=AuditEvent.objects.count()
@@ -47,7 +47,7 @@ class CatalogueSetupTests(TestCase):
 
     def test_existing_identity_code_and_status_are_preserved(self):
         dep=Department.objects.create(code='OLD-RAD',name='Radiology & Imaging',is_active=True)
-        self.assertEqual(self.load()['created_count'],51)
+        self.assertEqual(self.load()['created_count'],55)
         dep.refresh_from_db();self.assertEqual(dep.code,'OLD-RAD');self.assertTrue(dep.is_active)
         self.assertEqual(dep.catalogue_categories.count(),3)
 
@@ -79,7 +79,7 @@ class CatalogueSetupTests(TestCase):
         with self.assertRaises(ValidationError):self.load()
         with self.assertRaises(ValidationError):apply(self.data,self.keys,self.maker,'Verified proposal import',confirmation=CONFIRM)
         result=apply(self.data,self.keys,self.maker,'Verified proposal import',confirmation=CONFIRM,plan_token=plan(self.data)['plan_token'])
-        self.assertEqual(result['created_count'],52)
+        self.assertEqual(result['created_count'],56)
 
     def test_csv_roundtrip_rejects_financial_and_privilege_columns(self):
         self.assertEqual(proposal(csv_export(self.data))['entries'],self.data['entries'])
