@@ -79,3 +79,5 @@ body.dark-theme .compact-record-grid input,body.dark-theme .compact-record-grid 
 .receipt-preview-dialog iframe[hidden]{display:none}
 .receipt-preview-dialog button{padding:10px 18px;border:1px solid #1c4ed8;border-radius:6px;background:#fff;color:#1642aa;cursor:pointer}
 .receipt-preview-dialog footer{justify-content:flex-end;margin-top:14px}.receipt-preview-dialog [data-print]{background:#1c4ed8;color:#fff}.receipt-preview-dialog button:disabled{opacity:.5;cursor:wait}
+
+.compact-record-grid input[type="checkbox"]{width:auto;min-height:0;margin-right:8px;vertical-align:middle}

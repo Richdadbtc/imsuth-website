@@ -33,9 +33,11 @@ class CaptureInput(serializers.Serializer):
             data['submitted_reference']=''
         elif data['cash_receiver']:raise serializers.ValidationError({'cash_receiver':'A cash receiver applies only to cash payments.'})
         elif not data['submitted_reference']:raise serializers.ValidationError({'submitted_reference':'Enter the payment reference.'})
+        if data['payment_received'] and data['channel'] not in {'cash','pos','bank_transfer'}:raise serializers.ValidationError({'payment_received':'Online payments require provider confirmation.'})
         if not data['patient'] and not data['patient_name'].strip():raise serializers.ValidationError({'patient_name':'Enter the patient name.'})
         return data
 
+    payment_received = serializers.BooleanField(default=False)
     patient = serializers.UUIDField(required=False,allow_null=True,default=None)
     patient_name = serializers.CharField(max_length=200,allow_blank=True,default='')
     department = serializers.UUIDField()
@@ -76,7 +78,7 @@ class RecordPaymentView(APIView):
             items=list(receipt.invoice.items.all());used=sum(hasattr(item,'delivery') for item in items)
             latest.append({'id':str(receipt.pk),'receipt_number':receipt.receipt_number,'patient_name':receipt.invoice.patient_display_name,'service':', '.join(item.description for item in items),'department':receipt.invoice.department.name,'amount':receipt.amount,'payment_status':receipt.payment.status,'service_status':'Used' if items and used==len(items) else 'Partially used' if used else 'Not yet used','issued_at':receipt.issued_at})
         from apps.payments.cash_receivers import CASH_RECEIVERS
-        return Response({'unregistered_patient_entry':True,'cash_receivers':CASH_RECEIVERS,'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
+        return Response({'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receivers':CASH_RECEIVERS,'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
 
     def post(self,request):
         if request.user.role not in {'super_admin','finance','cashier'}: raise PermissionDenied('Only collection officers and finance administrators may record payments.')
@@ -144,6 +146,18 @@ class RecordPaymentView(APIView):
                 AuditEvent.record('payment.recorded_at_point',actor=request.user,obj=payment,request=request,metadata={'cash_receiver':payment.cash_receiver,'cash_point':str(point.pk),'cash_order':str(order.pk) if order else None,'patient_type':data['patient_type'],'base_total':str(base),'discount_total':str(discount),'manual_service':manual,'service_description':data['service_description'] if manual else service.name,'approved_total':str(approved),'entered_total':str(data['amount']),'override_reason':data['override_reason']})
                 if manual or approved!=data['amount']:
                     Alert.objects.create(department=department,alert_type='service_price_change',severity='medium',description='Manual service and officer-entered full price require review.' if manual else 'Recorded payment differs from the approved tariff; review the recorded reason.',related_type='payments.Payment',related_id=str(payment.pk))
+                if data['payment_received']:
+                    # The authenticated collection officer explicitly attests receipt of funds.
+                    # A slip reference alone never triggers this confirmation.
+                    payment.status=Payment.Status.CONFIRMED;payment.confirmed_at=timezone.now()
+                    payment.save(update_fields=['status','confirmed_at','updated_at'])
+                    invoice.amount_paid=payment.amount;invoice.status=Invoice.Status.PAID
+                    invoice.save(update_fields=['amount_paid','status','updated_at'])
+                    payment.invoice=invoice
+                    year=timezone.localdate().year
+                    import secrets
+                    receipt=Receipt.objects.create(payment=payment,invoice=invoice,receipt_number=f"RCT-{year}-{Sequence.next_value(f'receipt:{year}'):010d}",verification_token=secrets.token_hex(32),amount=payment.amount,currency=payment.currency)
+                    AuditEvent.record('payment.staff_received_confirmed',actor=request.user,obj=payment,request=request,metadata={'receipt_id':str(receipt.pk),'channel':payment.channel,'cash_receiver':payment.cash_receiver,'submitted_reference':payment.submitted_reference,'confirmation_method':'collection_officer_attestation'})
                 return Response(capture_payload(context),status=201)
         except DjangoValidationError as error:raise ValidationError(error.messages) from error
         except IntegrityError as error:raise ValidationError('Concurrent capture conflict; retry the same request key.') from error

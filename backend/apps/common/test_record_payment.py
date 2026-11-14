@@ -213,3 +213,26 @@ class RecordPaymentTests(TestCase):
         self.assertEqual(Invoice.objects.count(),before)
         self.data.update(patient=str(uuid4()),patient_name='Cannot override invalid patient')
         self.assertEqual(self.post().status_code,400)
+
+    def test_staff_received_confirmation_issues_one_paid_printable_receipt(self):
+        from apps.auditlog.models import AuditEvent
+        for channel,reference in [('cash',''),('pos','631313012611'),('bank_transfer','09FG2611042341124813CY0W7')]:
+            with self.subTest(channel=channel):
+                self.data.pop('patient',None)
+                self.data.update(patient_name='Receipt Example',channel=channel,submitted_reference=reference,cash_receiver='Nwaele Juliet' if channel=='cash' else '',payment_received=True,idempotency_key=str(uuid4()))
+                before=Receipt.objects.count()
+                result=self.post();self.assertEqual(result.status_code,201,result.data)
+                self.assertTrue(result.data['receipt_issued'])
+                self.assertEqual(result.data['payment']['status'],'confirmed')
+                self.assertEqual(Decimal(result.data['invoice']['amount_paid']),Decimal('100'))
+                payment=Payment.objects.get(pk=result.data['payment']['id'])
+                self.assertEqual(payment.invoice.status,'paid')
+                self.assertEqual(payment.invoice.outstanding_balance,Decimal('0'))
+                self.assertContains(self.client.get(f'/api/v1/receipts/{payment.receipt.pk}/print/'),'Receipt Example')
+                self.assertEqual(self.post().status_code,200)
+                self.assertEqual(Receipt.objects.count(),before+1)
+                self.assertTrue(AuditEvent.objects.filter(action='payment.staff_received_confirmed',actor=self.cashier).exists())
+
+    def test_online_cannot_use_staff_received_confirmation(self):
+        self.data.update(channel='online',cash_receiver='',submitted_reference='online-example',payment_received=True)
+        self.assertEqual(self.post().status_code,400)
