@@ -385,6 +385,7 @@ class RevenueDashboardView(APIView):
             start,end=date_range(request.query_params)
             return Response({
                 'period':{'start':start,'end':end},
+                'cash_received':{'amount':confirmed.filter(channel='cash').aggregate(n=Sum('amount'))['n'] or 0,'transactions':confirmed.filter(channel='cash').count()},
                 'cash_under_orders':{'amount':confirmed.filter(channel='cash',recorded_context__cash_order__isnull=False).aggregate(n=Sum('amount'))['n'] or 0,'transactions':confirmed.filter(channel='cash',recorded_context__cash_order__isnull=False).count()},
                 'insurance':{'nhis':None,'imshia':None,'configured':False},
                 'cash_orders':{'amount':dated(scoped(CashOrder.objects.filter(status='approved'),request.user,'cash_point__department_id'),request.query_params).aggregate(n=Sum('amount'))['n'] or 0,'count':dated(scoped(CashOrder.objects.filter(status='approved'),request.user,'cash_point__department_id'),request.query_params).count()},

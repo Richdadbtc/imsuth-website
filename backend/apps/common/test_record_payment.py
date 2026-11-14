@@ -223,6 +223,7 @@ class RecordPaymentTests(TestCase):
                 before=Receipt.objects.count()
                 result=self.post();self.assertEqual(result.status_code,201,result.data)
                 self.assertTrue(result.data['receipt_issued'])
+                self.assertTrue(result.data['payment']['receipt_number'].startswith('IMSUTH-RCT-'))
                 self.assertEqual(result.data['payment']['status'],'confirmed')
                 self.assertEqual(Decimal(result.data['invoice']['amount_paid']),Decimal('100'))
                 payment=Payment.objects.get(pk=result.data['payment']['id'])
@@ -236,3 +237,17 @@ class RecordPaymentTests(TestCase):
     def test_online_cannot_use_staff_received_confirmation(self):
         self.data.update(channel='online',cash_receiver='',submitted_reference='online-example',payment_received=True)
         self.assertEqual(self.post().status_code,400)
+
+    def test_overview_includes_cash_without_standing_order(self):
+        self.data.update(payment_received=True)
+        result=self.post();self.assertEqual(result.status_code,201,result.data)
+        self.client.force_authenticate(self.finance)
+        coverage=self.client.get('/api/v1/dashboard/overview-coverage/?period=all').data
+        self.assertEqual(coverage['cash_received']['amount'],Decimal('200'))
+        self.assertEqual(coverage['cash_received']['transactions'],2)
+        self.assertEqual(coverage['cash_under_orders']['amount'],0)
+        channels=self.client.get('/api/v1/dashboard/collections-by-channel/?period=all').data
+        self.assertEqual(next(r for r in channels if r['channel']=='cash')['amount'],Decimal('200'))
+        self.assertTrue(any(r['channel']=='cash' for r in coverage['daily_channels']))
+        payment=Payment.objects.get(pk=result.data['payment']['id']);payment.status='reversed';payment.save()
+        self.assertEqual(self.client.get('/api/v1/dashboard/overview-coverage/?period=all').data['cash_received']['amount'],Decimal('100'))

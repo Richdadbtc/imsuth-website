@@ -156,7 +156,7 @@ class RecordPaymentView(APIView):
                     payment.invoice=invoice
                     year=timezone.localdate().year
                     import secrets
-                    receipt=Receipt.objects.create(payment=payment,invoice=invoice,receipt_number=f"RCT-{year}-{Sequence.next_value(f'receipt:{year}'):010d}",verification_token=secrets.token_hex(32),amount=payment.amount,currency=payment.currency)
+                    receipt=Receipt.objects.create(payment=payment,invoice=invoice,receipt_number=f"IMSUTH-RCT-{year}-{Sequence.next_value(f'receipt:{year}'):010d}",verification_token=secrets.token_hex(32),amount=payment.amount,currency=payment.currency)
                     AuditEvent.record('payment.staff_received_confirmed',actor=request.user,obj=payment,request=request,metadata={'receipt_id':str(receipt.pk),'channel':payment.channel,'cash_receiver':payment.cash_receiver,'submitted_reference':payment.submitted_reference,'confirmation_method':'collection_officer_attestation'})
                 return Response(capture_payload(context),status=201)
         except DjangoValidationError as error:raise ValidationError(error.messages) from error

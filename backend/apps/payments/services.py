@@ -90,7 +90,7 @@ def confirm_payment_event(*, adapter, raw_body, signature):
         receipt_number = Sequence.next_value(f"receipt:{year}")
         receipt = Receipt.objects.create(
             payment=payment, invoice=invoice,
-            receipt_number=f"RCT-{year}-{receipt_number:010d}",
+            receipt_number=f"IMSUTH-RCT-{year}-{receipt_number:010d}",
             verification_token=hashlib.sha256(f"{uuid.uuid4()}:{payment.pk}".encode()).hexdigest(),
             amount=payment.amount, currency=payment.currency,
         )

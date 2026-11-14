@@ -47,6 +47,7 @@ class PaymentLifecycleTests(TestCase):
         confirmed, processed = confirm_payment_event(adapter=DeterministicTestAdapter(), raw_body=body, signature=self.sign(body))
         self.assertTrue(processed)
         self.assertEqual(confirmed.status, Payment.Status.CONFIRMED)
+        self.assertTrue(confirmed.receipt.receipt_number.startswith("IMSUTH-RCT-"))
         self.assertEqual(Receipt.objects.filter(payment=payment).count(), 1)
         self.invoice.refresh_from_db()
         self.assertEqual(self.invoice.status, Invoice.Status.PAID)
