@@ -1,0 +1,347 @@
+[
+  {
+    "id": "dashboard",
+    "label": "Management Dashboard",
+    "section": "dashboard"
+  },
+  {
+    "id": "dashboard-overview-preview",
+    "label": "Overview Dashboard",
+    "section": "dashboard"
+  },
+  {
+    "id": "dashboard-record-payment",
+    "label": "Record Payment",
+    "section": "dashboard"
+  },
+  {
+    "id": "dashboard-front-desk",
+    "label": "Front Desk Dashboard",
+    "section": "dashboard"
+  },
+  {
+    "id": "dashboard-cashier",
+    "label": "Cashier Dashboard",
+    "section": "dashboard"
+  },
+  {
+    "id": "dashboard-finance",
+    "label": "Finance Dashboard",
+    "section": "dashboard"
+  },
+  {
+    "id": "dashboard-daily",
+    "label": "Daily Activity Overview",
+    "section": "dashboard"
+  },
+  {
+    "id": "patients",
+    "label": "Department Desk",
+    "section": "patients"
+  },
+  {
+    "id": "patient-directory",
+    "label": "All Patients",
+    "section": "patients"
+  },
+  {
+    "id": "patient-registration",
+    "label": "Register Patient",
+    "section": "patients"
+  },
+  {
+    "id": "patient-profile",
+    "label": "Patient Profiles",
+    "section": "patients"
+  },
+  {
+    "id": "patient-search",
+    "label": "Patient Search",
+    "section": "patients"
+  },
+  {
+    "id": "patient-billing-history",
+    "label": "Patient Billing History",
+    "section": "patients"
+  },
+  {
+    "id": "billing",
+    "label": "All Invoices",
+    "section": "billing"
+  },
+  {
+    "id": "cash-points",
+    "label": "Cash Points and Orders",
+    "section": "billing"
+  },
+  {
+    "id": "billing-create",
+    "label": "Create Invoice",
+    "section": "billing"
+  },
+  {
+    "id": "billing-pending",
+    "label": "Pending Invoices",
+    "section": "billing"
+  },
+  {
+    "id": "billing-details",
+    "label": "Invoice Details",
+    "section": "billing"
+  },
+  {
+    "id": "billing-paid",
+    "label": "Paid Invoices",
+    "section": "billing"
+  },
+  {
+    "id": "billing-cancelled",
+    "label": "Cancelled / Corrected Invoices",
+    "section": "billing"
+  },
+  {
+    "id": "billing-services",
+    "label": "Departments & Services",
+    "section": "billing"
+  },
+  {
+    "id": "billing-tariffs",
+    "label": "Service Tariffs",
+    "section": "billing"
+  },
+  {
+    "id": "payments",
+    "label": "All Transactions",
+    "section": "payments"
+  },
+  {
+    "id": "payments-process",
+    "label": "Process Payment",
+    "section": "payments"
+  },
+  {
+    "id": "payments-verify",
+    "label": "Verify Payment",
+    "section": "payments"
+  },
+  {
+    "id": "payments-pending",
+    "label": "Pending Payments",
+    "section": "payments"
+  },
+  {
+    "id": "payments-verified",
+    "label": "Verified Payments",
+    "section": "payments"
+  },
+  {
+    "id": "payments-failed",
+    "label": "Failed Payments",
+    "section": "payments"
+  },
+  {
+    "id": "payments-receipts",
+    "label": "Receipts",
+    "section": "payments"
+  },
+  {
+    "id": "payments-receipt-verification",
+    "label": "Receipt Verification",
+    "section": "payments"
+  },
+  {
+    "id": "payments-receipt-reprints",
+    "label": "Receipt Reprints",
+    "section": "payments"
+  },
+  {
+    "id": "finance",
+    "label": "Finance Overview",
+    "section": "finance"
+  },
+  {
+    "id": "finance-collections",
+    "label": "Revenue Collections",
+    "section": "finance"
+  },
+  {
+    "id": "finance-settlements",
+    "label": "Daily Settlement",
+    "section": "finance"
+  },
+  {
+    "id": "finance-reports",
+    "label": "Revenue Reports",
+    "section": "finance"
+  },
+  {
+    "id": "finance-daily-report",
+    "label": "Daily Collection Report",
+    "section": "finance"
+  },
+  {
+    "id": "finance-department-report",
+    "label": "Department Revenue Report",
+    "section": "finance"
+  },
+  {
+    "id": "finance-cashier-report",
+    "label": "Cashier Collection Report",
+    "section": "finance"
+  },
+  {
+    "id": "finance-channel-report",
+    "label": "Payment Channel Report",
+    "section": "finance"
+  },
+  {
+    "id": "finance-reconciliation",
+    "label": "Bank Reconciliation",
+    "section": "finance"
+  },
+  {
+    "id": "alerts",
+    "label": "Alerts",
+    "section": "finance"
+  },
+  {
+    "id": "finance-discrepancies",
+    "label": "Reconciliation Discrepancies",
+    "section": "finance"
+  },
+  {
+    "id": "finance-refunds",
+    "label": "Refund Requests",
+    "section": "finance"
+  },
+  {
+    "id": "finance-reversals",
+    "label": "Reversal Requests",
+    "section": "finance"
+  },
+  {
+    "id": "finance-approvals",
+    "label": "Approval Queue",
+    "section": "finance"
+  },
+  {
+    "id": "administration",
+    "label": "Staff Management",
+    "section": "administration"
+  },
+  {
+    "id": "admin-catalogue-setup",
+    "label": "Hospital Catalogue Setup",
+    "section": "administration"
+  },
+  {
+    "id": "admin-add-staff",
+    "label": "Add Staff",
+    "section": "administration"
+  },
+  {
+    "id": "admin-roles",
+    "label": "Roles & Permissions",
+    "section": "administration"
+  },
+  {
+    "id": "admin-departments",
+    "label": "Departments Management",
+    "section": "administration"
+  },
+  {
+    "id": "admin-services",
+    "label": "Services and Prices",
+    "section": "administration"
+  },
+  {
+    "id": "admin-tariffs",
+    "label": "Tariff Management",
+    "section": "administration"
+  },
+  {
+    "id": "admin-notifications",
+    "label": "Notifications",
+    "section": "administration"
+  },
+  {
+    "id": "admin-settings",
+    "label": "System Settings",
+    "section": "administration"
+  },
+  {
+    "id": "users-audit",
+    "label": "Users and Audit",
+    "section": "administration"
+  },
+  {
+    "id": "admin-audit",
+    "label": "Audit Logs",
+    "section": "administration"
+  },
+  {
+    "id": "reports",
+    "label": "Reports Dashboard",
+    "section": "reports"
+  },
+  {
+    "id": "reports-revenue",
+    "label": "Revenue Reports",
+    "section": "reports"
+  },
+  {
+    "id": "reports-daily",
+    "label": "Daily Collection Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-department",
+    "label": "Department Revenue Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-cashier",
+    "label": "Cashier Collection Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-channel",
+    "label": "Payment Channel Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-outstanding",
+    "label": "Outstanding Invoices Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-settlement",
+    "label": "Settlement Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-reconciliation",
+    "label": "Reconciliation Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-audit",
+    "label": "Audit Trail Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-patients",
+    "label": "Patient Registration Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-system",
+    "label": "System Activity Report",
+    "section": "reports"
+  },
+  {
+    "id": "reports-export",
+    "label": "Export Reports",
+    "section": "reports"
+  }
+]

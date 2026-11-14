@@ -81,3 +81,7 @@ body.dark-theme .compact-record-grid input,body.dark-theme .compact-record-grid 
 .receipt-preview-dialog footer{justify-content:flex-end;margin-top:14px}.receipt-preview-dialog [data-print]{background:#1c4ed8;color:#fff}.receipt-preview-dialog button:disabled{opacity:.5;cursor:wait}
 
 .compact-record-grid input[type="checkbox"]{width:auto;min-height:0;margin-right:8px;vertical-align:middle}
+
+.ua-page-access{border:1px solid #dbe4ee;border-radius:8px;padding:12px}.ua-page-access [data-ua-page-choices]{display:grid;gap:8px;max-height:320px;overflow:auto;margin-top:12px}.ua-page-access [data-ua-page-choices] label{display:flex;align-items:center;gap:8px}.ua-page-access input[type="checkbox"]{width:auto;min-height:0}.ua-page-access small{color:#52677a}
+
+.page-shell a[data-page-denied]{display:none!important}

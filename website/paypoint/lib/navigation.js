@@ -53,3 +53,11 @@ export function screenFromSegments(segments) {
   return segments.join('/');
 }
 export const screenHref = screen => screen === 'dashboard' ? '/' : `/${encodeURIComponent(screen)}`;
+
+export function canAccessPage(user,page) {
+  const alias={'department-management':'admin-departments','services-management':'admin-services','help':'help-support'};
+  if(Array.isArray(user.allowed_pages))return user.allowed_pages.includes(alias[page]||page);
+  const permission=navigationPage[page]?.permission;
+  return !permission||Boolean(user.permissions?.[permission]);
+}
+export function firstAccessiblePage(user){return user.allowed_pages?.find(page=>navigationPage[page])||'my-profile';}

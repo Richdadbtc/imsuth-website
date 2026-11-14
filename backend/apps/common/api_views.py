@@ -17,7 +17,9 @@ from apps.registry.models import Patient
 
 
 def user_payload(user):
+    from apps.accounts.page_access import allowed_pages
     return {
+        "allowed_pages":allowed_pages(user),
         "id": user.pk,
         "username": user.username,
         "full_name": user.get_full_name() or user.username,
@@ -47,6 +49,8 @@ class SessionView(APIView):
     def get(self, request):
         payload = {"authenticated": request.user.is_authenticated, "csrf_token": get_token(request)}
         if request.user.is_authenticated:
+            from apps.accounts.page_access import can_access_page
+            if request.query_params.get("page") and not can_access_page(request.user,request.query_params["page"]):return Response({"detail":"Your administrator has not granted access to this page."},status=403)
             payload["user"] = user_payload(request.user)
         return Response(payload)
 

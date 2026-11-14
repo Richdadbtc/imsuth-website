@@ -41,11 +41,13 @@ class LoggedViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def perform_create(self, serializer):
         obj = serializer.save()
+        if hasattr(obj,'page_access'):AuditEvent.record('user.page_access_created',actor=self.request.user,obj=obj,metadata={'role':obj.role,'page_access':obj.page_access})
         AuditEvent.record('api.created', actor=self.request.user, obj=obj, request=self.request)
 
     @transaction.atomic
     def perform_update(self, serializer):
         obj = serializer.save()
+        if 'page_access' in serializer.validated_data:AuditEvent.record('user.page_access_changed',actor=self.request.user,obj=obj,metadata={'role':obj.role,'page_access':obj.page_access})
         AuditEvent.record('api.updated', actor=self.request.user, obj=obj, request=self.request)
 
     def destroy(self, request, *args, **kwargs):
@@ -58,7 +60,7 @@ class StaffSerializer(serializers.ModelSerializer):
     phone = serializers.CharField(source='account_profile.phone',required=False,allow_blank=True,max_length=30,default='')
     class Meta:
         model = User
-        fields = ('id','username','employee_id','first_name','last_name','full_name','email','role','department','is_active','date_joined','last_login','must_change_password','password','phone')
+        fields = ('id','username','employee_id','first_name','last_name','full_name','email','role','page_access','department','is_active','date_joined','last_login','must_change_password','password','phone')
         read_only_fields = ('id','date_joined','last_login','must_change_password')
     def get_full_name(self, obj) -> str:
         return obj.get_full_name() or obj.username
@@ -67,6 +69,15 @@ class StaffSerializer(serializers.ModelSerializer):
             raise ValidationError('Only a Django superuser may assign the system administrator role.')
         if self.instance and self.instance.pk == self.context['request'].user.pk and (data.get('is_active') is False or 'role' in data and data['role'] != self.instance.role):
             raise ValidationError('You cannot deactivate or change your own administrative role here.')
+        from apps.accounts.page_access import role_pages
+        role=data.get('role',getattr(self.instance,'role',''))
+        selected=data.get('page_access',getattr(self.instance,'page_access',None))
+        if selected is not None:
+            if not isinstance(selected,list) or any(not isinstance(p,str) for p in selected):raise ValidationError({'page_access':'Select a list of page identifiers or use role defaults.'})
+            if role=='super_admin':raise ValidationError({'page_access':'Super administrators retain full page access. Use role defaults.'})
+            if set(selected)-role_pages(role):raise ValidationError({'page_access':'Some selected pages are not available to this role.'})
+            if self.instance and self.instance.pk==self.context['request'].user.pk:raise ValidationError({'page_access':'You cannot restrict your own administrative access.'})
+            data['page_access']=sorted(set(selected))
         if 'password' in data:
             try:
                 validate_password(data['password'], self.instance or User(username=data.get('username',''), email=data.get('email','')))

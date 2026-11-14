@@ -4,7 +4,7 @@ import {mountHospitalCatalogueSetup} from './catalogue-setup.js';
 import {createLivePages} from './live-pages.js';
 import {refreshOverview,watchPaymentStatus,mountTariffProposals,mountCashEvidence,mountOverviewTransactions,mountDepartmentDirectory} from './revenue-live.js';
 import {api as request} from '../lib/api.js';
-import {navigationPage} from '../lib/navigation.js';
+import {navigationPage,canAccessPage,firstAccessiblePage} from '../lib/navigation.js';
 
 export function mountWorkspace(content, {user,navigate,onSignedOut,onProfileSaved,onUnreadCount}) {
 const abort = new AbortController();
@@ -15,6 +15,7 @@ let activeRows=[];
 const chartAttributes = {'data-chart-background':'background','data-chart-colour':'--department-colour','data-chart-width':'width','data-chart-height':'height'};
 const applyChartStyles = root => {
   if (!(root instanceof Element)) return;
+  for(const link of root.querySelectorAll('a[href^="#"]')){const page=link.getAttribute('href').slice(1);if(navigationPage[page]&&!canAccessPage(user,page))link.setAttribute('data-page-denied','');}
   for (const [attribute, property] of Object.entries(chartAttributes)) {
     const nodes = [...(root.hasAttribute(attribute) ? [root] : []), ...root.querySelectorAll(`[${attribute}]`)];
     for (const node of nodes) {
@@ -1650,6 +1651,7 @@ async function usersAndAudit() {
   }));
   const logs = await loadAll('audit-logs');
   const roles = Object.fromEntries(list(await api('users/role_choices/')).map(r=>[r.value,r.label]));
+  const pageChoices=await api('users/page_choices/');
   const departmentRecords = await loadAll('departments');
   const departments = departmentRecords.map(d => String(d.id));
   const departmentName = v => departmentRecords.find(d => String(d.id) === String(v))?.name || v || '—';
@@ -1667,10 +1669,22 @@ async function usersAndAudit() {
     dateStyle: 'medium',
     timeStyle: 'short'
   }) : 'Never';
-  content.innerHTML = `<div class="users-audit-page"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><label>Period<select data-ua-period><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="1">Today</option><option value="all">All records</option></select></label></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment">Record payment</a><a href="#patients">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit" aria-current="page">Users and audit</a></nav><p class="overview-preview-note">${'Connected to the authenticated backend. Changes affect real staff access and are audited. Choose a department and set an initial password when creating an account. Passwords are never displayed in the user directory.'}</p><div class="ua-layout"><main><header class="finance-overview-heading"><div><h1>Users and Audit</h1><p>Manage system users, roles and permissions. View audit logs of all important actions.</p></div><button class="pending-verify" data-ua-add >Add User</button></header><section class="finance-overview-kpis" data-ua-kpis></section><section class="finance-card"><form class="ua-filters" data-ua-filters><label>System Users<input name="search" type="search" placeholder="Search users by name, email or username..."></label><label>Role<select name="role"><option value="">All Roles</option>${Object.entries(roles).map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></label><label>Status<select name="status"><option value="">All Statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select></label><button class="pending-verify">Apply Filters</button><button type="reset" class="pending-outline">Reset</button></form></section><section class="finance-card"><div data-ua-users></div><div class="pending-pagination"><span data-ua-count aria-live="polite"></span><div data-ua-pages></div></div></section></main><aside><section class="finance-card"><h2 data-ua-editor-title>Add / Edit User</h2><form class="ua-editor" data-ua-editor><input type="hidden" name="id"><div class="ua-pair"><label>Full Name *<input name="full_name" required maxlength="150" placeholder="Enter full name..."></label><label>Username *<input name="username" required maxlength="150" pattern="[A-Za-z0-9_@.+-]+" placeholder="Enter username..."></label></div><label>Email Address *<input type="email" name="email" required maxlength="254" placeholder="Enter email address..."></label><div class="ua-pair"><label>Role *<select name="role" required><option value="">Select role</option>${Object.entries(roles).map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></label><label>Department<select name="department"><option value="">No department (hospital-wide)</option>${departments.map(v => `<option value="${esc(v)}">${esc(departmentName(v))}${departmentRecords.find(d=>String(d.id)===v)?.is_active===false?' (inactive)':''}</option>`).join('')}</select></label><label>Phone Number (optional)<input name="phone" type="tel" maxlength="30" placeholder="Enter phone number..."></label><label>Status *<select name="status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label></div><p>${departments.length?'Select the user’s department above.':'No departments have been imported yet.'} <a href="#admin-catalogue-setup">Manage department catalogue</a></p><div class="ua-pair"><label><span data-ua-password-label>Initial password *</span><input name="password" type="password" autocomplete="new-password" maxlength="4096" required></label><label>Confirm password<input name="password_confirm" type="password" autocomplete="new-password" maxlength="4096" required></label></div><p data-ua-password-help>Set a strong initial password. The backend validates and securely hashes it.</p><p data-ua-message role="status"></p><div class="ua-actions"><button type="reset" class="pending-outline">Clear Form</button><button class="pending-verify" >Save User</button></div></form></section><section class="finance-card"><div class="finance-card-heading"><h2>Recent Audit Logs</h2><button type="button" class="help-link" data-ua-all>View All</button></div><div data-ua-logs></div></section></aside></div></div>`;
+  content.innerHTML = `<div class="users-audit-page"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><label>Period<select data-ua-period><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="1">Today</option><option value="all">All records</option></select></label></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment">Record payment</a><a href="#patients">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit" aria-current="page">Users and audit</a></nav><p class="overview-preview-note">${'Connected to the authenticated backend. Changes affect real staff access and are audited. Choose a department and set an initial password when creating an account. Passwords are never displayed in the user directory.'}</p><div class="ua-layout"><main><header class="finance-overview-heading"><div><h1>Users and Audit</h1><p>Manage system users, roles and permissions. View audit logs of all important actions.</p></div><button class="pending-verify" data-ua-add >Add User</button></header><section class="finance-overview-kpis" data-ua-kpis></section><section class="finance-card"><form class="ua-filters" data-ua-filters><label>System Users<input name="search" type="search" placeholder="Search users by name, email or username..."></label><label>Role<select name="role"><option value="">All Roles</option>${Object.entries(roles).map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></label><label>Status<select name="status"><option value="">All Statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select></label><button class="pending-verify">Apply Filters</button><button type="reset" class="pending-outline">Reset</button></form></section><section class="finance-card"><div data-ua-users></div><div class="pending-pagination"><span data-ua-count aria-live="polite"></span><div data-ua-pages></div></div></section></main><aside><section class="finance-card"><h2 data-ua-editor-title>Add / Edit User</h2><form class="ua-editor" data-ua-editor><input type="hidden" name="id"><div class="ua-pair"><label>Full Name *<input name="full_name" required maxlength="150" placeholder="Enter full name..."></label><label>Username *<input name="username" required maxlength="150" pattern="[A-Za-z0-9_@.+-]+" placeholder="Enter username..."></label></div><label>Email Address *<input type="email" name="email" required maxlength="254" placeholder="Enter email address..."></label><div class="ua-pair"><label>Role *<select name="role" required><option value="">Select role</option>${Object.entries(roles).map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></label><label>Department<select name="department"><option value="">No department (hospital-wide)</option>${departments.map(v => `<option value="${esc(v)}">${esc(departmentName(v))}${departmentRecords.find(d=>String(d.id)===v)?.is_active===false?' (inactive)':''}</option>`).join('')}</select></label><label>Phone Number (optional)<input name="phone" type="tel" maxlength="30" placeholder="Enter phone number..."></label><label>Status *<select name="status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label></div><p>${departments.length?'Select the user’s department above.':'No departments have been imported yet.'} <a href="#admin-catalogue-setup">Manage department catalogue</a></p><div class="ua-pair"><label><span data-ua-password-label>Initial password *</span><input name="password" type="password" autocomplete="new-password" maxlength="4096" required></label><label>Confirm password<input name="password_confirm" type="password" autocomplete="new-password" maxlength="4096" required></label></div><fieldset class="ua-page-access"><legend>Page access</legend><label>Access preset<select name="page_access_mode"><option value="defaults">Use role defaults</option><option value="custom">Choose pages for this user</option></select></label><p>Page access is limited to the selected role. Personal profile, password and help remain available.</p><div class="ua-actions"><button type="button" class="pending-outline" data-ua-access-all>Select all for role</button><button type="button" class="pending-outline" data-ua-access-clear>Clear selection</button></div><div data-ua-page-choices></div></fieldset><p data-ua-password-help>Set a strong initial password. The backend validates and securely hashes it.</p><p data-ua-message role="status"></p><div class="ua-actions"><button type="reset" class="pending-outline">Clear Form</button><button class="pending-verify" >Save User</button></div></form></section><section class="finance-card"><div class="finance-card-heading"><h2>Recent Audit Logs</h2><button type="button" class="help-link" data-ua-all>View All</button></div><div data-ua-logs></div></section></aside></div></div>`;
   const root = content.querySelector('.users-audit-page'),
     q = s => root.querySelector(s),
     form = q('[data-ua-editor]');
+  const drawPageChoices=(selected=null)=>{
+    const role=form.elements.role.value,defaults=pageChoices.roles[role]||[],custom=form.elements.page_access_mode.value==='custom'&&role!=='super_admin';
+    form.elements.page_access_mode.disabled=role==='super_admin';
+    q('[data-ua-access-all]').disabled=q('[data-ua-access-clear]').disabled=role==='super_admin'||!role;
+    const checked=new Set(selected===null?defaults:selected);
+    q('[data-ua-page-choices]').innerHTML=pageChoices.pages.filter(p=>defaults.includes(p.id)).map(p=>`<label><input type="checkbox" data-ua-access-page value="${esc(p.id)}" ${checked.has(p.id)?'checked':''} ${custom?'':'disabled'}> ${esc(p.label)} <small>(${esc(p.section)})</small></label>`).join('')||'<p>Select a role to see its available pages.</p>';
+  };
+  form.elements.role.addEventListener('change',()=>{form.elements.page_access_mode.value='defaults';drawPageChoices();});
+  form.elements.page_access_mode.addEventListener('change',()=>drawPageChoices());
+  q('[data-ua-access-all]').onclick=()=>{form.elements.page_access_mode.value='custom';drawPageChoices();};
+  q('[data-ua-access-clear]').onclick=()=>{form.elements.page_access_mode.value='custom';drawPageChoices([]);};
+  drawPageChoices();
   const filtered = () => users.filter(u => (!filters.search || [u.full_name, u.email, u.username].join(' ').toLowerCase().includes(filters.search.toLowerCase())) && (!filters.role || u.role === filters.role) && (!filters.status || u.is_active === (filters.status === 'active')));
   const periodLogs = () => {
     const today = new Date().toLocaleDateString('en-CA', {
@@ -1699,6 +1713,7 @@ async function usersAndAudit() {
     q('[data-ua-password-label]').textContent='Initial password *';
     q('[data-ua-password-help]').textContent='Set a strong initial password. The backend validates and securely hashes it.';
     q('[data-ua-message]').textContent = '';
+    setTimeout(()=>drawPageChoices(),0);
   }
   form.addEventListener('reset', clear);
   q('[data-ua-add]').addEventListener('click', () => {
@@ -1741,6 +1756,7 @@ async function usersAndAudit() {
           department: v.department || null,
           is_active: v.status === 'active'
         };
+      body.page_access=v.role==='super_admin'||v.page_access_mode!=='custom'?null:[...form.querySelectorAll('[data-ua-access-page]:checked')].map(input=>input.value);
       if(v.password)body.password=v.password;
       const button = form.querySelector('[type=submit]') || form.querySelector('.pending-verify');
       button.disabled = true;
@@ -1799,6 +1815,7 @@ async function usersAndAudit() {
       q('[data-ua-password-help]').textContent='Leave both password fields blank to keep the existing password.';
       for (const k of ['full_name', 'username', 'email', 'phone', 'role', 'department']) form.elements.namedItem(k).value = u[k] || '';
       form.elements.namedItem('status').value = u.is_active ? 'active' : 'inactive';
+      form.elements.page_access_mode.value=u.page_access===null||u.page_access===undefined?'defaults':'custom';drawPageChoices(u.page_access??null);
       q('[data-ua-editor-title]').textContent = 'Edit User';
       q('[data-ua-message]').textContent = 'Editing ' + u.full_name;
       form.elements.namedItem('full_name').focus();
@@ -1923,8 +1940,13 @@ const pages = {
 };
 
 async function render(page) {
-  const permission = (['admin-departments','admin-services'].includes(page) ? 'billing' : navigationPage[page]?.permission) || (page==='patient-registration' ? 'patients' : null);
-  if (permission && !user.permissions?.[permission]) {showError({status:403,message:'Your role does not permit access to this module.'});return;}
+  if(page==='dashboard'&&!canAccessPage(user,page)){navigate(firstAccessiblePage(user));return;}
+  try {
+    const fresh=await api('session/?page='+encodeURIComponent(page));
+    if(fresh.user){Object.assign(user,fresh.user);onProfileSaved?.(fresh.user);}
+  } catch(error){showError(error);return;}
+  if(!canAccessPage(user,page)){showError({status:403,message:'Your administrator has not granted access to this page.'});return;}
+
   if (!pages[page]) {content.innerHTML='<div class="api-error"><h1>Page not found</h1><p>Select a page from the navigation.</p></div>';return;}
   setBusy();
   try {await pages[page]();} catch(error) {if(!abort.signal.aborted)showError(error);}

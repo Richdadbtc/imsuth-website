@@ -12,6 +12,7 @@ class User(AbstractUser):
         FRONT_DESK = "front_desk", "Front Desk Officer"
         CASHIER = "cashier", "Cashier / PayPoint Officer"
 
+    page_access = models.JSONField(null=True,blank=True,default=None)
     role = models.CharField(max_length=32, choices=Role.choices, blank=True)
     employee_id = models.CharField(max_length=32, unique=True, null=True, blank=True)
     department = models.ForeignKey("catalogue.Department", null=True, blank=True, on_delete=models.PROTECT, related_name="staff")

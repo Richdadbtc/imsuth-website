@@ -427,9 +427,15 @@ class UsersViewSet(StaffViewSet):
     @action(detail=True)
     def permissions(self,request,pk=None):
         user=self.get_object()
-        return Response({'role':user.role,'permissions':sorted(user.get_all_permissions())})
+        from apps.accounts.page_access import allowed_pages
+        return Response({'role':user.role,'permissions':sorted(user.get_all_permissions()),'page_access':user.page_access,'allowed_pages':allowed_pages(user)})
     @action(detail=False)
     def role_choices(self,request): return Response([{'value':v,'label':n} for v,n in User.Role.choices])
+
+    @action(detail=False)
+    def page_choices(self,request):
+        from apps.accounts.page_access import PAGES,role_pages
+        return Response({'pages':PAGES,'roles':{role:sorted(role_pages(role)) for role in User.Role.values}})
 
 
 class AuditLogsViewSet(AuditViewSet):
