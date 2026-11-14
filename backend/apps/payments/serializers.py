@@ -63,9 +63,17 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 
 class ReceiptSerializer(serializers.ModelSerializer):
+    patient_name=serializers.CharField(source='invoice.patient_display_name',read_only=True)
+    department=serializers.CharField(source='invoice.department.name',read_only=True)
+    payment_status=serializers.CharField(source='payment.status',read_only=True)
+    payment_reference=serializers.CharField(source='payment.reference',read_only=True)
+    service_summary=serializers.SerializerMethodField()
+    reprint_count=serializers.SerializerMethodField()
+    def get_service_summary(self,obj):return ', '.join(item.description for item in obj.invoice.items.all())
+    def get_reprint_count(self,obj):return obj.num_reprints if hasattr(obj,'num_reprints') else obj.reprints.count()
     class Meta:
         model = Receipt
-        fields = ("id", "receipt_number", "payment", "invoice", "amount", "currency", "issued_at")
+        fields = ("id", "receipt_number", "payment", "invoice", "amount", "currency", "issued_at", "patient_name", "department", "payment_status", "payment_reference", "service_summary", "reprint_count")
 
 
 class TestWebhookSerializer(serializers.Serializer):

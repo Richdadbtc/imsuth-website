@@ -2,6 +2,7 @@ import json
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
+from django.db.models import Count
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -42,13 +43,14 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
 class ReceiptViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields=('payment','invoice')
-    queryset = Receipt.objects.select_related("payment", "invoice").all()
+    queryset = Receipt.objects.select_related("payment", "invoice__patient", "invoice__department").prefetch_related("invoice__items").annotate(num_reprints=Count("reprints",distinct=True)).order_by("-issued_at", "pk")
     serializer_class = ReceiptSerializer
     permission_classes = (permissions.IsAuthenticated,)
     def get_queryset(self):
         from apps.common.revenue_api import scoped
         return scoped(super().get_queryset(), self.request.user, 'invoice__department_id')
-    search_fields = ("receipt_number", "payment__reference", "invoice__invoice_number")
+    filterset_fields = ("payment", "invoice")
+    search_fields = ("receipt_number", "payment__reference", "invoice__invoice_number", "invoice__patient_name", "invoice__patient__first_name", "invoice__patient__last_name", "invoice__department__name")
 
 
 class TestWebhookView(APIView):
