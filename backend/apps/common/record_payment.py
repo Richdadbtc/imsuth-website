@@ -33,9 +33,11 @@ class CaptureInput(serializers.Serializer):
             data['submitted_reference']=''
         elif data['cash_receiver']:raise serializers.ValidationError({'cash_receiver':'A cash receiver applies only to cash payments.'})
         elif not data['submitted_reference']:raise serializers.ValidationError({'submitted_reference':'Enter the payment reference.'})
+        if not data['patient'] and not data['patient_name'].strip():raise serializers.ValidationError({'patient_name':'Enter the patient name.'})
         return data
 
-    patient = serializers.UUIDField()
+    patient = serializers.UUIDField(required=False,allow_null=True,default=None)
+    patient_name = serializers.CharField(max_length=200,allow_blank=True,default='')
     department = serializers.UUIDField()
     service = serializers.UUIDField(required=False,allow_null=True,default=None)
     service_description = serializers.CharField(required=False,allow_blank=True,max_length=200,default='')
@@ -72,9 +74,9 @@ class RecordPaymentView(APIView):
         latest=[]
         for receipt in receipts:
             items=list(receipt.invoice.items.all());used=sum(hasattr(item,'delivery') for item in items)
-            latest.append({'id':str(receipt.pk),'receipt_number':receipt.receipt_number,'patient_name':str(receipt.invoice.patient),'service':', '.join(item.description for item in items),'department':receipt.invoice.department.name,'amount':receipt.amount,'payment_status':receipt.payment.status,'service_status':'Used' if items and used==len(items) else 'Partially used' if used else 'Not yet used','issued_at':receipt.issued_at})
+            latest.append({'id':str(receipt.pk),'receipt_number':receipt.receipt_number,'patient_name':receipt.invoice.patient_display_name,'service':', '.join(item.description for item in items),'department':receipt.invoice.department.name,'amount':receipt.amount,'payment_status':receipt.payment.status,'service_status':'Used' if items and used==len(items) else 'Partially used' if used else 'Not yet used','issued_at':receipt.issued_at})
         from apps.payments.cash_receivers import CASH_RECEIVERS
-        return Response({'cash_receivers':CASH_RECEIVERS,'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
+        return Response({'unregistered_patient_entry':True,'cash_receivers':CASH_RECEIVERS,'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
 
     def post(self,request):
         if request.user.role not in {'super_admin','finance','cashier'}: raise PermissionDenied('Only collection officers and finance administrators may record payments.')
@@ -92,11 +94,13 @@ class RecordPaymentView(APIView):
                 if data['channel']!='cash' and Payment.objects.filter(channel=data['channel'],submitted_reference=data['submitted_reference']).exists():raise ValidationError({'submitted_reference':'This payment reference has already been recorded. Check the existing transaction.'})
                 department=scoped(Department.objects.filter(pk=data['department'],is_active=True),request.user,'pk').first()
                 if not department: raise ValidationError({'department':'Select an active permitted department.'})
-                from .api import RevenuePatientViewSet
-                patient_view=RevenuePatientViewSet();patient_view.request=request
-                patients=patient_view.get_queryset().filter(status='active')
-                patient=patients.filter(pk=data['patient']).first()
-                if not patient:raise ValidationError({'patient':'Select an active patient within your access scope.'})
+                patient=None
+                if data['patient']:
+                    from .api import RevenuePatientViewSet
+                    patient_view=RevenuePatientViewSet();patient_view.request=request
+                    patient=patient_view.get_queryset().filter(status='active',pk=data['patient']).first()
+                    if not patient:raise ValidationError({'patient':'Select an active patient within your access scope.'})
+                patient_name=str(patient) if patient else data['patient_name'].strip()
                 manual=not data['service']
                 if manual:
                     if not data['service_description'].strip() or 'base_amount' not in data or data['quantity']!=1:
@@ -121,11 +125,11 @@ class RecordPaymentView(APIView):
                     if not order:raise ValidationError({'cash_order':'Select an approved order for this cash point.'})
                 if manual:
                     year=timezone.localdate().year
-                    invoice=Invoice.objects.create(invoice_number=f"INV-{year}-{Sequence.next_value(f'invoice:{year}'):08d}",payment_reference=f"PAY-{year}-{Sequence.next_value(f'payment-reference:{year}'):010d}",patient=patient,department=department,created_by=request.user,idempotency_key='record:'+str(data['idempotency_key']),total_amount=approved,currency='NGN')
+                    invoice=Invoice.objects.create(invoice_number=f"INV-{year}-{Sequence.next_value(f'invoice:{year}'):08d}",payment_reference=f"PAY-{year}-{Sequence.next_value(f'payment-reference:{year}'):010d}",patient=patient,patient_name=patient_name,department=department,created_by=request.user,idempotency_key='record:'+str(data['idempotency_key']),total_amount=approved,currency='NGN')
                     InvoiceItem.objects.create(invoice=invoice,is_manual=True,service_code='MANUAL',description=data['service_description'].strip(),quantity=1,unit_amount=approved,currency='NGN')
                 else:
                     if data['amount']!=approved and len(data['override_reason'].strip())<5:raise ValidationError('A price override requires a reason of at least five characters.')
-                    invoice=Invoice.create_from_items(patient=patient,department=department,item_requests=[{'service':service,'quantity':data['quantity']}],created_by=request.user,idempotency_key='record:'+str(data['idempotency_key']),capture_total=data['amount'],capture_reason=data['override_reason'] or ('Patient type discount: '+data['patient_type'] if discount else ''))
+                    invoice=Invoice.create_from_items(patient=patient,patient_name=patient_name,department=department,item_requests=[{'service':service,'quantity':data['quantity']}],created_by=request.user,idempotency_key='record:'+str(data['idempotency_key']),capture_total=data['amount'],capture_reason=data['override_reason'] or ('Patient type discount: '+data['patient_type'] if discount else ''))
                 if invoice.currency!='NGN':raise ValidationError('This capture flow accepts NGN tariffs only.')
                 active=RecordedPayment.objects.exclude(payment__status__in=['failed','expired','refunded','reversed'])
                 if order:

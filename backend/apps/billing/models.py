@@ -21,7 +21,8 @@ class Invoice(TimeStampedModel):
 
     invoice_number = models.CharField(max_length=32, unique=True, editable=False, db_index=True)
     payment_reference = models.CharField(max_length=40, unique=True, editable=False, db_index=True)
-    patient = models.ForeignKey("registry.Patient", on_delete=models.PROTECT, related_name="invoices")
+    patient_name = models.CharField(max_length=200, blank=True)
+    patient = models.ForeignKey("registry.Patient", on_delete=models.PROTECT, related_name="invoices", null=True, blank=True)
     department = models.ForeignKey("catalogue.Department", on_delete=models.PROTECT, related_name="invoices")
     status = models.CharField(max_length=24, choices=Status.choices, default=Status.ISSUED, db_index=True)
     total_amount = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal("0.00"))
@@ -34,17 +35,22 @@ class Invoice(TimeStampedModel):
     class Meta:
         ordering = ("-issued_at",)
         constraints = [
+            models.CheckConstraint(condition=models.Q(patient__isnull=False) | ~models.Q(patient_name=""), name="invoice_patient_or_name"),
             models.CheckConstraint(condition=models.Q(total_amount__gte=0), name="invoice_total_nonnegative"),
             models.CheckConstraint(condition=models.Q(amount_paid__gte=0), name="invoice_paid_nonnegative"),
             models.CheckConstraint(condition=models.Q(amount_paid__lte=models.F("total_amount")), name="invoice_paid_not_over_total"),
         ]
 
     @property
+    def patient_display_name(self):
+        return self.patient_name or (str(self.patient) if self.patient_id else "Not supplied")
+
+    @property
     def outstanding_balance(self):
         return self.total_amount - self.amount_paid
 
     @classmethod
-    def create_from_items(cls, *, patient, department, item_requests, created_by, idempotency_key=None, capture_total=None, capture_reason=""):
+    def create_from_items(cls, *, patient, department, item_requests, created_by, idempotency_key=None, capture_total=None, capture_reason="", patient_name=""):
         if not department.is_active:
             raise ValidationError('Inactive departments cannot issue new invoices.')
         with transaction.atomic():
@@ -52,7 +58,7 @@ class Invoice(TimeStampedModel):
                 existing = cls.objects.filter(idempotency_key=idempotency_key).first()
                 if existing:
                     same_items = sorted((str(i.service_id), i.quantity) for i in existing.items.all()) == sorted((str(i['service'].pk), i.get('quantity',1)) for i in item_requests)
-                    if existing.patient_id != patient.pk or existing.department_id != department.pk or existing.created_by_id != created_by.pk or not same_items or (capture_total is not None and existing.total_amount != capture_total):
+                    if existing.patient_id != getattr(patient,"pk",None) or existing.patient_name != patient_name or existing.department_id != department.pk or existing.created_by_id != created_by.pk or not same_items or (capture_total is not None and existing.total_amount != capture_total):
                         raise ValidationError('Idempotency key belongs to a different invoice request.')
                     return existing
             year = timezone.localdate().year
@@ -62,13 +68,13 @@ class Invoice(TimeStampedModel):
                 existing = cls.objects.filter(idempotency_key=idempotency_key).first()
                 if existing:
                     same_items = sorted((str(i.service_id), i.quantity) for i in existing.items.all()) == sorted((str(i['service'].pk), i.get('quantity',1)) for i in item_requests)
-                    if existing.patient_id != patient.pk or existing.department_id != department.pk or existing.created_by_id != created_by.pk or not same_items or (capture_total is not None and existing.total_amount != capture_total):
+                    if existing.patient_id != getattr(patient,"pk",None) or existing.patient_name != patient_name or existing.department_id != department.pk or existing.created_by_id != created_by.pk or not same_items or (capture_total is not None and existing.total_amount != capture_total):
                         raise ValidationError('Idempotency key belongs to a different invoice request.')
                     return existing
             invoice = cls.objects.create(
                 invoice_number=f"INV-{year}-{number:08d}",
                 payment_reference=f"PAY-{year}-{reference_number:010d}",
-                patient=patient,
+                patient=patient,patient_name=patient_name,
                 department=department,
                 created_by=created_by,
                 idempotency_key=idempotency_key,

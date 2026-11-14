@@ -36,7 +36,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         from apps.common.revenue_api import scoped
         return scoped(super().get_queryset(), self.request.user, 'invoice__department_id')
-    search_fields = ("reference", "provider_reference", "invoice__invoice_number", "invoice__patient__patient_id")
+    search_fields = ("reference", "provider_reference", "invoice__invoice_number", "invoice__patient__patient_id", "invoice__patient_name")
     filterset_fields = {"status":["exact","in"],"channel":["exact"],"provider":["exact"],"currency":["exact"],"invoice":["exact"],"invoice__patient":["exact"]}
 
 

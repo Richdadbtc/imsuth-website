@@ -286,7 +286,7 @@ async function enhancedRecordPaymentPreview(capture) {
     field = (label, name, type = 'text', attrs = '') => `<label>${label}<input type="${type}" name="${name}" ${attrs}></label>`,
     now = new Date(),
     localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-  content.innerHTML = `<div class="record-payment-preview compact-record-payment"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><span class="record-preview-label">Record Payment</span></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment" aria-current="page">Record payment</a><a href="#patients">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit">Users and audit</a></nav><div class="compact-record-layout"><form class="finance-card record-preview-form" data-rp-form><h2>Record a payment and issue a receipt</h2><div class="compact-record-grid"><label>Cash point<select name="cash_point" required>${options(capture.cash_points,'Select cash point')}</select></label><label>Department paid for<select name="department" required>${departmentOptions()}</select></label><label>Service paid for<input name="service" required maxlength="200" placeholder="Enter service paid for"></label><p class="compact-record-department-status" data-rp-department-status role="status" hidden></p><label>Patient name<input name="patient_query" required autocomplete="off" placeholder="Search registered patient" aria-describedby="patient-selection-status"><span id="patient-selection-status" data-rp-selection-status>Type at least 2 characters, then select a patient.</span><span data-rp-results aria-live="polite"></span></label><label>Patient type<select name="category"><option value="self_pay">Regular (full price)</option><option value="nhis">NHIS (10% discount)</option><option value="imshia">IMSHIA (10% discount)</option></select></label><label>Full service amount (₦)<input name="paid" type="number" min="0.01" step="0.01" required placeholder="Enter full amount before discount"></label><label>Reason, if the amount differs from the price list<textarea name="override_reason" maxlength="500"></textarea></label><label>Payment channel<select name="channel"><option value="pos">POS/card</option><option value="bank_transfer">Bank transfer</option><option value="online">Online payment</option><option value="cash">Cash</option></select></label><label data-rp-reference-field>Reference (card slip, transfer, bank teller or USSD)<input name="reference" required maxlength="120" autocomplete="off"><small data-rp-reference-help></small></label><label data-rp-cash-receiver-field hidden>Cash received by<select name="cash_receiver" disabled><option value="">Select receiver</option>${(capture.cash_receivers||[]).map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')}</select></label><label>Cash standing order (cash only)<select name="cash_order" disabled><option value="">None</option></select></label><button type="submit" class="pending-verify compact-record-submit" ${capture.can_record&&capture.manual_service_entry?'':'disabled'}>Issue receipt</button></div><p class="compact-record-note"><span data-rp-price-summary>Regular patients pay the full entered price. NHIS and IMSHIA receive 10% off.</span> Manual service entries and prices are flagged for review. An official receipt is issued only after payment verification.</p><p data-rp-message role="status"></p><details class="compact-record-setup"><summary>Department and category setup status</summary>${catalogueNotice}</details><input type="hidden" name="quantity" value="1"><input type="hidden" name="occurred" value="${localDate}"><input type="hidden" name="remarks" value="">${['patient_name','phone','dob','gender','address','next_of_kin','kin_phone'].map(name=>`<input type="hidden" name="${name}">`).join('')}<div hidden><span data-rp-total></span><span data-rp-fees></span><span data-rp-service></span><span data-rp-service-line></span><span data-rp-patient></span><button type="button" data-rp-search>Search</button></div></form><aside class="finance-card" data-rp-receipt-card><h2>Receipt</h2><div data-rp-receipt>The receipt appears here after verification.</div></aside></div><section class="finance-card"><h2>Latest receipts</h2><div data-rp-recent></div></section></div>`;
+  content.innerHTML = `<div class="record-payment-preview compact-record-payment"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><span class="record-preview-label">Record Payment</span></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment" aria-current="page">Record payment</a><a href="#patients">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit">Users and audit</a></nav><div class="compact-record-layout"><form class="finance-card record-preview-form" data-rp-form><h2>Record a payment and issue a receipt</h2><div class="compact-record-grid"><label>Cash point<select name="cash_point" required>${options(capture.cash_points,'Select cash point')}</select></label><label>Department paid for<select name="department" required>${departmentOptions()}</select></label><label>Service paid for<input name="service" required maxlength="200" placeholder="Enter service paid for"></label><p class="compact-record-department-status" data-rp-department-status role="status" hidden></p><label>Patient name<input name="patient_query" required autocomplete="off" placeholder="Enter patient name" aria-describedby="patient-selection-status"><span id="patient-selection-status" data-rp-selection-status>No patient registration required.</span><span data-rp-results aria-live="polite"></span></label><label>Patient type<select name="category"><option value="self_pay">Regular (full price)</option><option value="nhis">NHIS (10% discount)</option><option value="imshia">IMSHIA (10% discount)</option></select></label><label>Full service amount (₦)<input name="paid" type="number" min="0.01" step="0.01" required placeholder="Enter full amount before discount"></label><label>Reason, if the amount differs from the price list<textarea name="override_reason" maxlength="500"></textarea></label><label>Payment channel<select name="channel"><option value="pos">POS/card</option><option value="bank_transfer">Bank transfer</option><option value="online">Online payment</option><option value="cash">Cash</option></select></label><label data-rp-reference-field>Reference (card slip, transfer, bank teller or USSD)<input name="reference" required maxlength="120" autocomplete="off"><small data-rp-reference-help></small></label><label data-rp-cash-receiver-field hidden>Cash received by<select name="cash_receiver" disabled><option value="">Select receiver</option>${(capture.cash_receivers||[]).map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')}</select></label><label>Cash standing order (cash only)<select name="cash_order" disabled><option value="">None</option></select></label><button type="submit" class="pending-verify compact-record-submit" ${capture.can_record&&capture.manual_service_entry?'':'disabled'}>Issue receipt</button></div><p class="compact-record-note"><span data-rp-price-summary>Regular patients pay the full entered price. NHIS and IMSHIA receive 10% off.</span> Manual service entries and prices are flagged for review. An official receipt is issued only after payment verification.</p><p data-rp-message role="status"></p><details class="compact-record-setup"><summary>Department and category setup status</summary>${catalogueNotice}</details><input type="hidden" name="quantity" value="1"><input type="hidden" name="occurred" value="${localDate}"><input type="hidden" name="remarks" value="">${['patient_name','phone','dob','gender','address','next_of_kin','kin_phone'].map(name=>`<input type="hidden" name="${name}">`).join('')}<div hidden><span data-rp-total></span><span data-rp-fees></span><span data-rp-service></span><span data-rp-service-line></span><span data-rp-patient></span><button type="button" data-rp-search>Search</button></div></form><aside class="finance-card" data-rp-receipt-card><h2>Receipt</h2><div data-rp-receipt>The receipt appears here after verification.</div></aside></div><section class="finance-card"><h2>Latest receipts</h2><div data-rp-recent></div></section></div>`;
   const root = content.querySelector('.record-payment-preview'),
     form = content.querySelector('[data-rp-form]'),
     el = name => form.elements.namedItem(name),
@@ -307,38 +307,7 @@ async function enhancedRecordPaymentPreview(capture) {
     content.querySelector('[data-rp-receipt-card]').hidden = false;
     content.querySelector('[data-rp-receipt]').textContent='The receipt appears here after verification.';
   };
-  const pickPatient = index => {
-    patient = patients[index];
-    el('patient_name').value = fullName(patient);
-    el('phone').value = patient.phone || '';
-    el('dob').value = patient.date_of_birth || '';
-    el('gender').value = patient.sex || '';
-    el('address').value = patient.address || '';
-    el('next_of_kin').value = patient.emergency_contact || '';
-    el('kin_phone').value = patient.next_of_kin_phone || '';
-    el('patient_query').value = fullName(patient);
-    content.querySelector('[data-rp-selection-status]').textContent='Selected: '+fullName(patient)+' · '+patient.patient_id;
-    content.querySelector('[data-rp-results]').innerHTML = '';
-    content.querySelector('[data-rp-patient]').innerHTML = details([['Patient ID', patient.patient_id], ['Full Name', fullName(patient)], ['Gender', patient.sex], ['Date of Birth', patient.date_of_birth], ['Phone Number', patient.phone], ['Address', patient.address], ['Emergency Contact', patient.emergency_contact], ['Next of Kin Phone', patient.next_of_kin_phone]]);
-    clearReceipt();
-  };
   const chooseService = () => {service=el('service').value.trim()?{name:el('service').value.trim()}:null;fees();clearReceipt();};
-  let patientSearchSequence=0;
-  root.addEventListener('click', async event => {
-    if (event.target.closest('[data-rp-search]')) {
-      const query=el('patient_query').value.trim(),sequence=++patientSearchSequence;
-      if(!query){content.querySelector('[data-rp-results]').textContent='Enter a patient ID, name or phone number.';return;}
-      content.querySelector('[data-rp-results]').textContent='Searching permitted patients…';
-      try {
-        const result=await api('patients/?page_size=20&search='+encodeURIComponent(query));
-        if(sequence!==patientSearchSequence||!root.isConnected)return;
-        patients.splice(0,patients.length,...list(result));
-        content.querySelector('[data-rp-results]').innerHTML=patients.map((p,k)=>`<button type="button" class="pending-outline" data-rp-patient-index="${k}">${escapeHtml(p.patient_id)} · ${escapeHtml(fullName(p))}</button>`).join('')||'No matching patients found.';
-      }catch(error){if(root.isConnected)content.querySelector('[data-rp-results]').textContent=error.message;}
-    }
-    const pick = event.target.closest('[data-rp-patient-index]');
-    if (pick) pickPatient(Number(pick.dataset.rpPatientIndex));
-  });
   form.addEventListener('input', () => {
     delete form.dataset.requestKey;
     delete form.dataset.lastPayment;
@@ -362,15 +331,6 @@ async function enhancedRecordPaymentPreview(capture) {
     el('override_reason').required=false;
     fees();
     clearReceipt();
-  });
-  let patientSearchTimer;
-  el('patient_query').addEventListener('input', () => {
-    patient=null;
-    content.querySelector('[data-rp-selection-status]').textContent='Select a registered patient from the search results.';
-    content.querySelector('[data-rp-results]').innerHTML='';
-    patientSearchSequence++;
-    clearReceipt();clearTimeout(patientSearchTimer);
-    if(el('patient_query').value.trim().length>=2)patientSearchTimer=setTimeout(()=>{if(root.isConnected)root.querySelector('[data-rp-search]').click();},300);
   });
   const updateOrders=()=>{
     const enabled=el('channel').value==='cash'&&!!el('cash_point').value;
@@ -401,9 +361,10 @@ async function enhancedRecordPaymentPreview(capture) {
       paid = total(),
       reference = el('channel').value==='cash'?'':el('reference').value.trim(),
       receiver = el('channel').value==='cash'?el('cash_receiver').value:'';
+    if(!capture.unregistered_patient_entry){message.textContent='Update the backend to enable payments without patient registration.';return;}
     if(departments.find(d=>String(d.id)===el('department').value)?.is_active===false){message.textContent='This department is inactive. Complete department activation before recording payments.';return;}
-    if (!patient || !el('service').value.trim() || !Number.isInteger(quantity) || quantity < 1 || quantity > 100 || (el('channel').value==='cash'?!receiver:!reference) || !el('cash_point').value || !Number.isFinite(paid) || paid<=0) {
-      message.textContent = 'Select a cash point and patient, enter the service description, select a cash receiver or enter a reference, and enter a positive full service amount.';
+    if (!el('patient_query').value.trim() || !el('service').value.trim() || !Number.isInteger(quantity) || quantity < 1 || quantity > 100 || (el('channel').value==='cash'?!receiver:!reference) || !el('cash_point').value || !Number.isFinite(paid) || paid<=0) {
+      message.textContent = 'Select a cash point, enter the patient name, enter the service description, select a cash receiver or enter a reference, and enter a positive full service amount.';
       return;
     }
     if (!el('occurred').value || !Number.isFinite(Date.parse(el('occurred').value)) || Date.parse(el('occurred').value) > Date.now() + 60000) {
@@ -417,14 +378,14 @@ async function enhancedRecordPaymentPreview(capture) {
         el('occurred').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
         const key = form.dataset.requestKey || (form.dataset.requestKey = crypto.randomUUID());
         const recorded=await api('record-payment/',{method:'POST',body:JSON.stringify({
-          patient:patient.id,department:el('department').value,service_description:el('service').value.trim(),patient_type:el('category').value==='self_pay'?'regular':el('category').value,base_amount:Number(el('paid').value).toFixed(2),quantity,
+          patient_name:el('patient_query').value.trim(),department:el('department').value,service_description:el('service').value.trim(),patient_type:el('category').value==='self_pay'?'regular':el('category').value,base_amount:Number(el('paid').value).toFixed(2),quantity,
           cash_point:el('cash_point').value,cash_order:el('cash_order').value||null,
           amount:paid.toFixed(2),override_reason:el('override_reason').value.trim(),channel:el('channel').value,
           cash_receiver:receiver,submitted_reference:reference,reported_paid_at:new Date(el('occurred').value).toISOString(),
           remarks:el('remarks').value.trim(),idempotency_key:key
         })});
         const {invoice,payment}=recorded;
-        content.querySelector('[data-rp-receipt]').innerHTML=details([['Invoice',invoice.invoice_number],['Patient',fullName(patient)],['Department',departments.find(d=>String(d.id)===el('department').value)?.name],['Service',el('service').value.trim()],['Amount',moneyWhole(payment.amount)],['Payment status',payment.status]])+'<p>Payment recorded. An official receipt has not been issued; verification is pending.</p>';
+        content.querySelector('[data-rp-receipt]').innerHTML=details([['Invoice',invoice.invoice_number],['Patient',el('patient_query').value.trim()],['Department',departments.find(d=>String(d.id)===el('department').value)?.name],['Service',el('service').value.trim()],['Amount',moneyWhole(payment.amount)],['Payment status',payment.status]])+'<p>Payment recorded. An official receipt has not been issued; verification is pending.</p>';
         message.textContent = `Payment attempt ${payment.reference} recorded. Status: ${payment.status}. Amount due: ${moneyWhole(invoice.outstanding_balance)}. Reference submission does not verify payment; no paid receipt has been issued.`;
         payments.unshift(payment);
         if(recorded.price_changed)message.textContent+=' The price change has been flagged for review.';

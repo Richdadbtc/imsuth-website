@@ -25,10 +25,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
     outstanding_balance = serializers.DecimalField(max_digits=19, decimal_places=2, read_only=True)
 
     class Meta:
-        extra_kwargs = {'idempotency_key': {'validators': []}}
+        extra_kwargs = {'idempotency_key': {'validators': []}, 'patient': {'required':True,'allow_null':False}}
         model = Invoice
-        fields = ("id", "invoice_number", "payment_reference", "patient", "department", "status", "total_amount", "amount_paid", "outstanding_balance", "currency", "idempotency_key", "issued_at", "items", "line_items")
-        read_only_fields = ("id", "invoice_number", "payment_reference", "status", "total_amount", "amount_paid", "currency", "issued_at")
+        fields = ("id", "invoice_number", "payment_reference", "patient", "patient_name", "department", "status", "total_amount", "amount_paid", "outstanding_balance", "currency", "idempotency_key", "issued_at", "items", "line_items")
+        read_only_fields = ("patient_name", "id", "invoice_number", "payment_reference", "status", "total_amount", "amount_paid", "currency", "issued_at")
 
     def create(self, validated_data):
         from apps.common.revenue_api import scoped

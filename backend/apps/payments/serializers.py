@@ -14,7 +14,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     collected_by_id = serializers.IntegerField(source="initiated_by_id", read_only=True)
     collected_by_name = serializers.CharField(source="initiated_by.get_full_name", read_only=True)
-    patient_name = serializers.CharField(source="invoice.patient.__str__", read_only=True)
+    patient_name = serializers.CharField(source="invoice.patient_display_name", read_only=True)
     department_id = serializers.UUIDField(source="invoice.department_id", read_only=True)
     department = serializers.CharField(source="invoice.department.name", read_only=True)
     invoice_number = serializers.CharField(source="invoice.invoice_number", read_only=True)

@@ -53,5 +53,5 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         obj = self.get_object()
         return Response({'invoice': str(obj.pk), 'total': obj.total_amount, 'paid': obj.amount_paid, 'balance': obj.outstanding_balance, 'currency': obj.currency})
 
-    search_fields = ("invoice_number", "payment_reference", "patient__patient_id", "patient__first_name", "patient__last_name")
+    search_fields = ("invoice_number", "payment_reference", "patient__patient_id", "patient__first_name", "patient__last_name", "patient_name")
     filterset_fields = {"status":["exact","in"],"department":["exact"],"patient":["exact"],"currency":["exact"]}

@@ -181,3 +181,35 @@ class RecordPaymentTests(TestCase):
             self.assertEqual(payment.initiated_by_id,self.cashier.pk)
         self.data.update(idempotency_key=str(uuid4()))
         self.assertEqual(self.post().status_code,201)
+
+    def test_walk_in_capture_keeps_name_without_registering_patient(self):
+        from apps.registry.models import Patient
+        before=Patient.objects.count()
+        self.data.pop('patient');self.data['patient_name']='Walk-in Example'
+        result=self.post();self.assertEqual(result.status_code,201,result.data)
+        context=RecordedPayment.objects.select_related('payment__invoice').get()
+        invoice=context.payment.invoice
+        self.assertIsNone(invoice.patient_id)
+        self.assertEqual(invoice.patient_name,'Walk-in Example')
+        self.assertEqual(result.data['payment']['patient_name'],'Walk-in Example')
+        self.assertEqual(Patient.objects.count(),before)
+        self.assertEqual(self.post().data['payment']['id'],result.data['payment']['id'])
+        self.data['patient_name']='Different name'
+        self.assertEqual(self.post().status_code,400)
+        payment=context.payment;payment.status='confirmed';payment.save()
+        receipt=Receipt.objects.create(receipt_number='WALK-IN-TEST',payment=payment,invoice=invoice,amount=payment.amount,currency='NGN')
+        self.assertContains(self.client.get(f'/api/v1/receipts/{receipt.pk}/print/'),'Walk-in Example')
+        latest=self.client.get('/api/v1/record-payment/').data['receipts']
+        self.assertEqual(next(r for r in latest if r['id']==str(receipt.pk))['patient_name'],'Walk-in Example')
+        self.client.force_authenticate(self.finance)
+        listing=self.client.get('/api/v1/department-desk/receipts/?department='+str(self.dep.pk))
+        self.assertEqual(listing.status_code,200,listing.data)
+        self.assertIn('Walk-in Example',[r['patient_name'] for r in listing.data['results']])
+
+    def test_walk_in_capture_requires_name_and_preserves_registered_patient_scope(self):
+        self.data.pop('patient');self.data['patient_name']='   '
+        before=Invoice.objects.count()
+        self.assertEqual(self.post().status_code,400)
+        self.assertEqual(Invoice.objects.count(),before)
+        self.data.update(patient=str(uuid4()),patient_name='Cannot override invalid patient')
+        self.assertEqual(self.post().status_code,400)

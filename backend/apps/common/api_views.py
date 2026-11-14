@@ -103,7 +103,7 @@ class DashboardSummaryView(APIView):
             "recent_transactions": [{
                 "id": payment.pk,
                 "reference": payment.reference,
-                "patient": payment.invoice.patient.patient_id,
+                "patient": payment.invoice.patient_display_name,
                 "department": payment.invoice.department.name,
                 "amount": payment.amount,
                 "currency": payment.currency,

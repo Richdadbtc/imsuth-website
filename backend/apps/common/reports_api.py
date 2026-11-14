@@ -70,7 +70,7 @@ class ReportView(APIView):
             qs=Invoice.objects.select_related('patient','department').prefetch_related('items').filter(issued_at__date__gte=start,issued_at__date__lte=end,status__in=['issued','partially_paid'],currency='NGN')
             if params.get('department'):qs=qs.filter(department_id=fk(params['department']))
             if params.get('status'):qs=qs.filter(status=params['status'])
-            summary={'outstanding':sum((obj.outstanding_balance for obj in qs),Decimal('0')),'invoices':qs.count(),'patients':qs.values('patient').distinct().count(),'overdue':None,'note':'Due dates are not recorded. Age uses invoice issue date as of period end.'}
+            summary={'outstanding':sum((obj.outstanding_balance for obj in qs),Decimal('0')),'invoices':qs.count(),'patients':qs.filter(patient__isnull=False).values('patient').distinct().count(),'overdue':None,'note':'Due dates are not recorded. Age uses invoice issue date as of period end.'}
             aging=defaultdict(lambda:{'amount':Decimal('0'),'count':0})
             for obj in qs:
                 age=(end-timezone.localtime(obj.issued_at).date()).days
