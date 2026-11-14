@@ -1,3 +1,4 @@
+import {mountReceiptPreview} from './receipt-preview.js';
 import {referenceRule,isSlipChannel,normalizeSlipReference} from '../lib/slip-reference.js';
 import {mountHospitalCatalogueSetup} from './catalogue-setup.js';
 import {createLivePages} from './live-pages.js';
@@ -7,6 +8,7 @@ import {navigationPage} from '../lib/navigation.js';
 
 export function mountWorkspace(content, {user,navigate,onSignedOut,onProfileSaved,onUnreadCount}) {
 const abort = new AbortController();
+mountReceiptPreview(content,abort.signal);
 const api = (path, options={}) => request(path, {...options, signal:abort.signal});
 const session = {authenticated:true,user:{...user,permissions:{...user.permissions}}};
 let activeRows=[];
@@ -297,7 +299,7 @@ async function enhancedRecordPaymentPreview(capture) {
   if(!capture.manual_service_entry)content.querySelector('[data-rp-message]').textContent='The backend must be updated before manual services and patient-type discounts can be recorded.';
   let latestReceipts=capture.receipts;
   const recent = () => {
-    content.querySelector('[data-rp-recent]').innerHTML = `<div class="table-wrap"><table class="data-table finance-data-table record-recent-table"><thead><tr><th>Receipt</th><th>Patient</th><th>Service</th><th>Department</th><th>Amount paid</th><th>Service status</th><th>Actions</th></tr></thead><tbody>${latestReceipts.map(i=>`<tr><td>${escapeHtml(i.receipt_number)}</td><td>${escapeHtml(i.patient_name)}</td><td>${escapeHtml(i.service)}</td><td>${escapeHtml(i.department)}</td><td>${moneyWhole(i.amount)}</td><td>${escapeHtml(i.payment_status==='confirmed'?i.service_status:i.payment_status)}</td><td>${i.payment_status==='confirmed'?`<a class="pending-outline" target="_blank" rel="noopener" href="/paypoint/api/v1/receipts/${encodeURIComponent(i.id)}/print/">Print receipt</a>`:'Receipt unavailable'}</td></tr>`).join('')||'<tr><td colspan="7">No official receipts issued yet.</td></tr>'}</tbody></table></div>`;
+    content.querySelector('[data-rp-recent]').innerHTML = `<div class="table-wrap"><table class="data-table finance-data-table record-recent-table"><thead><tr><th>Receipt</th><th>Patient</th><th>Service</th><th>Department</th><th>Amount paid</th><th>Service status</th><th>Actions</th></tr></thead><tbody>${latestReceipts.map(i=>`<tr><td>${escapeHtml(i.receipt_number)}</td><td>${escapeHtml(i.patient_name)}</td><td>${escapeHtml(i.service)}</td><td>${escapeHtml(i.department)}</td><td>${moneyWhole(i.amount)}</td><td>${escapeHtml(i.payment_status==='confirmed'?i.service_status:i.payment_status)}</td><td>${i.payment_status==='confirmed'?`<a class="pending-outline" target="_blank" rel="noopener" href="/paypoint/api/v1/receipts/${encodeURIComponent(i.id)}/print/">Preview receipt</a>`:'Receipt unavailable'}</td></tr>`).join('')||'<tr><td colspan="7">No official receipts issued yet.</td></tr>'}</tbody></table></div>`;
   };
 
   const clearReceipt = () => {
@@ -447,7 +449,7 @@ async function enhancedRecordPaymentPreview(capture) {
               official = list(response)[0];
             if (official) {
               content.querySelector('[data-rp-receipt-card]').hidden = false;
-              content.querySelector('[data-rp-receipt]').innerHTML = details([['Receipt',official.receipt_number],['Patient',payment.patient_name],['Department',payment.department],['Service',payment.service_summary],['Amount',moneyWhole(official.amount)],['Issued',official.issued_at]])+`<p>Payment verified</p><a class="pending-outline" target="_blank" rel="noopener" href="${escapeHtml('/paypoint/api/v1/')}receipts/${encodeURIComponent(official.id)}/print/">Open official receipt</a>`;
+              content.querySelector('[data-rp-receipt]').innerHTML = details([['Receipt',official.receipt_number],['Patient',payment.patient_name],['Department',payment.department],['Service',payment.service_summary],['Amount',moneyWhole(official.amount)],['Issued',official.issued_at]])+`<p>Payment verified</p><a class="pending-outline" target="_blank" rel="noopener" href="${escapeHtml('/paypoint/api/v1/')}receipts/${encodeURIComponent(official.id)}/print/">Preview receipt</a>`;
               latestReceipts=(await api('record-payment/')).receipts;recent();
               message.textContent = 'The backend has confirmed payment and issued an official receipt.';
             }
@@ -499,7 +501,7 @@ async function enhancedDepartmentDesk() {
     try{
       const data=await api('department-desk/receipts/'+query()+'&period='+encodeURIComponent(period.value)+'&page_size=10&page='+page);
       if(version!==listVersion||!root.isConnected)return;
-      root.querySelector('[data-desk-list]').innerHTML=`<div class="table-wrap"><table class="data-table finance-data-table"><thead><tr><th>Receipt</th><th>Patient</th><th>Service</th><th>Department</th><th>Amount paid</th><th>Status</th><th>Actions</th></tr></thead><tbody>${data.results.map(r=>`<tr><td>${escapeHtml(r.receipt_number)}</td><td>${escapeHtml(r.patient_name)}</td><td>${escapeHtml(r.items.map(i=>i.service).join(', '))}</td><td>${escapeHtml(r.department_name)}</td><td>${moneyWhole(r.amount)}</td><td>${escapeHtml(r.eligible_for_delivery?r.service_status:'Payment unavailable for delivery')}</td><td><button type="button" class="pending-outline" data-desk-reference="${escapeHtml(r.receipt_number)}">Check receipt</button>${r.payment_status==='confirmed'?` <a class="pending-outline" href="/paypoint/api/v1/receipts/${encodeURIComponent(r.id)}/print/" target="_blank" rel="noopener">Print receipt</a>`:''}</td></tr>`).join('')||'<tr><td colspan="7">No official receipts for this department and period.</td></tr>'}</tbody></table></div>`;
+      root.querySelector('[data-desk-list]').innerHTML=`<div class="table-wrap"><table class="data-table finance-data-table"><thead><tr><th>Receipt</th><th>Patient</th><th>Service</th><th>Department</th><th>Amount paid</th><th>Status</th><th>Actions</th></tr></thead><tbody>${data.results.map(r=>`<tr><td>${escapeHtml(r.receipt_number)}</td><td>${escapeHtml(r.patient_name)}</td><td>${escapeHtml(r.items.map(i=>i.service).join(', '))}</td><td>${escapeHtml(r.department_name)}</td><td>${moneyWhole(r.amount)}</td><td>${escapeHtml(r.eligible_for_delivery?r.service_status:'Payment unavailable for delivery')}</td><td><button type="button" class="pending-outline" data-desk-reference="${escapeHtml(r.receipt_number)}">Check receipt</button>${r.payment_status==='confirmed'?` <a class="pending-outline" href="/paypoint/api/v1/receipts/${encodeURIComponent(r.id)}/print/" target="_blank" rel="noopener">Preview receipt</a>`:''}</td></tr>`).join('')||'<tr><td colspan="7">No official receipts for this department and period.</td></tr>'}</tbody></table></div>`;
       hasNext=!!data.next;hasPrevious=!!data.previous;
       root.querySelector('[data-desk-count]').textContent=`Showing ${data.count?(page-1)*10+1:0}–${Math.min(page*10,data.count)} of ${data.count} receipts`;
       root.querySelector('[data-desk-page]').textContent=String(page);
@@ -508,7 +510,7 @@ async function enhancedDepartmentDesk() {
   };
   const renderChecked=()=>{
     const r=selected;if(!r)return;
-    result.innerHTML=`<h2>${escapeHtml(r.receipt_number)}</h2><div class="desk-verification-banner ${r.eligible_for_delivery?'verified':''}"><b>${r.eligible_for_delivery?'Payment verified':'Not eligible for service delivery'}</b><p>${escapeHtml(r.service_status)}</p></div>${details([['Patient',r.patient_name],['Patient ID',r.patient_id],['Department',r.department_name],['Amount paid',moneyWhole(r.amount)],['Payment channel',r.channel],['Payment status',r.payment_status]])}<fieldset><legend>Services</legend>${r.items.map(i=>`<label class="desk-service-choice"><input type="checkbox" data-desk-item="${escapeHtml(i.id)}" ${i.delivered||!r.can_deliver?'disabled':''}> ${escapeHtml(i.service)} × ${i.quantity} — ${i.delivered?'Service delivered':'Not yet used'}</label>`).join('')}</fieldset><label>Service notes (optional)<textarea data-desk-notes maxlength="500"></textarea></label><button type="button" class="teal-button" data-desk-deliver disabled>Confirm service delivery</button>${r.payment_status==='confirmed'?` <a class="pending-outline" href="/paypoint/api/v1/receipts/${encodeURIComponent(r.id)}/print/" target="_blank" rel="noopener">Print receipt</a>`:''}${!r.can_deliver&&r.items.some(i=>!i.delivered)?'<p>Delivery requires an authorized department supervisor or finance administrator and a fully paid, undisputed invoice.</p>':''}`;
+    result.innerHTML=`<h2>${escapeHtml(r.receipt_number)}</h2><div class="desk-verification-banner ${r.eligible_for_delivery?'verified':''}"><b>${r.eligible_for_delivery?'Payment verified':'Not eligible for service delivery'}</b><p>${escapeHtml(r.service_status)}</p></div>${details([['Patient',r.patient_name],['Patient ID',r.patient_id],['Department',r.department_name],['Amount paid',moneyWhole(r.amount)],['Payment channel',r.channel],['Payment status',r.payment_status]])}<fieldset><legend>Services</legend>${r.items.map(i=>`<label class="desk-service-choice"><input type="checkbox" data-desk-item="${escapeHtml(i.id)}" ${i.delivered||!r.can_deliver?'disabled':''}> ${escapeHtml(i.service)} × ${i.quantity} — ${i.delivered?'Service delivered':'Not yet used'}</label>`).join('')}</fieldset><label>Service notes (optional)<textarea data-desk-notes maxlength="500"></textarea></label><button type="button" class="teal-button" data-desk-deliver disabled>Confirm service delivery</button>${r.payment_status==='confirmed'?` <a class="pending-outline" href="/paypoint/api/v1/receipts/${encodeURIComponent(r.id)}/print/" target="_blank" rel="noopener">Preview receipt</a>`:''}${!r.can_deliver&&r.items.some(i=>!i.delivered)?'<p>Delivery requires an authorized department supervisor or finance administrator and a fully paid, undisputed invoice.</p>':''}`;
   };
   const check=async(reference)=>{
     const version=++checkVersion;selected=null;result.textContent='Checking receipt with the server…';message('');
@@ -722,7 +724,7 @@ async function legacyRecordPaymentPreview() {
               official = list(response)[0];
             if (official) {
               content.querySelector('[data-rp-receipt-card]').hidden = false;
-              content.querySelector('[data-rp-receipt]').innerHTML = `<p>Official receipt ${escapeHtml(official.receipt_number)} · ${moneyWhole(official.amount)}</p><a class="pending-outline" target="_blank" rel="noopener" href="${escapeHtml('/paypoint/api/v1/')}receipts/${encodeURIComponent(official.id)}/print/">Open official receipt</a>`;
+              content.querySelector('[data-rp-receipt]').innerHTML = `<p>Official receipt ${escapeHtml(official.receipt_number)} · ${moneyWhole(official.amount)}</p><a class="pending-outline" target="_blank" rel="noopener" href="${escapeHtml('/paypoint/api/v1/')}receipts/${encodeURIComponent(official.id)}/print/">Preview receipt</a>`;
               message.textContent = 'The backend has confirmed payment and issued an official receipt.';
             }
           }
@@ -956,7 +958,7 @@ async function legacyDepartmentDesk() {
     }
     if ((t.closest('[data-desk-view]') || t.closest('[data-desk-print]')) && selected) {
       {
-        content.querySelector('[data-desk-dialog]').innerHTML = `<h2>Official Receipt</h2><p>${escapeHtml(selected.receipt_number)}</p><a class="pending-outline" href="${escapeHtml('/paypoint/api/v1/')}receipts/${encodeURIComponent(selected.id)}/print/" target="_blank" rel="noopener">Open official receipt</a>`;
+        content.querySelector('[data-desk-dialog]').innerHTML = `<h2>Official Receipt</h2><p>${escapeHtml(selected.receipt_number)}</p><a class="pending-outline" href="${escapeHtml('/paypoint/api/v1/')}receipts/${encodeURIComponent(selected.id)}/print/" target="_blank" rel="noopener">Preview receipt</a>`;
         content.querySelector('dialog').showModal();
         return;
       }

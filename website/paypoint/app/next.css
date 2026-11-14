@@ -70,3 +70,12 @@ body.dark-theme .compact-record-grid input,body.dark-theme .compact-record-grid 
 @media(max-width:600px){.compact-record-grid{grid-template-columns:1fr}}
 
 .compact-record-department-status{grid-column:1/-1;padding:12px;border-left:3px solid #ec9b25;background:var(--card,#f4f8fb);line-height:1.5}
+
+.receipt-preview-dialog{width:min(950px,94vw);max-width:94vw;max-height:94vh;padding:20px;border:1px solid #cbd5e1;border-radius:12px;color:#172d4a;background:#fff;box-sizing:border-box}
+.receipt-preview-dialog::backdrop{background:rgba(8,25,43,.7)}
+.receipt-preview-dialog header,.receipt-preview-dialog footer{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.receipt-preview-dialog h2{margin:0}.receipt-preview-dialog p{margin:8px 0 14px}
+.receipt-preview-dialog iframe{display:block;width:100%;height:60vh;border:1px solid #dbe4ee;background:white;box-sizing:border-box}
+.receipt-preview-dialog iframe[hidden]{display:none}
+.receipt-preview-dialog button{padding:10px 18px;border:1px solid #1c4ed8;border-radius:6px;background:#fff;color:#1642aa;cursor:pointer}
+.receipt-preview-dialog footer{justify-content:flex-end;margin-top:14px}.receipt-preview-dialog [data-print]{background:#1c4ed8;color:#fff}.receipt-preview-dialog button:disabled{opacity:.5;cursor:wait}
