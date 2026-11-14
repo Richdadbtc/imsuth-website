@@ -126,7 +126,7 @@ class RecordPaymentTests(TestCase):
         for category,net in [('regular','3000.00'),('nhis','2700.00'),('imshia','2700.00')]:
             with self.subTest(category=category):
                 self.data.pop('service',None)
-                self.data.update(service_description='Entered consultation',patient_type=category,base_amount='3000.00',amount=net,cash_receiver='',channel='pos',idempotency_key=str(uuid4()),submitted_reference='09FG2611111259590001'+{'regular':'ABCDE','nhis':'ABCDF','imshia':'ABCDG'}[category])
+                self.data.update(service_description='Entered consultation',patient_type=category,base_amount='3000.00',amount=net,cash_receiver='',channel='pos',idempotency_key=str(uuid4()),submitted_reference={'regular':'631313012611','nhis':'631313012612','imshia':'631313012613'}[category])
                 response=self.post();self.assertEqual(response.status_code,201,response.data)
                 context=RecordedPayment.objects.get(payment_id=response.data['payment']['id']);item=context.payment.invoice.items.get()
                 self.assertEqual(str(context.payment.amount),net);self.assertEqual(context.patient_type,category)
@@ -148,7 +148,7 @@ class RecordPaymentTests(TestCase):
         self.assertEqual(Invoice.objects.count(),before)
 
     def test_catalogue_service_uses_tariff_for_discount_not_submitted_base(self):
-        self.data.update(patient_type='nhis',base_amount='50000',amount='90',cash_receiver='',channel='pos',submitted_reference='09FG2611111259590001ABCDE')
+        self.data.update(patient_type='nhis',base_amount='50000',amount='90',cash_receiver='',channel='pos',submitted_reference='631313012611')
         response=self.post();self.assertEqual(response.status_code,201,response.data)
         context=RecordedPayment.objects.get();self.assertEqual(context.base_total,Decimal('100'))
         self.assertEqual(context.discount_total,Decimal('10'));self.assertEqual(context.approved_total,Decimal('90'))
@@ -160,7 +160,7 @@ class RecordPaymentTests(TestCase):
             self.data.update(cash_receiver='',channel=channel,submitted_reference='123456',idempotency_key=str(uuid4()))
             response=self.post();self.assertEqual(response.status_code,400,response.data)
             self.assertEqual(Invoice.objects.count(),before)
-        self.data.update(cash_receiver='',channel='pos',submitted_reference='09fg2611042341124813 cy0w7')
+        self.data.update(cash_receiver='',channel='bank_transfer',submitted_reference='09fg2611042341124813 cy0w7')
         result=self.post();self.assertEqual(result.status_code,201,result.data)
         self.assertEqual(RecordedPayment.objects.get().payment.submitted_reference,'09FG2611042341124813CY0W7')
         self.assertFalse(result.data['receipt_issued'])

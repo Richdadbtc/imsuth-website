@@ -1,4 +1,4 @@
-"""Validation of the hospital's confirmed POS-slip TRANS REF format."""
+"""Validation of the hospital's channel-specific card and transfer slip reference formats."""
 import re
 from datetime import datetime
 from django.core.exceptions import ValidationError
@@ -10,6 +10,9 @@ SLIP_HELP='Enter the complete 25-character TRANS REF from the POS slip: 09FG, 16
 def validate_slip_reference(value,channel):
     if channel not in SLIP_CHANNELS:return value
     reference=re.sub(r'\s+','',value or '').upper()
+    if channel=='pos':
+        if not re.fullmatch(r'[0-9]{12}',reference):raise ValidationError('Enter the 12-digit Reference Number printed on the card slip, not the STAN or Auth Code.')
+        return reference
     if not re.fullmatch(SLIP_PATTERN,reference):raise ValidationError(SLIP_HELP)
     try:datetime.strptime('20'+reference[4:16],'%Y%m%d%H%M%S')
     except ValueError as error:raise ValidationError('The TRANS REF contains an invalid transaction date or time.') from error
