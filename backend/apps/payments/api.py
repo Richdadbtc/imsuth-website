@@ -43,7 +43,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
 class ReceiptViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields=('payment','invoice')
-    queryset = Receipt.objects.select_related("payment", "invoice__patient", "invoice__department").prefetch_related("invoice__items").annotate(num_reprints=Count("reprints",distinct=True)).order_by("-issued_at", "pk")
+    queryset = Receipt.objects.select_related("payment", "payment__initiated_by", "payment__recorded_context__cash_point", "payment__recorded_context__created_by", "invoice__patient", "invoice__department").prefetch_related("invoice__items").annotate(num_reprints=Count("reprints",distinct=True)).order_by("-issued_at", "pk")
     serializer_class = ReceiptSerializer
     permission_classes = (permissions.IsAuthenticated,)
     def get_queryset(self):
@@ -119,7 +119,10 @@ def print_receipt(self,request,pk=None):
     paper=request.query_params.get('paper','a4')
     if paper not in {'a4','thermal'}:raise APIValidationError('Choose A4 or thermal paper.')
     from .receipt_assets import receipt_images
-    html=render_to_string('paypoint/receipt.html',{'receipt':obj,'items':obj.invoice.items.all(),'thermal':paper=='thermal',**receipt_images(obj)})
+    collection=getattr(obj.payment,'recorded_context',None)
+    officer=collection.created_by if collection else obj.payment.initiated_by
+    collection_details={'department_paid_for':obj.invoice.department.name,'cash_point_name':collection.cash_point.name if collection else 'Not recorded','recorded_by':(officer.get_full_name() or officer.username) if officer else 'Not recorded'}
+    html=render_to_string('paypoint/receipt.html',{'receipt':obj,'items':obj.invoice.items.all(),'thermal':paper=='thermal',**collection_details,**receipt_images(obj)})
     response=HttpResponse(html);response['Cache-Control']='private, no-store';return response
 
 ReceiptViewSet.print_receipt=print_receipt
