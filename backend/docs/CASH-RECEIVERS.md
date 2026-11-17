@@ -1,9 +1,9 @@
-# Cash receiver selection
+# Automatic cash receiver
 
-Record Payment setup now returns the approved cash receivers: Nwaele Juliet, Udegbe Egonna, Onuoha Lilian, Ibewuike Blessing, Sabina Mbenaso, Anisa Eze, Emafor Egomau, Obiefule Rachel, Ibemye Senfa, Odimegwu Henrietta, Nwodife Edith, Okonkwo Grace, Chibue Chigozie, Amozie Esther. Selecting Cash replaces the reference input with a required receiver dropdown. Other channels retain their payment reference requirements.
+Record Payment records the signed-in officer's full name as `Payment.cash_receiver` for cash. If the account has no full name, it uses the username. The backend derives the value from the authenticated account and ignores any submitted receiver name. Other payment channels store no cash receiver.
 
-The capture API requires an approved receiver for cash, clears the submitted reference for cash, and rejects a receiver for other channels. Receiver names are reusable across payments; cash submissions are not deduplicated by blank reference. Request-key idempotency remains enforced. The receiver is stored in Payment.cash_receiver, returned in payment responses, included in the capture audit event and displayed on the printed receipt. The authenticated recording officer remains tracked independently. Selecting a name does not verify payment or grant access.
+The frontend displays the name in a read-only input when Cash is selected; there is no dropdown. Payment setup exposes `cash_receiver` and `cash_receiver_automatic`; a one-name `cash_receivers` list remains for older clients during deployment.
 
-Receiver storage was introduced by payments migration 0004_payment_cash_receiver. This list update requires only a backend deployment; no new migration is needed.
+The stored name is a snapshot: renaming an account does not rewrite historical payments or receipts. The account ID remains tracked independently by `initiated_by`, the recorded-payment context and audit events. This does not grant access or verify funds.
 
-The ten additional names extend the original four receiver choices, giving fourteen options. Previously recorded receiver names remain on historical receipts. The frontend fetches this list from the backend; no frontend change or database migration is required.
+Deploy backend and frontend. Apply payments migration `0005_cash_receiver_full_name`, which widens receiver storage to accommodate the full account name without truncation. The former approved-name list is no longer used for capture validation.

@@ -27,12 +27,13 @@ class CaptureInput(serializers.Serializer):
         from apps.payments.slip_reference import validate_slip_reference
         try:data['submitted_reference']=validate_slip_reference(data['submitted_reference'],data['channel'],compact=True)
         except DjangoValidationError as error:raise serializers.ValidationError({'submitted_reference':error.messages}) from error
-        from apps.payments.cash_receivers import CASH_RECEIVERS
         if data['channel']=='cash':
-            if data['cash_receiver'] not in CASH_RECEIVERS:raise serializers.ValidationError({'cash_receiver':'Select an approved cash receiver.'})
+            officer=self.context['request'].user
+            data['cash_receiver']=officer.get_full_name().strip() or officer.username
             data['submitted_reference']=''
-        elif data['cash_receiver']:raise serializers.ValidationError({'cash_receiver':'A cash receiver applies only to cash payments.'})
-        elif not data['submitted_reference']:raise serializers.ValidationError({'submitted_reference':'Enter the payment reference.'})
+        else:
+            data['cash_receiver']=''
+            if not data['submitted_reference']:raise serializers.ValidationError({'submitted_reference':'Enter the payment reference.'})
         if data['payment_received'] and data['channel'] not in {'cash','pos','bank_transfer'}:raise serializers.ValidationError({'payment_received':'Online payments require provider confirmation.'})
         if not data['patient'] and not data['patient_name'].strip():raise serializers.ValidationError({'patient_name':'Enter the patient name.'})
         return data
@@ -51,7 +52,7 @@ class CaptureInput(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=19, decimal_places=2, min_value=Decimal('0.01'))
     override_reason = serializers.CharField(max_length=500, allow_blank=True, default='')
     channel = serializers.ChoiceField(choices=Payment.Channel.choices)
-    cash_receiver = serializers.CharField(max_length=100,allow_blank=True,default='')
+    cash_receiver = serializers.CharField(read_only=True)
     submitted_reference = serializers.CharField(max_length=120,allow_blank=True,default='')
     reported_paid_at = serializers.DateTimeField()
     remarks = serializers.CharField(max_length=500, allow_blank=True, default='')
@@ -80,12 +81,12 @@ class RecordPaymentView(APIView):
         departments=Department.objects.filter(is_active=True)
         if request.user.role not in {'super_admin','finance','cashier'} or (request.user.role=='cashier' and not points.filter(department__isnull=True).exists()):
             departments=scoped(departments,request.user,'pk')
-        from apps.payments.cash_receivers import CASH_RECEIVERS
-        return Response({'departments':list(departments.order_by('name').values('id','name','is_active')),'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receivers':CASH_RECEIVERS,'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
+        receiver=request.user.get_full_name().strip() or request.user.username
+        return Response({'departments':list(departments.order_by('name').values('id','name','is_active')),'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receiver':receiver,'cash_receiver_automatic':True,'cash_receivers':[receiver],'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
 
     def post(self,request):
         if request.user.role not in {'super_admin','finance','cashier'}: raise PermissionDenied('Only collection officers and finance administrators may record payments.')
-        serializer=CaptureInput(data=request.data);serializer.is_valid(raise_exception=True);data=serializer.validated_data
+        serializer=CaptureInput(data=request.data,context={'request':request});serializer.is_valid(raise_exception=True);data=serializer.validated_data
         fingerprint=hashlib.sha256(json.dumps(data,sort_keys=True,default=str).encode()).hexdigest()
         try:
             with transaction.atomic():

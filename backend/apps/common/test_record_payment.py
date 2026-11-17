@@ -198,23 +198,30 @@ class RecordPaymentTests(TestCase):
         payment.submitted_reference='09FG2611042341124813CY0W7';payment.save()
         self.assertEqual(self.post().status_code,400)
 
-    def test_cash_receiver_required_validated_and_reusable(self):
-        self.point.daily_limit=None;self.point.save()
-        choices=self.client.get('/api/v1/record-payment/').data['cash_receivers']
-        self.assertEqual(list(choices),['Nwaele Juliet', 'Udegbe Egonna', 'Onuoha Lilian', 'Ibewuike Blessing', 'Sabina Mbenaso', 'Anisa Eze', 'Emafor Egomau', 'Obiefule Rachel', 'Ibemye Senfa', 'Odimegwu Henrietta', 'Nwodife Edith', 'Okonkwo Grace', 'Chibue Chigozie', 'Amozie Esther'])
-        for value in ['', 'Unlisted Person']:
-            self.data['cash_receiver']=value
-            response=self.post();self.assertEqual(response.status_code,400,response.data)
-        for receiver in choices:
-            self.data.update(cash_receiver=receiver,idempotency_key=str(uuid4()))
+    def test_cash_receiver_uses_signed_in_name_and_ignores_submitted_names(self):
+        self.cashier.first_name='Sabina';self.cashier.last_name='Mbenaso';self.cashier.save()
+        setup=self.client.get('/api/v1/record-payment/').data
+        self.assertTrue(setup['cash_receiver_automatic'])
+        self.assertEqual(setup['cash_receiver'],'Sabina Mbenaso')
+        for submitted in [None,'','Another officer']:
+            self.data['idempotency_key']=str(uuid4())
+            if submitted is None:self.data.pop('cash_receiver',None)
+            else:self.data['cash_receiver']=submitted
             response=self.post();self.assertEqual(response.status_code,201,response.data)
-            self.assertEqual(response.data['payment']['cash_receiver'],receiver)
             payment=Payment.objects.get(pk=response.data['payment']['id'])
-            self.assertEqual(payment.cash_receiver,receiver)
-            self.assertEqual(payment.submitted_reference,'')
+            self.assertEqual(payment.cash_receiver,'Sabina Mbenaso')
             self.assertEqual(payment.initiated_by_id,self.cashier.pk)
-        self.data.update(idempotency_key=str(uuid4()))
-        self.assertEqual(self.post().status_code,201)
+        self.cashier.first_name='Renamed';self.cashier.save()
+        payment.refresh_from_db();self.assertEqual(payment.cash_receiver,'Sabina Mbenaso')
+
+    def test_cash_receiver_falls_back_to_username_and_preserves_full_length(self):
+        self.data.pop('cash_receiver',None)
+        response=self.post();self.assertEqual(response.status_code,201,response.data)
+        self.assertEqual(response.data['payment']['cash_receiver'],self.cashier.username)
+        self.cashier.first_name='A'*150;self.cashier.last_name='B'*150;self.cashier.save()
+        self.data['idempotency_key']=str(uuid4())
+        response=self.post();self.assertEqual(response.status_code,201,response.data)
+        self.assertEqual(response.data['payment']['cash_receiver'],self.cashier.get_full_name())
 
     def test_walk_in_capture_keeps_name_without_registering_patient(self):
         from apps.registry.models import Patient
