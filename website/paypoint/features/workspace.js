@@ -238,6 +238,25 @@ async function userAccountSettings() {
 async function helpSupport() {
   return livePages.help();
 }
+async function cashierDashboard() {
+  content.innerHTML=`${title('Cashier Dashboard')}<section class="finance-card"><div class="finance-card-heading"><p data-cashier-scope>Your collections and receipt activity</p><label>Period <select data-cashier-period><option value="today">Today</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="all">All records</option></select></label></div><a class="pending-verify" href="#dashboard-record-payment">Record payment</a> <a class="pending-outline" href="#payments-receipt-reprints">Receipt reprints</a></section><div data-cashier-results role="region" aria-label="Cashier collections"></div>`;
+  const root=content.querySelector('[data-cashier-results]'),period=content.querySelector('[data-cashier-period]');
+  let sequence=0;
+  const render=async()=>{
+    const version=++sequence;
+    root.innerHTML='<p role="status">Loading collections…</p>';
+    try{
+      const data=await api('dashboard/cashier/?period='+encodeURIComponent(period.value));
+      if(version!==sequence||!root.isConnected)return;
+      content.querySelector('[data-cashier-scope]').textContent=data.scope==='own_collections'?'Your collections across all departments and cash points':'Hospital collections';
+      const cards=[['Confirmed collections',money(data.confirmed_amount)],['Confirmed payments',data.confirmed_transactions],['Receipts issued',data.receipts_issued],['Pending payments',data.pending_transactions],['Pending amount',money(data.pending_amount)]];
+      root.innerHTML=`<section class="source-overview-kpis">${cards.map(([label,value])=>`<article class="finance-card"><p>${escapeHtml(label)}</p><h2>${escapeHtml(value)}</h2></article>`).join('')}</section><section class="finance-card"><h2>Confirmed collections by channel</h2>${table(['Channel','Payments','Amount'],data.channels.map(row=>[row.channel.replaceAll('_',' '),row.transactions,money(row.amount)]))}</section><section class="finance-card"><h2>Recent payments</h2>${table(['Date','Patient','Department','Channel','Amount','Status','Receipt'],data.recent_transactions.map(row=>[new Date(row.created_at).toLocaleString(),row.patient_name,row.department,row.channel.replaceAll('_',' '),money(row.amount),{html:status(row.status)},{html:row.status==='confirmed'&&row.receipt_id?`<a class="pending-outline" target="_blank" rel="noopener" href="/paypoint/api/v1/receipts/${encodeURIComponent(row.receipt_id)}/print/">Preview receipt</a>`:'Not issued'}]))}</section><p>${escapeHtml(data.note)}</p>`;
+    }catch(error){if(version===sequence&&root.isConnected)root.innerHTML=`<section class="api-error" role="alert"><h2>Unable to load cashier collections</h2><p>${escapeHtml(error.status===404?'Deploy the backend update to enable the Cashier Dashboard.':error.message)}</p><button type="button" class="pending-outline" data-cashier-retry>Try again</button></section>`;}
+  };
+  period.addEventListener('change',render);
+  root.addEventListener('click',event=>{if(event.target.closest('[data-cashier-retry]'))render();});
+  await render();
+}
 async function overviewDashboardPreview() {
   content.innerHTML=`<div class="overview-preview-page imported-overview"><header class="source-overview-header"><div><h1>IMSUTH Central Pay Point</h1><small>Imo State Teaching Hospital, Orlu: all payments in one place</small></div><label>Period <select data-overview-period><option value="1">Today</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="all">All records</option></select></label></header><nav class="source-overview-nav" aria-label="Revenue control sections"><a href="#dashboard-overview-preview" aria-current="page">Overview</a><a href="#dashboard-record-payment">Record payment</a><a href="#patients">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts <b data-overview-alert-count></b></a><a href="#users-audit">Users and audit</a></nav><div class="source-overview-body"><section class="source-overview-kpis" data-overview-kpis aria-label="Collection summary"><p>Loading collection summary…</p></section><div class="source-overview-grid"><section class="source-overview-card"><h2>Daily collections by channel</h2><div data-overview-daily aria-label="Daily confirmed NGN collections"></div></section><section class="source-overview-card"><h2>Channel split</h2><div data-overview-channels></div></section><section class="source-overview-card"><h2>Top departments</h2><div data-overview-departments></div></section><section class="source-overview-card"><h2>Reconciliation with bank and POS settlement</h2><div data-overview-reconciliation></div><a class="source-overview-report" href="#reports-reconciliation">View reconciliation report</a></section></div><p class="overview-preview-note">Confirmed NGN collections for the selected period. Pending attempts are excluded. Reconciliation counts imported statement rows.</p></div></div>`;
   await refreshOverview(content.querySelector('.imported-overview'),escapeHtml,moneyWhole);
@@ -1870,7 +1889,7 @@ const pages = {
   "dashboard-record-payment": recordPaymentPreview,
   dashboard,
   "dashboard-front-desk": dashboardPreset("front_desk"),
-  "dashboard-cashier": dashboardPreset("cashier"),
+  "dashboard-cashier": cashierDashboard,
   "dashboard-finance": dashboardPreset("finance"),
   "dashboard-daily": dashboardPreset("daily"),
   patients: departmentDesk,

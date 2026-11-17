@@ -382,6 +382,25 @@ class DepartmentDeskViewSet(viewsets.GenericViewSet):
 class RevenueDashboardView(APIView):
     permission_classes=[permissions.IsAuthenticated]
     def get(self,request,metric='summary'):
+        if metric=='cashier':
+            if request.user.role not in {'cashier','finance','super_admin'}:
+                raise PermissionDenied('Only cashiers and finance administrators can view this dashboard.')
+            payments=Payment.objects.filter(currency='NGN').select_related('invoice__patient','invoice__department','initiated_by','receipt').prefetch_related('invoice__items')
+            if request.user.role=='cashier':payments=payments.filter(initiated_by=request.user)
+            attempts=dated(payments,request.query_params)
+            confirmed=dated(payments.filter(status='confirmed'),request.query_params,'confirmed_at')
+            pending=attempts.filter(status__in=['pending','awaiting_offline_verification','review_required'])
+            return Response({
+                'scope':'own_collections' if request.user.role=='cashier' else 'hospital_collections',
+                'currency':'NGN',
+                'confirmed_amount':confirmed.aggregate(n=Sum('amount'))['n'] or 0,
+                'confirmed_transactions':confirmed.count(),
+                'pending_amount':pending.aggregate(n=Sum('amount'))['n'] or 0,
+                'pending_transactions':pending.count(),
+                'receipts_issued':Receipt.objects.filter(payment__in=confirmed).count(),
+                'channels':list(confirmed.values('channel').annotate(amount=Sum('amount'),transactions=Count('pk')).order_by('channel')),
+                'recent_transactions':PaymentSerializer(attempts.order_by('-created_at','pk')[:10],many=True).data,
+                'note':'Confirmed collections use confirmation date; recent and pending payments use creation date. Cashiers see their own collections across departments and cash points.'})
         base=scoped(Payment.objects.select_related('invoice__patient','invoice__department','initiated_by','receipt').prefetch_related('invoice__items'),request.user,'invoice__department_id').filter(currency='NGN')
         # Confirmed collections use confirmation date. Attempts use creation date.
         attempts=dated(base,request.query_params)
