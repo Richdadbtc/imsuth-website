@@ -18,6 +18,12 @@ class SlipReferenceTests(SimpleTestCase):
         for value in [VALID,'012611','611231','63131301261','6313130126111','63131301261A']:
             with self.assertRaises(ValidationError):validate_slip_reference(value,'pos')
 
+    def test_compact_transfer_reference_is_canonical_for_new_submissions(self):
+        for value in ['09fg/cy0w7','09fgcy0w7',VALID]:
+            self.assertEqual(validate_slip_reference(value,'bank_transfer',compact=True),'09FG/CY0W7')
+        for value in ['09FG/CY0W','09FG/CY0W77','09FG//CY0W7','09FG/CY0W!']:
+            with self.assertRaises(ValidationError):validate_slip_reference(value,'bank_transfer')
+
     def test_other_channels_keep_their_own_reference_format(self):
         self.assertEqual(validate_slip_reference('CASH-001','cash'),'CASH-001')
 
@@ -34,3 +40,11 @@ class ReceiptSlipGateTests(TestCase):
         self.assertEqual(client.get(path).status_code,400)
         self.receipt.payment.submitted_reference='631313012611';self.receipt.payment.save()
         self.assertEqual(client.get(path).status_code,200)
+
+    def test_print_accepts_legacy_and_compact_transfer_references(self):
+        from rest_framework.test import APIClient
+        client=APIClient();client.force_authenticate(self.admin)
+        for reference in [VALID,'09FG/CY0W7']:
+            self.payment.channel='bank_transfer';self.payment.submitted_reference=reference;self.payment.save()
+            self.assertEqual(client.get(f'/api/v1/receipts/{self.receipt.pk}/print/').status_code,200)
+            self.payment.refresh_from_db();self.assertEqual(self.payment.submitted_reference,reference)

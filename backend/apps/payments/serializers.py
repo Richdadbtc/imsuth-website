@@ -26,7 +26,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     def validate(self,data):
         from .slip_reference import validate_slip_reference
-        try:data['submitted_reference']=validate_slip_reference(data.get('submitted_reference',getattr(self.instance,'submitted_reference','')),data.get('channel',getattr(self.instance,'channel','')))
+        try:data['submitted_reference']=validate_slip_reference(data.get('submitted_reference',getattr(self.instance,'submitted_reference','')),data.get('channel',getattr(self.instance,'channel','')),compact=True)
         except DjangoValidationError as error:raise serializers.ValidationError({'submitted_reference':error.messages}) from error
         return data
 

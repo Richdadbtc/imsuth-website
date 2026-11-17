@@ -1,5 +1,5 @@
 import {mountReceiptPreview} from './receipt-preview.js';
-import {referenceRule,isSlipChannel,normalizeSlipReference} from '../lib/slip-reference.js';
+import {referenceRule,isSlipChannel,normalizeSlipReference,formatTransferReference} from '../lib/slip-reference.js';
 import {mountHospitalCatalogueSetup} from './catalogue-setup.js';
 import {createLivePages} from './live-pages.js';
 import {refreshOverview,watchPaymentStatus,mountTariffProposals,mountCashEvidence,mountOverviewTransactions,mountDepartmentDirectory} from './revenue-live.js';
@@ -352,7 +352,7 @@ async function enhancedRecordPaymentPreview(capture) {
     else{el('reference').removeAttribute('pattern');el('reference').placeholder='Enter payment reference';el('reference').title='';}
     root.querySelector('[data-rp-reference-help]').textContent=slip?rule.help:'Enter the reference for this payment channel.';
   };
-  el('reference').addEventListener('input',()=>{if(isSlipChannel(el('channel').value))el('reference').value=normalizeSlipReference(el('reference').value);});
+  el('reference').addEventListener('input',()=>{if(isSlipChannel(el('channel').value))el('reference').value=el('channel').value==='bank_transfer'?formatTransferReference(el('reference').value):normalizeSlipReference(el('reference').value);});
   el('cash_point').addEventListener('change',updateOrders);el('channel').addEventListener('change',()=>{updateOrders();updateReferenceRule();});
   updateReferenceRule();
   el('paid').addEventListener('input',()=>{fees();el('override_reason').required=false;clearReceipt();});

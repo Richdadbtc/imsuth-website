@@ -25,7 +25,7 @@ from .revenue_api import scoped_cash_points, scoped_cash_orders, scoped, scoped_
 class CaptureInput(serializers.Serializer):
     def validate(self,data):
         from apps.payments.slip_reference import validate_slip_reference
-        try:data['submitted_reference']=validate_slip_reference(data['submitted_reference'],data['channel'])
+        try:data['submitted_reference']=validate_slip_reference(data['submitted_reference'],data['channel'],compact=True)
         except DjangoValidationError as error:raise serializers.ValidationError({'submitted_reference':error.messages}) from error
         from apps.payments.cash_receivers import CASH_RECEIVERS
         if data['channel']=='cash':
@@ -96,7 +96,13 @@ class RecordPaymentView(APIView):
                 if old:
                     if old.created_by_id!=request.user.pk or old.fingerprint!=fingerprint: raise ValidationError('This request key belongs to a different submission.')
                     return Response(capture_payload(old))
-                if data['channel']!='cash' and Payment.objects.filter(channel=data['channel'],submitted_reference=data['submitted_reference']).exists():raise ValidationError({'submitted_reference':'This payment reference has already been recorded. Check the existing transaction.'})
+                if data['channel']!='cash':
+                    references=Q(submitted_reference=data['submitted_reference'])
+                    if data['channel']=='bank_transfer':
+                        first,last=data['submitted_reference'].split('/')
+                        references|=Q(submitted_reference__istartswith=first,submitted_reference__iendswith=last)
+                    if Payment.objects.filter(references,channel=data['channel']).exists():
+                        raise ValidationError({'submitted_reference':'This payment reference has already been recorded. Check the existing transaction.'})
                 departments=Department.objects.filter(pk=data['department'],is_active=True)
                 if not (request.user.role=='cashier' and point.department_id is None):
                     departments=scoped(departments,request.user,'pk')

@@ -185,8 +185,18 @@ class RecordPaymentTests(TestCase):
             self.assertEqual(Invoice.objects.count(),before)
         self.data.update(cash_receiver='',channel='bank_transfer',submitted_reference='09fg2611042341124813 cy0w7')
         result=self.post();self.assertEqual(result.status_code,201,result.data)
-        self.assertEqual(RecordedPayment.objects.get().payment.submitted_reference,'09FG2611042341124813CY0W7')
+        self.assertEqual(RecordedPayment.objects.get().payment.submitted_reference,'09FG/CY0W7')
         self.assertFalse(result.data['receipt_issued'])
+
+    def test_compact_transfer_reference_and_legacy_duplicate_protection(self):
+        self.data.update(cash_receiver='',channel='bank_transfer',submitted_reference='09fgcy0w7')
+        result=self.post();self.assertEqual(result.status_code,201,result.data)
+        payment=RecordedPayment.objects.get().payment
+        self.assertEqual(payment.submitted_reference,'09FG/CY0W7')
+        self.data['idempotency_key']=str(uuid4())
+        self.assertEqual(self.post().status_code,400)
+        payment.submitted_reference='09FG2611042341124813CY0W7';payment.save()
+        self.assertEqual(self.post().status_code,400)
 
     def test_cash_receiver_required_validated_and_reusable(self):
         choices=self.client.get('/api/v1/record-payment/').data['cash_receivers']
