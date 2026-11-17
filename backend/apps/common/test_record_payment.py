@@ -199,8 +199,9 @@ class RecordPaymentTests(TestCase):
         self.assertEqual(self.post().status_code,400)
 
     def test_cash_receiver_required_validated_and_reusable(self):
+        self.point.daily_limit=None;self.point.save()
         choices=self.client.get('/api/v1/record-payment/').data['cash_receivers']
-        self.assertEqual(list(choices),['Nwaele Juliet','Udegbe Egonna','Onuoha Lilian','Ibewuike Blessing'])
+        self.assertEqual(list(choices),['Nwaele Juliet', 'Udegbe Egonna', 'Onuoha Lilian', 'Ibewuike Blessing', 'Sabina Mbenaso', 'Anisa Eze', 'Emafor Egomau', 'Obiefule Rachel', 'Ibemye Senfa', 'Odimegwu Henrietta', 'Nwodife Edith', 'Okonkwo Grace', 'Chibue Chigozie', 'Amozie Esther'])
         for value in ['', 'Unlisted Person']:
             self.data['cash_receiver']=value
             response=self.post();self.assertEqual(response.status_code,400,response.data)
