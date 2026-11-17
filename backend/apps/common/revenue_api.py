@@ -29,6 +29,16 @@ def scoped(queryset, user, field='department_id'):
     return queryset.filter(**{field: user.department_id}) if user.department_id else queryset.none()
 
 
+def scoped_receipts(queryset, user, prefix=''):
+    """Keep department access and let cashiers view their own shared-point receipts."""
+    allowed=scoped(queryset,user,prefix+'invoice__department_id')
+    if user.role!='cashier':return allowed
+    return queryset.filter(Q(pk__in=allowed.values('pk')) | Q(**{
+        prefix+'payment__recorded_context__created_by_id':user.pk,
+        prefix+'payment__recorded_context__cash_point__department__isnull':True,
+    }))
+
+
 def date_range(params):
     today = timezone.localdate()
     period = params.get('period', '30')

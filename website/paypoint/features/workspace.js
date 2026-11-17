@@ -267,7 +267,7 @@ async function enhancedRecordPaymentPreview(capture) {
     }
     return items;
   };
-  const [patients, departments, services, tariffs, payments] = await Promise.all([Promise.resolve([]), fetchAll('departments'), Promise.resolve([]), Promise.resolve([]), Promise.resolve([])]);
+  const [patients, departments, services, tariffs, payments] = await Promise.all([Promise.resolve([]), (Array.isArray(capture.departments)?Promise.resolve(capture.departments):fetchAll('departments')), Promise.resolve([]), Promise.resolve([]), Promise.resolve([])]);
   let cataloguePreview=null,catalogueUnavailable=false;
   if(user.role==='super_admin'){
     try{cataloguePreview=await api('catalogue-setup/');}

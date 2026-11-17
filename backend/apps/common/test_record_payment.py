@@ -108,6 +108,29 @@ class RecordPaymentTests(TestCase):
         self.data['idempotency_key']=str(uuid4());self.data['submitted_reference']='SYN-SHARED-OTHER';self.data['department']=str(self.other.pk)
         self.assertEqual(self.post().status_code,400)
 
+    def test_cashier_without_department_collects_for_any_active_department_at_shared_point(self):
+        from apps.common.models import CashPoint
+        from apps.catalogue.models import Department
+        from apps.accounts.models import User
+        self.cashier.department=None;self.cashier.save()
+        inactive=Department.objects.create(code='CLOSED',name='Inactive synthetic',is_active=False)
+        choices=self.client.get('/api/v1/record-payment/').data['departments']
+        self.assertIn(str(self.other.pk),{str(row['id']) for row in choices})
+        self.assertNotIn(str(inactive.pk),{str(row['id']) for row in choices})
+        self.data.update(cash_point=str(CashPoint.objects.get(name='OPD CASH POINT').pk),
+            department=str(self.other.pk),patient=None,patient_name='Synthetic walk-in',
+            service=None,service_description='Synthetic manual service',base_amount='100',payment_received=True)
+        result=self.post();self.assertEqual(result.status_code,201,result.data)
+        receipt=RecordedPayment.objects.get().payment.receipt
+        self.assertEqual(self.client.get(f'/api/v1/receipts/{receipt.pk}/print/').status_code,200)
+        self.assertIn(str(receipt.pk),{row['id'] for row in self.client.get('/api/v1/record-payment/').data['receipts']})
+        other_cashier=User.objects.create_user(username='other-point-officer',role='cashier')
+        self.client.force_authenticate(other_cashier)
+        self.assertEqual(self.client.get(f'/api/v1/receipts/{receipt.pk}/print/').status_code,404)
+        self.client.force_authenticate(self.cashier)
+        self.data['department']=str(inactive.pk);self.data['idempotency_key']=str(uuid4())
+        self.assertEqual(self.post().status_code,400)
+
     def test_shared_cash_orders_are_unlimited_but_private_to_requester(self):
         from apps.common.models import CashPoint
         shared=CashPoint.objects.get(name='OPD CASH POINT')

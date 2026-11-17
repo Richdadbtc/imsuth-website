@@ -445,15 +445,15 @@ class ReprintViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filterset_fields = ('receipt','printed_by','format')
     def get_queryset(self):
-        from .revenue_api import scoped
-        return scoped(super().get_queryset(),self.request.user,'receipt__invoice__department_id')
+        from .revenue_api import scoped_receipts
+        return scoped_receipts(super().get_queryset(),self.request.user,'receipt__')
     def create(self, request):
         if request.user.role not in {'cashier','finance','super_admin'}:
             raise PermissionDenied('This role cannot reprint receipts.')
         serializer = ReprintSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        from .revenue_api import scoped
-        if not scoped(Receipt.objects.filter(pk=serializer.validated_data['receipt'].pk),request.user,'invoice__department_id').exists():
+        from .revenue_api import scoped_receipts
+        if not scoped_receipts(Receipt.objects.filter(pk=serializer.validated_data['receipt'].pk),request.user).exists():
             raise PermissionDenied('Receipt is outside your access scope.')
         if serializer.validated_data['receipt'].payment.status != Payment.Status.CONFIRMED:
             raise ValidationError('Only confirmed payment receipts can be reprinted.')

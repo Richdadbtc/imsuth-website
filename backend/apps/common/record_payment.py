@@ -19,7 +19,7 @@ from apps.payments.models import Payment, Receipt
 from apps.payments.serializers import PaymentSerializer
 from apps.auditlog.models import AuditEvent
 from .models import Sequence, CashPoint, CashOrder, RecordedPayment, Alert
-from .revenue_api import scoped_cash_points, scoped_cash_orders, scoped
+from .revenue_api import scoped_cash_points, scoped_cash_orders, scoped, scoped_receipts
 
 
 class CaptureInput(serializers.Serializer):
@@ -72,13 +72,16 @@ class RecordPaymentView(APIView):
     def get(self,request):
         points=scoped_cash_points(CashPoint.objects.filter(is_active=True),request.user)
         orders=scoped_cash_orders(CashOrder.objects.filter(status='approved',cash_point__is_active=True),request.user)
-        receipts=scoped(Receipt.objects.select_related('payment','invoice__patient','invoice__department').prefetch_related('invoice__items__delivery'),request.user,'invoice__department_id').order_by('-issued_at')[:10]
+        receipts=scoped_receipts(Receipt.objects.select_related('payment','invoice__patient','invoice__department').prefetch_related('invoice__items__delivery'),request.user).order_by('-issued_at')[:10]
         latest=[]
         for receipt in receipts:
             items=list(receipt.invoice.items.all());used=sum(hasattr(item,'delivery') for item in items)
             latest.append({'id':str(receipt.pk),'receipt_number':receipt.receipt_number,'patient_name':receipt.invoice.patient_display_name,'service':', '.join(item.description for item in items),'department':receipt.invoice.department.name,'amount':receipt.amount,'payment_status':receipt.payment.status,'service_status':'Used' if items and used==len(items) else 'Partially used' if used else 'Not yet used','issued_at':receipt.issued_at})
+        departments=Department.objects.filter(is_active=True)
+        if request.user.role not in {'super_admin','finance','cashier'} or (request.user.role=='cashier' and not points.filter(department__isnull=True).exists()):
+            departments=scoped(departments,request.user,'pk')
         from apps.payments.cash_receivers import CASH_RECEIVERS
-        return Response({'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receivers':CASH_RECEIVERS,'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
+        return Response({'departments':list(departments.order_by('name').values('id','name','is_active')),'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receivers':CASH_RECEIVERS,'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
 
     def post(self,request):
         if request.user.role not in {'super_admin','finance','cashier'}: raise PermissionDenied('Only collection officers and finance administrators may record payments.')
@@ -94,7 +97,10 @@ class RecordPaymentView(APIView):
                     if old.created_by_id!=request.user.pk or old.fingerprint!=fingerprint: raise ValidationError('This request key belongs to a different submission.')
                     return Response(capture_payload(old))
                 if data['channel']!='cash' and Payment.objects.filter(channel=data['channel'],submitted_reference=data['submitted_reference']).exists():raise ValidationError({'submitted_reference':'This payment reference has already been recorded. Check the existing transaction.'})
-                department=scoped(Department.objects.filter(pk=data['department'],is_active=True),request.user,'pk').first()
+                departments=Department.objects.filter(pk=data['department'],is_active=True)
+                if not (request.user.role=='cashier' and point.department_id is None):
+                    departments=scoped(departments,request.user,'pk')
+                department=departments.first()
                 if not department: raise ValidationError({'department':'Select an active permitted department.'})
                 patient=None
                 if data['patient']:

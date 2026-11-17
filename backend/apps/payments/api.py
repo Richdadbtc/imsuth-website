@@ -47,8 +47,8 @@ class ReceiptViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ReceiptSerializer
     permission_classes = (permissions.IsAuthenticated,)
     def get_queryset(self):
-        from apps.common.revenue_api import scoped
-        return scoped(super().get_queryset(), self.request.user, 'invoice__department_id')
+        from apps.common.revenue_api import scoped_receipts
+        return scoped_receipts(super().get_queryset(), self.request.user)
     filterset_fields = ("payment", "invoice")
     search_fields = ("receipt_number", "payment__reference", "invoice__invoice_number", "invoice__patient_name", "invoice__patient__first_name", "invoice__patient__last_name", "invoice__department__name")
 
