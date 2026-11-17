@@ -96,7 +96,7 @@ class RecordPaymentTests(TestCase):
 
     def test_shared_unlimited_points_are_available_without_expanding_patient_scope(self):
         from apps.common.models import CashPoint
-        names={'Main cash-point 1','Main cash-point 2','A&E Cash-point'}
+        names={'OPD CASH POINT','GOPD CASH POINT','A&E Cash-point'}
         points=CashPoint.objects.filter(name__in=names)
         self.assertEqual(points.count(),3)
         self.assertTrue(all(p.department_id is None and p.daily_limit is None for p in points))
@@ -110,7 +110,7 @@ class RecordPaymentTests(TestCase):
 
     def test_shared_cash_orders_are_unlimited_but_private_to_requester(self):
         from apps.common.models import CashPoint
-        shared=CashPoint.objects.get(name='Main cash-point 1')
+        shared=CashPoint.objects.get(name='OPD CASH POINT')
         order=CashOrder.objects.create(cash_point=shared,requested_by=self.cashier,amount='5000000',purpose='Synthetic shared order',idempotency_key='synthetic-unlimited-order',status='approved')
         visible=self.client.get('/api/v1/record-payment/').data['cash_orders']
         self.assertIn(str(order.pk),[o['id'] for o in visible])
