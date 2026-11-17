@@ -14,7 +14,7 @@ class LiveUiContracts(TestCase):
     def setUpTestData(cls):fixtures.RevenueControlTests.setUpTestData.__func__(cls)
     def setUp(self):self.api=APIClient();self.api.force_authenticate(self.admin)
     def test_staff_phone_persists_on_create_and_edit(self):
-        response=self.api.post('/api/v1/users/',{'username':'live-ui-staff','role':'cashier','phone':'08000000123'},format='json')
+        response=self.api.post('/api/v1/users/',{'username':'live-ui-staff','role':'cashier','password':'Synthetic-New-Login-2030!','phone':'08000000123'},format='json')
         self.assertEqual(response.status_code,201,response.data);pk=response.data['id']
         self.assertEqual(response.data['phone'],'08000000123')
         result=self.api.patch(f'/api/v1/users/{pk}/',{'phone':'08000000456'},format='json')

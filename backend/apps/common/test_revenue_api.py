@@ -95,7 +95,7 @@ class RevenueControlTests(TestCase):
     def test_users_audit_are_admin_controlled(self):
         self.assertEqual(self.client.get(self.path('users')).status_code,403)
         self.client.force_authenticate(self.admin)
-        user=self.post('users',{'username':'synthetic-new','role':'cashier'})
+        user=self.post('users',{'username':'synthetic-new','role':'cashier','password':'Synthetic-New-Login-2030!'})
         self.assertEqual(user.status_code,201,user.data)
         self.assertNotIn('password',user.data)
         self.assertEqual(self.post(f"users/{user.data['id']}/deactivate",{}).status_code,200)

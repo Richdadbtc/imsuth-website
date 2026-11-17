@@ -1810,14 +1810,15 @@ async function usersAndAudit() {
       if (!u) return;
       editing = u.id;
       form.elements.password.value='';form.elements.password_confirm.value='';
-      form.elements.password.required=false;form.elements.password_confirm.required=false;
-      q('[data-ua-password-label]').textContent='New password (optional)';
-      q('[data-ua-password-help]').textContent='Leave both password fields blank to keep the existing password.';
+      const needsPassword=u.has_usable_password===false;
+      form.elements.password.required=needsPassword;form.elements.password_confirm.required=needsPassword;
+      q('[data-ua-password-label]').textContent=needsPassword?'Set password *':'New password (optional)';
+      q('[data-ua-password-help]').textContent=needsPassword?'This account has no usable login password. Set a password to enable sign-in.':'Leave both password fields blank to keep the existing password.';
       for (const k of ['full_name', 'username', 'email', 'phone', 'role', 'department']) form.elements.namedItem(k).value = u[k] || '';
       form.elements.namedItem('status').value = u.is_active ? 'active' : 'inactive';
       form.elements.page_access_mode.value=u.page_access===null||u.page_access===undefined?'defaults':'custom';drawPageChoices(u.page_access??null);
       q('[data-ua-editor-title]').textContent = 'Edit User';
-      q('[data-ua-message]').textContent = 'Editing ' + u.full_name;
+      q('[data-ua-message]').textContent = 'Editing ' + u.full_name + (u.is_active?'':' — Account is inactive. Select Active to allow sign-in.');
       form.elements.namedItem('full_name').focus();
     }
   });

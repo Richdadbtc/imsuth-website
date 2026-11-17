@@ -55,16 +55,18 @@ class LoggedViewSet(viewsets.ModelViewSet):
 
 
 class StaffSerializer(serializers.ModelSerializer):
+    has_usable_password=serializers.BooleanField(read_only=True)
     full_name = serializers.SerializerMethodField()
-    password = serializers.CharField(write_only=True, required=False, max_length=4096)
+    password = serializers.CharField(write_only=True, required=False, max_length=4096,trim_whitespace=False)
     phone = serializers.CharField(source='account_profile.phone',required=False,allow_blank=True,max_length=30,default='')
     class Meta:
         model = User
-        fields = ('id','username','employee_id','first_name','last_name','full_name','email','role','page_access','department','is_active','date_joined','last_login','must_change_password','password','phone')
+        fields = ('id','username','employee_id','first_name','last_name','full_name','email','role','page_access','department','is_active','date_joined','last_login','must_change_password','has_usable_password','password','phone')
         read_only_fields = ('id','date_joined','last_login','must_change_password')
     def get_full_name(self, obj) -> str:
         return obj.get_full_name() or obj.username
     def validate(self, data):
+        if self.instance is None and not data.get('password','').strip():raise ValidationError({'password':'Set an initial password so this user can sign in.'})
         if data.get('role') == 'super_admin' and not self.context['request'].user.is_superuser:
             raise ValidationError('Only a Django superuser may assign the system administrator role.')
         if self.instance and self.instance.pk == self.context['request'].user.pk and (data.get('is_active') is False or 'role' in data and data['role'] != self.instance.role):

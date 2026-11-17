@@ -62,7 +62,13 @@ class SessionLoginView(APIView):
     def post(self, request):
         username = str(request.data.get("username", "")).strip()
         password = str(request.data.get("password", ""))
-        user = authenticate(request, username=username, password=password)
+        # Preserve exact username matches, and resolve a capitalization difference
+        # only when it identifies a single account. Never guess between duplicates.
+        identity=username
+        if not User.objects.filter(username=username).exists():
+            matches=list(User.objects.filter(username__iexact=username).values_list('username',flat=True)[:2])
+            if len(matches)==1:identity=matches[0]
+        user = authenticate(request, username=identity, password=password)
         if user is None or not user.is_active:
             return Response({"detail": "The username or password was not recognised."}, status=status.HTTP_400_BAD_REQUEST)
         from rest_framework import serializers
