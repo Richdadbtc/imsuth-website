@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import timedelta
 from uuid import uuid4
 from django.test import TestCase
 from django.utils import timezone
@@ -197,6 +198,19 @@ class RecordPaymentTests(TestCase):
         self.assertEqual(self.post().status_code,400)
         payment.submitted_reference='09FG2611042341124813CY0W7';payment.save()
         self.assertEqual(self.post().status_code,400)
+
+    def test_payment_setup_includes_active_department_services_with_current_approved_prices(self):
+        from apps.catalogue.models import Service, TariffVersion
+        self.cashier.department=None;self.cashier.save()
+        unpriced=Service.objects.create(code='UNPRICED',name='Unpriced service',department=self.other)
+        inactive=Service.objects.create(code='INACTIVE',name='Inactive service',department=self.other,is_active=False)
+        TariffVersion.objects.create(service=self.service,amount='200',is_approved=True,effective_from=timezone.now()+timedelta(days=1))
+        rows=self.client.get('/api/v1/record-payment/').data['services']
+        services={str(row['id']):row for row in rows}
+        self.assertEqual(services[str(self.service.pk)]['amount'],Decimal('100'))
+        self.assertEqual(str(services[str(self.service.pk)]['department_id']),str(self.dep.pk))
+        self.assertIsNone(services[str(unpriced.pk)]['amount'])
+        self.assertNotIn(str(inactive.pk),services)
 
     def test_cash_receiver_uses_signed_in_name_and_ignores_submitted_names(self):
         self.cashier.first_name='Sabina';self.cashier.last_name='Mbenaso';self.cashier.save()

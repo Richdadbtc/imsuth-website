@@ -4,7 +4,7 @@ import json
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import timedelta
 from django.db import transaction, IntegrityError
-from django.db.models import Q
+from django.db.models import Q, OuterRef, Subquery
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from rest_framework import serializers, permissions
@@ -81,8 +81,12 @@ class RecordPaymentView(APIView):
         departments=Department.objects.filter(is_active=True)
         if request.user.role not in {'super_admin','finance','cashier'} or (request.user.role=='cashier' and not points.filter(department__isnull=True).exists()):
             departments=scoped(departments,request.user,'pk')
+        from apps.catalogue.models import TariffVersion
+        now=timezone.now()
+        current_tariff=TariffVersion.objects.filter(service_id=OuterRef('pk'),is_approved=True,currency='NGN',effective_from__lte=now).filter(Q(effective_until__isnull=True)|Q(effective_until__gt=now)).order_by('-effective_from')
+        services=Service.objects.filter(department__in=departments,is_active=True).annotate(amount=Subquery(current_tariff.values('amount')[:1])).order_by('name','pk')
         receiver=request.user.get_full_name().strip() or request.user.username
-        return Response({'departments':list(departments.order_by('name').values('id','name','is_active')),'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receiver':receiver,'cash_receiver_automatic':True,'cash_receivers':[receiver],'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
+        return Response({'services':list(services.values('id','name','department_id','amount')),'departments':list(departments.order_by('name').values('id','name','is_active')),'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receiver':receiver,'cash_receiver_automatic':True,'cash_receivers':[receiver],'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
 
     def post(self,request):
         if request.user.role not in {'super_admin','finance','cashier'}: raise PermissionDenied('Only collection officers and finance administrators may record payments.')
