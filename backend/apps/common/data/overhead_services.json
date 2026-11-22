@@ -1,0 +1,431 @@
+{
+  "version": "2026-11-22.1",
+  "items": [
+    {
+      "group": "Medical certificate",
+      "code": "cert_employment",
+      "name": "Fit cert for employment",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "group": "Medical certificate",
+      "code": "cert_school",
+      "name": "Fit cert for school",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "group": "Medical certificate",
+      "code": "cert_travel",
+      "name": "Fit cert for Travelling",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "7500"
+    },
+    {
+      "group": "Medical report",
+      "code": "report_local",
+      "name": "Medical report \u2014 local",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "group": "Medical report",
+      "code": "report_travel",
+      "name": "Medical report \u2014 Travelling",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "7500"
+    },
+    {
+      "group": "Medical report",
+      "code": "report_police",
+      "name": "Police report",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "8000"
+    },
+    {
+      "group": "Medical report",
+      "code": "report_excuse",
+      "name": "Excuse duty",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "group": "Medical report",
+      "code": "report_staff",
+      "name": "Excuse duty for staff",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "0"
+    },
+    {
+      "group": "Dressing room",
+      "code": "dressing_major",
+      "name": "Major dressing",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "group": "Dressing room",
+      "code": "dressing_intermediate",
+      "name": "Intermediate dressing",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "group": "Dressing room",
+      "code": "dressing_minor",
+      "name": "Minor dressing",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "group": "Stitches removal",
+      "code": "stitches_major",
+      "name": "Stitches removal \u2014 major",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "group": "Stitches removal",
+      "code": "stitches_intermediate",
+      "name": "Stitches removal \u2014 intermediate",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2000"
+    },
+    {
+      "group": "Stitches removal",
+      "code": "stitches_minor",
+      "name": "Stitches removal \u2014 minor",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "group": "General",
+      "code": "card",
+      "name": "Card",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "group": "General",
+      "code": "folder",
+      "name": "Folder",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "group": "General",
+      "code": "consultation",
+      "name": "Consultation",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "group": "General",
+      "code": "emergency_card",
+      "name": "Emergency card",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3000"
+    },
+    {
+      "group": "Operation fees",
+      "code": "operation_minor",
+      "name": "Operation fee \u2014 minor",
+      "kind": "editable",
+      "unit": "unit"
+    },
+    {
+      "group": "Operation fees",
+      "code": "operation_intermediate",
+      "name": "Operation fee \u2014 intermediate",
+      "kind": "editable",
+      "unit": "unit"
+    },
+    {
+      "group": "Operation fees",
+      "code": "operation_major",
+      "name": "Operation fee \u2014 major",
+      "kind": "editable",
+      "unit": "unit"
+    },
+    {
+      "group": "Operation fees",
+      "code": "operation_super_major",
+      "name": "Operation fee \u2014 super major",
+      "kind": "editable",
+      "unit": "unit"
+    },
+    {
+      "group": "Operation fees",
+      "code": "operation_elective",
+      "name": "Operation fee \u2014 elective",
+      "kind": "editable",
+      "unit": "unit"
+    },
+    {
+      "group": "Operation fees",
+      "code": "operation_unbooked",
+      "name": "Operation fee \u2014 unbooked",
+      "kind": "editable",
+      "unit": "unit"
+    },
+    {
+      "group": "Admission fee",
+      "code": "admission_aminity",
+      "name": "Admission \u2014 Aminity",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3600"
+    },
+    {
+      "group": "Admission fee",
+      "code": "admission_icu",
+      "name": "Admission \u2014 ICU",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "admission_ae",
+      "name": "Admission \u2014 A/E",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "750"
+    },
+    {
+      "group": "Admission fee",
+      "code": "admission_bed",
+      "name": "Bed fee",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3100"
+    },
+    {
+      "group": "Admission fee",
+      "code": "admission_ward",
+      "name": "Admission \u2014 WARD",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "750"
+    },
+    {
+      "group": "Admission fee",
+      "code": "admission_utility",
+      "name": "Utility",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "group": "Admission fee",
+      "code": "surcharge",
+      "name": "Surcharge \u2014 10% of selected items",
+      "kind": "percentage",
+      "unit": "unit"
+    },
+    {
+      "group": "Admission fee",
+      "code": "doctor_aminity",
+      "name": "Dr. Care Aminity",
+      "kind": "fixed",
+      "unit": "day",
+      "amount": "2000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "doctor_icu",
+      "name": "Dr. Care ICU",
+      "kind": "fixed",
+      "unit": "day",
+      "amount": "5000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "doctor_ae",
+      "name": "Dr. Care A/E",
+      "kind": "tiered",
+      "unit": "day",
+      "amount": "10000",
+      "subsequent_amount": "5000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "doctor_ward",
+      "name": "Dr. Care ward",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "nursing_aminity",
+      "name": "Nursing care Aminity",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "group": "Admission fee",
+      "code": "nursing_icu",
+      "name": "Nursing care ICU",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "nursing_ae",
+      "name": "Nursing care A/E",
+      "kind": "tiered",
+      "unit": "day",
+      "amount": "6000",
+      "subsequent_amount": "3000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "dustbin",
+      "name": "Dustbin",
+      "kind": "fixed",
+      "unit": "week",
+      "amount": "300"
+    },
+    {
+      "group": "Admission fee",
+      "code": "catheter",
+      "name": "Catheterization",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6250"
+    },
+    {
+      "group": "Admission fee",
+      "code": "dressing_ae_major",
+      "name": "DRESSING pro major A/E",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6250"
+    },
+    {
+      "group": "Admission fee",
+      "code": "dressing_ae_minor",
+      "name": "DRESSING pro minor A/E",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "delivery",
+      "name": "Delivery fee",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "10000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "delivery_unbooked",
+      "name": "Delivery fee unbooked",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "15000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "anc",
+      "name": "ANC",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5250"
+    },
+    {
+      "group": "Admission fee",
+      "code": "monitor",
+      "name": "Monitor",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "bench",
+      "name": "Bench fee",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5500"
+    },
+    {
+      "group": "Admission fee",
+      "code": "birth",
+      "name": "Birth cert.",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "ecg",
+      "name": "ECG",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "phototherapy",
+      "name": "Phototherapy",
+      "kind": "editable",
+      "unit": "day"
+    },
+    {
+      "group": "Admission fee",
+      "code": "stamping",
+      "name": "Stamping",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "death_inpatient",
+      "name": "Death cert. (Inpatient)",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "death_outpatient",
+      "name": "Death cert. (Out patient)",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "10000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "immunization",
+      "name": "Immunization creche",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3000"
+    }
+  ]
+}

@@ -17,7 +17,7 @@ class RecordPaymentTests(TestCase):
 
     def setUp(self):
         self.client=APIClient();self.client.force_authenticate(self.cashier)
-        self.data={'patient':str(self.patient.pk),'department':str(self.dep.pk),'sub_head':'overhead','service':str(self.service.pk),'cash_point':str(self.point.pk),'quantity':1,'amount':'100.00','channel':'cash','cash_receiver':'Nwaele Juliet','submitted_reference':'','reported_paid_at':timezone.now().isoformat(),'idempotency_key':str(uuid4())}
+        self.data={'patient':str(self.patient.pk),'department':str(self.dep.pk),'sub_head':'rf','service':str(self.service.pk),'cash_point':str(self.point.pk),'quantity':1,'amount':'100.00','channel':'cash','cash_receiver':'Nwaele Juliet','submitted_reference':'','reported_paid_at':timezone.now().isoformat(),'idempotency_key':str(uuid4())}
 
     def post(self):return self.client.post('/api/v1/record-payment/',self.data,format='json')
 
@@ -29,8 +29,10 @@ class RecordPaymentTests(TestCase):
         self.assertEqual(self.post().status_code,400)
         self.data['sub_head']='other';self.assertEqual(self.post().status_code,400)
         self.assertFalse(RecordedPayment.objects.exists())
+        self.point.daily_limit=None;self.point.save()
         for value,label in [('overhead','Over-head'),('rf','R/F'),('drf','DRF')]:
             self.data.update(sub_head=value,idempotency_key=str(uuid4()))
+            self.data.update(overhead_items=[{'code':'card','quantity':1}] if value=='overhead' else [],service=None if value=='overhead' else str(self.service.pk),amount='1000' if value=='overhead' else '100')
             response=self.post();self.assertEqual(response.status_code,201,response.data)
             self.assertEqual(response.data['sub_head'],value)
             self.assertEqual(response.data['sub_head_label'],label)

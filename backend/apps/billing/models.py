@@ -139,7 +139,7 @@ class InvoiceItem(TimeStampedModel):
     service_code = models.CharField(max_length=32)
     description = models.CharField(max_length=200)
     quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
-    unit_amount = models.DecimalField(max_digits=19, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))])
+    unit_amount = models.DecimalField(max_digits=19, decimal_places=2, validators=[MinValueValidator(Decimal("0"))])
     currency = models.CharField(max_length=3, default="NGN")
 
     @property
