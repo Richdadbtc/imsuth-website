@@ -102,3 +102,5 @@ body.dark-theme .imsuth-request-feedback,body.dark-theme .imsuth-account-created
 @keyframes imsuth-loader-breathe{50%{opacity:.65;transform:scale(.92)}}
 @media(prefers-reduced-motion:reduce){.imsuth-logo-orbit:before,.imsuth-logo-orbit img{animation:none}}
 @media(max-width:600px){.imsuth-request-feedback{right:16px;bottom:16px;padding:12px 16px;gap:12px}.imsuth-account-created{padding:24px}}
+
+.compact-record-grid [data-rp-sub-head-field][hidden]{display:none!important}

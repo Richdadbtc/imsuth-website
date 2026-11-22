@@ -101,6 +101,8 @@ class RecordedPayment(TimeStampedModel):
     cash_point = models.ForeignKey(CashPoint, on_delete=models.PROTECT)
     cash_order = models.ForeignKey(CashOrder, null=True, blank=True, on_delete=models.PROTECT)
     payment = models.OneToOneField('payments.Payment', on_delete=models.PROTECT, related_name='recorded_context')
+    SUB_HEAD_CHOICES = [('overhead','Over-head'),('rf','R/F'),('drf','DRF')]
+    sub_head = models.CharField(max_length=16, choices=SUB_HEAD_CHOICES, blank=True, default='')
     patient_type = models.CharField(max_length=16, default='regular', choices=[('regular','Regular'),('nhis','NHIS'),('imshia','IMSHIA')])
     base_total = models.DecimalField(max_digits=19, decimal_places=2, null=True, blank=True)
     discount_total = models.DecimalField(max_digits=19, decimal_places=2, default=0)

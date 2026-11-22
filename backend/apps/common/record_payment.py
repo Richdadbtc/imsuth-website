@@ -42,6 +42,7 @@ class CaptureInput(serializers.Serializer):
     patient = serializers.UUIDField(required=False,allow_null=True,default=None)
     patient_name = serializers.CharField(max_length=200,allow_blank=True,default='')
     department = serializers.UUIDField()
+    sub_head = serializers.ChoiceField(choices=RecordedPayment.SUB_HEAD_CHOICES)
     service = serializers.UUIDField(required=False,allow_null=True,default=None)
     service_description = serializers.CharField(required=False,allow_blank=True,max_length=200,default='')
     patient_type = serializers.ChoiceField(choices=['regular','nhis','imshia'],default='regular')
@@ -64,7 +65,7 @@ class CaptureInput(serializers.Serializer):
 
 
 def capture_payload(context):
-    return {'payment':PaymentSerializer(context.payment).data,'invoice':InvoiceSerializer(context.payment.invoice).data,'price_changed':context.entered_total!=context.approved_total,'receipt_issued':hasattr(context.payment,'receipt'),'patient_type':context.patient_type,'base_total':context.base_total,'discount_total':context.discount_total,'amount_due':context.approved_total}
+    return {'payment':PaymentSerializer(context.payment).data,'invoice':InvoiceSerializer(context.payment.invoice).data,'price_changed':context.entered_total!=context.approved_total,'receipt_issued':hasattr(context.payment,'receipt'),'sub_head':context.sub_head,'sub_head_label':context.get_sub_head_display(),'patient_type':context.patient_type,'base_total':context.base_total,'discount_total':context.discount_total,'amount_due':context.approved_total}
 
 
 class RecordPaymentView(APIView):
@@ -86,7 +87,7 @@ class RecordPaymentView(APIView):
         current_tariff=TariffVersion.objects.filter(service_id=OuterRef('pk'),is_approved=True,currency='NGN',effective_from__lte=now).filter(Q(effective_until__isnull=True)|Q(effective_until__gt=now)).order_by('-effective_from')
         services=Service.objects.filter(department__in=departments,is_active=True).annotate(amount=Subquery(current_tariff.values('amount')[:1])).order_by('name','pk')
         receiver=request.user.get_full_name().strip() or request.user.username
-        return Response({'services':list(services.values('id','name','department_id','amount')),'departments':list(departments.order_by('name').values('id','name','is_active')),'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receiver':receiver,'cash_receiver_automatic':True,'cash_receivers':[receiver],'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
+        return Response({'sub_heads':[{'value':value,'label':label} for value,label in RecordedPayment.SUB_HEAD_CHOICES],'services':list(services.values('id','name','department_id','amount')),'departments':list(departments.order_by('name').values('id','name','is_active')),'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receiver':receiver,'cash_receiver_automatic':True,'cash_receivers':[receiver],'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
 
     def post(self,request):
         if request.user.role not in {'super_admin','finance','cashier'}: raise PermissionDenied('Only collection officers and finance administrators may record payments.')
@@ -159,8 +160,8 @@ class RecordPaymentView(APIView):
                     if point.daily_limit is not None and used+data['amount']>point.daily_limit:raise ValidationError({'cash_point':'This cash point daily collection limit would be exceeded.'})
                 payment=Payment.create_intent(invoice=invoice,channel=data['channel'],initiated_by=request.user,idempotency_key='record:'+str(data['idempotency_key']))
                 payment.cash_receiver=data['cash_receiver'];payment.submitted_reference=data['submitted_reference'];payment.reported_paid_at=data['reported_paid_at'];payment.remarks=data['remarks'];payment.save(update_fields=['cash_receiver','submitted_reference','reported_paid_at','remarks','updated_at'])
-                context=RecordedPayment.objects.create(idempotency_key=str(data['idempotency_key']),fingerprint=fingerprint,created_by=request.user,cash_point=point,cash_order=order,payment=payment,patient_type=data['patient_type'],base_total=base,discount_total=discount,approved_total=approved,entered_total=data['amount'],override_reason=data['override_reason'])
-                AuditEvent.record('payment.recorded_at_point',actor=request.user,obj=payment,request=request,metadata={'cash_receiver':payment.cash_receiver,'cash_point':str(point.pk),'cash_order':str(order.pk) if order else None,'patient_type':data['patient_type'],'base_total':str(base),'discount_total':str(discount),'manual_service':manual,'service_description':data['service_description'] if manual else service.name,'approved_total':str(approved),'entered_total':str(data['amount']),'override_reason':data['override_reason']})
+                context=RecordedPayment.objects.create(idempotency_key=str(data['idempotency_key']),fingerprint=fingerprint,created_by=request.user,cash_point=point,cash_order=order,payment=payment,sub_head=data['sub_head'],patient_type=data['patient_type'],base_total=base,discount_total=discount,approved_total=approved,entered_total=data['amount'],override_reason=data['override_reason'])
+                AuditEvent.record('payment.recorded_at_point',actor=request.user,obj=payment,request=request,metadata={'sub_head':context.sub_head,'cash_receiver':payment.cash_receiver,'cash_point':str(point.pk),'cash_order':str(order.pk) if order else None,'patient_type':data['patient_type'],'base_total':str(base),'discount_total':str(discount),'manual_service':manual,'service_description':data['service_description'] if manual else service.name,'approved_total':str(approved),'entered_total':str(data['amount']),'override_reason':data['override_reason']})
                 if manual or approved!=data['amount']:
                     Alert.objects.create(department=department,alert_type='service_price_change',severity='medium',description='Manual service and officer-entered full price require review.' if manual else 'Recorded payment differs from the approved tariff; review the recorded reason.',related_type='payments.Payment',related_id=str(payment.pk))
                 if data['payment_received']:

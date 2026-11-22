@@ -17,9 +17,27 @@ class RecordPaymentTests(TestCase):
 
     def setUp(self):
         self.client=APIClient();self.client.force_authenticate(self.cashier)
-        self.data={'patient':str(self.patient.pk),'department':str(self.dep.pk),'service':str(self.service.pk),'cash_point':str(self.point.pk),'quantity':1,'amount':'100.00','channel':'cash','cash_receiver':'Nwaele Juliet','submitted_reference':'','reported_paid_at':timezone.now().isoformat(),'idempotency_key':str(uuid4())}
+        self.data={'patient':str(self.patient.pk),'department':str(self.dep.pk),'sub_head':'overhead','service':str(self.service.pk),'cash_point':str(self.point.pk),'quantity':1,'amount':'100.00','channel':'cash','cash_receiver':'Nwaele Juliet','submitted_reference':'','reported_paid_at':timezone.now().isoformat(),'idempotency_key':str(uuid4())}
 
     def post(self):return self.client.post('/api/v1/record-payment/',self.data,format='json')
+
+    def test_sub_head_choices_are_required_validated_and_saved(self):
+        from apps.auditlog.models import AuditEvent
+        self.assertEqual(self.client.get('/api/v1/record-payment/').data['sub_heads'],[
+            {'value':'overhead','label':'Over-head'},{'value':'rf','label':'R/F'},{'value':'drf','label':'DRF'}])
+        self.data.pop('sub_head')
+        self.assertEqual(self.post().status_code,400)
+        self.data['sub_head']='other';self.assertEqual(self.post().status_code,400)
+        self.assertFalse(RecordedPayment.objects.exists())
+        for value,label in [('overhead','Over-head'),('rf','R/F'),('drf','DRF')]:
+            self.data.update(sub_head=value,idempotency_key=str(uuid4()))
+            response=self.post();self.assertEqual(response.status_code,201,response.data)
+            self.assertEqual(response.data['sub_head'],value)
+            self.assertEqual(response.data['sub_head_label'],label)
+            recorded=RecordedPayment.objects.get(payment_id=response.data['payment']['id'])
+            self.assertEqual(recorded.sub_head,value)
+            event=AuditEvent.objects.filter(action='payment.recorded_at_point',object_id=str(recorded.payment_id)).first()
+            self.assertEqual(event.metadata['sub_head'],value)
 
     def test_atomic_capture_retry_and_no_receipt_before_verification(self):
         result=self.post();self.assertEqual(result.status_code,201,result.data)
