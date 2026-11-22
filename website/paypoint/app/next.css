@@ -85,3 +85,20 @@ body.dark-theme .compact-record-grid input,body.dark-theme .compact-record-grid 
 .ua-page-access{border:1px solid #dbe4ee;border-radius:8px;padding:12px}.ua-page-access [data-ua-page-choices]{display:grid;gap:8px;max-height:320px;overflow:auto;margin-top:12px}.ua-page-access [data-ua-page-choices] label{display:flex;align-items:center;gap:8px}.ua-page-access input[type="checkbox"]{width:auto;min-height:0}.ua-page-access small{color:#52677a}
 
 .page-shell a[data-page-denied]{display:none!important}
+
+.imsuth-request-feedback{position:fixed;right:24px;bottom:24px;z-index:10000;display:flex;align-items:center;gap:16px;max-width:calc(100vw - 32px);padding:16px 22px;border:1px solid #cddfe8;border-radius:14px;background:#fff;color:#123e51;box-shadow:0 12px 40px #092c4526;font-weight:600;pointer-events:none}
+.imsuth-request-feedback[hidden]{display:none!important}
+.imsuth-logo-orbit{position:relative;display:inline-flex;align-items:center;justify-content:center;width:68px;height:68px;flex-shrink:0}
+.imsuth-logo-orbit:before{content:"";position:absolute;inset:0;border:3px solid #d9edf0;border-top-color:#16899b;border-right-color:#154e70;border-radius:50%;animation:imsuth-loader-turn 1.1s linear infinite}
+.imsuth-logo-orbit img{width:46px;height:46px;object-fit:contain;animation:imsuth-loader-breathe 1.8s ease-in-out infinite}
+.imsuth-connecting{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:200px;text-align:center}
+.imsuth-account-created{width:min(440px,calc(100vw - 32px));max-height:90vh;overflow:auto;box-sizing:border-box;padding:32px;text-align:center;border:1px solid #d4e5e8;border-radius:18px;background:#fff;color:#123e51;box-shadow:0 24px 80px #072c4540}
+.imsuth-account-created::backdrop{background:#082b45a6}
+.imsuth-success-logo{display:block;width:72px;height:72px;object-fit:contain;margin:0 auto 16px}
+.imsuth-success-check{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:#dcf6e7;color:#078344;font-size:28px;font-weight:700}
+.imsuth-account-created h2{margin:16px 0 10px}.imsuth-account-created p{line-height:1.6;overflow-wrap:anywhere}.imsuth-success-username{padding:12px;background:#f0f7fa;border-radius:8px;font-weight:600}.imsuth-account-created button{width:100%;margin-top:12px}
+body.dark-theme .imsuth-request-feedback,body.dark-theme .imsuth-account-created{background:#172a35;color:#e4edf3;border-color:#365161}body.dark-theme .imsuth-success-username{background:#203b49}
+@keyframes imsuth-loader-turn{to{transform:rotate(360deg)}}
+@keyframes imsuth-loader-breathe{50%{opacity:.65;transform:scale(.92)}}
+@media(prefers-reduced-motion:reduce){.imsuth-logo-orbit:before,.imsuth-logo-orbit img{animation:none}}
+@media(max-width:600px){.imsuth-request-feedback{right:16px;bottom:16px;padding:12px 16px;gap:12px}.imsuth-account-created{padding:24px}}

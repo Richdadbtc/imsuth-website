@@ -1,3 +1,4 @@
+import {beginRequest} from './request-state.js';
 export const API_BASE = '/paypoint/api/v1/';
 const describe = value => typeof value === 'string' ? value : Array.isArray(value) ? value.map(describe).join(' ') : value && typeof value === 'object' ? Object.entries(value).map(([key,item])=>`${key.replaceAll('_',' ')}: ${describe(item)}`).join(' ') : String(value??'');
 let sessionCsrf='';
@@ -35,13 +36,18 @@ if(unsafe&&!csrfRetried&&response.status===403&&/^CSRF Failed:/i.test(body?.deta
   return response;
 }
 export async function api(path,options={}) {
+  const method=(options.method||'GET').toUpperCase(),writing=!['GET','HEAD','OPTIONS'].includes(method);
+  const account=/^users\/(?:[0-9]+\/)?$/.test(path);
+  const finish=beginRequest(account&&writing?(method==='POST'?'Creating account…':'Updating account…'):writing?'Saving changes…':'Waiting for server response…',writing?1:0);
+  try{
   const response=await request(path,options);
   const payload=response.status===204?null:response.headers.get('content-type')?.includes('application/json')?await response.json():null;
   // Page-level session checks also refresh the token after a login in another tab.
   if(/^session\/(?:\?|$)/.test(path)&&payload?.csrf_token)sessionCsrf=payload.csrf_token;
   return payload;
+  }finally{finish();}
 }
 export const getSession=async()=>{const session=await api('session/');sessionCsrf=session?.csrf_token||'';return session;};
 export const login=async(username,password)=>{await getSession();const session=await api('session/login/',{method:'POST',body:JSON.stringify({username,password})});sessionCsrf=session?.csrf_token||'';if(!sessionCsrf)await getSession();return session;};
 export const logout=()=>api('session/logout/',{method:'POST'});
-export async function download(path,filename) {const response=await request(path),url=URL.createObjectURL(await response.blob()),anchor=document.createElement('a');anchor.href=url;anchor.download=filename;document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+export async function download(path,filename) {const finish=beginRequest('Preparing download…');try{const response=await request(path),url=URL.createObjectURL(await response.blob()),anchor=document.createElement('a');anchor.href=url;anchor.download=filename;document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}finally{finish();}}

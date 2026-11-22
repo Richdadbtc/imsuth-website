@@ -1,3 +1,5 @@
+import {beginRequest} from '../lib/request-state.js';
+import {logoLoadingMarkup,showAccountCreated} from './request-feedback.js';
 import {mountReceiptPreview} from './receipt-preview.js';
 import {referenceRule,isSlipChannel,normalizeSlipReference,formatTransferReference} from '../lib/slip-reference.js';
 import {mountHospitalCatalogueSetup} from './catalogue-setup.js';
@@ -70,7 +72,7 @@ const title = text => `<div class="page-toolbar"><div><p class="eyebrow">IMSUTH 
 const status = value => `<span class="status status-${escapeHtml(value)}">${escapeHtml(String(value || "unknown").replaceAll("_", " "))}</span>`;
 const empty = message => `<div class="empty-state">${escapeHtml(message)}</div>`;
 function setBusy(label = "Loading authorised data…") {
-  content.innerHTML = `<div class="loading-state" role="status">${escapeHtml(label)}</div>`;
+  content.innerHTML = `<div class="loading-state imsuth-connecting" role="status">${logoLoadingMarkup}<p>${escapeHtml(label)}</p></div>`;
 }
 function showError(error) {
   if (error.status === 401 || error.status === 403) {
@@ -1792,18 +1794,25 @@ async function usersAndAudit() {
       body.page_access=v.role==='super_admin'||v.page_access_mode!=='custom'?null:[...form.querySelectorAll('[data-ua-access-page]:checked')].map(input=>input.value);
       if(v.password)body.password=v.password;
       const button = form.querySelector('[type=submit]') || form.querySelector('.pending-verify');
-      button.disabled = true;
+      if(form.getAttribute('aria-busy')==='true')return;
+      const creating=!editing,buttonLabel=button.textContent;
+      const finishAccount=beginRequest(creating?'Creating account…':'Updating account…',2);
+      button.disabled = true;form.setAttribute('aria-busy','true');
+      button.textContent=creating?'Creating account…':'Saving account…';
       try {
-        await api(editing ? `users/${editing}/` : 'users/', {
+        const saved=await api(editing ? `users/${editing}/` : 'users/', {
           method: editing ? 'PATCH' : 'POST',
           body: JSON.stringify(body)
         });
         form.elements.password.value='';form.elements.password_confirm.value='';
-        await usersAndAudit();
+        let refreshFailed=false;
+        try{await usersAndAudit();}catch{refreshFailed=true;}
+        if(creating&&!abort.signal.aborted)showAccountCreated(content,{...saved,username:saved?.username||body.username,full_name:saved?.full_name||v.full_name},{signal:abort.signal,refreshFailed});
+        else if(refreshFailed&&msg.isConnected)msg.textContent='Account saved, but the list could not refresh. Reload to see the changes.';
       } catch (error) {
         msg.textContent = error.message;
       } finally {
-        button.disabled = false;
+        button.disabled = false;button.textContent=buttonLabel;form.removeAttribute('aria-busy');finishAccount();
       }
       return;
     }

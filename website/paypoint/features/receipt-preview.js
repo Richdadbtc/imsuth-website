@@ -1,3 +1,4 @@
+import {beginRequest} from '../lib/request-state.js';
 import {API_BASE} from '../lib/api.js';
 
 export function receiptPreviewPath(href,origin) {
@@ -26,6 +27,7 @@ export function mountReceiptPreview(content,signal) {
     dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
     print.onclick=()=>{if(!print.disabled){frame.contentWindow.focus();frame.contentWindow.print();}};
     dialog.showModal();
+    const finish=beginRequest('Loading receipt…');
     try {
       const response=await fetch(path,{credentials:'same-origin',cache:'no-store',signal:controller.signal});
       if(!response.ok || !response.headers.get('content-type')?.includes('text/html'))throw new Error('Receipt unavailable. Check payment verification and your access, then try again.');
@@ -44,6 +46,6 @@ export function mountReceiptPreview(content,signal) {
       },{once:true});
       if(controller.signal.aborted || !dialog.isConnected)return;
       frame.hidden=false;frame.srcdoc='<!doctype html>'+doc.documentElement.outerHTML;
-    } catch(error) {if(!controller.signal.aborted)status.textContent=error.message;}
+    } catch(error) {if(!controller.signal.aborted)status.textContent=error.message;}finally{finish();}
   },{signal});
 }

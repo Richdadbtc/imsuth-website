@@ -6,6 +6,7 @@ import {api,getSession,logout} from '../lib/api.js';
 import {navigationSections,navigationPage,screenHref,screenFromSegments,canAccessPage} from '../lib/navigation.js';
 import {Login,Recovery} from './auth.jsx';
 import Workspace from './workspace.jsx';
+import {mountRequestFeedback} from '../features/request-feedback.js';
 
 export default function PayPoint({children}) {
   const pathname=usePathname();
@@ -14,6 +15,7 @@ export default function PayPoint({children}) {
   const navigate=useCallback(page=>{setMenu(false);setMobile(false);setFilter('');router.push(screenHref(page));},[router]);
   const signedOut=useCallback(()=>{setSession(null);router.replace('/login');},[router]);
   const profileSaved=useCallback(values=>setSession(s=>s?{...s,user:{...s.user,...values}}:s),[]);
+  useEffect(()=>mountRequestFeedback(),[]);
   useEffect(()=>{let active=true;getSession().then(data=>{if(active){setSession(data.authenticated?data:null);setError('');}}).catch(()=>{if(active)setError('The PayPoint API is currently unavailable.');}).finally(()=>{if(active)setReady(true);});const expired=()=>signedOut();window.addEventListener('paypoint-session-expired',expired);return()=>{active=false;window.removeEventListener('paypoint-session-expired',expired);};},[signedOut]);
   useEffect(()=>{const legacy=()=>{const hash=window.location.hash;if(hash.startsWith('#recover=')){setToken(hash.slice(9));window.history.replaceState(null,'',window.location.pathname+window.location.search);router.replace('/forgot-password');}else if(hash&&hash!=='#main'){router.replace(screenHref(hash.slice(1)));}};legacy();window.addEventListener('hashchange',legacy);return()=>window.removeEventListener('hashchange',legacy);},[router]);
   useEffect(()=>{setExpanded(navigationPage[screen]?.section||'dashboard');setMenu(false);setFilter('');},[screen]);
@@ -21,7 +23,7 @@ export default function PayPoint({children}) {
   useEffect(()=>{document.body.classList.toggle('nav-open',mobile);return()=>document.body.classList.remove('nav-open');},[mobile]);
   async function signOut(){setError('');try{await logout();signedOut();}catch(e){setError(e.message);}}
   function signedIn(data){setSession(data);setError('');if(screen==='login'||screen==='forgot-password')router.replace('/');}
-  if(!ready)return <main className="next-state" role="status">Connecting to PayPoint…</main>;
+  if(!ready)return <main className="next-state imsuth-connecting" role="status"><span className="imsuth-logo-orbit" aria-hidden="true"><img src="/paypoint/images/hospital%20logo.png" alt=""/></span><p>Connecting to PayPoint…</p></main>;
   if(screen==='forgot-password')return <Recovery initialToken={token} onReset={()=>{setToken('');setSession(null);}} onCancel={()=>setToken('')}/>;
   if(!session)return <Login onLogin={signedIn} initialError={error}/>;
   const user=session.user;
