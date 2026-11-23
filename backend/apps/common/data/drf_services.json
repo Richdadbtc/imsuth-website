@@ -1,0 +1,2907 @@
+{
+  "version": "2026-11-23.1",
+  "label": "DRF pharmacy",
+  "source": "IMSUTH_Pharmacy_Price_List_1-322.pdf",
+  "source_sha256": "9fcf908ea49873d14ab70e3ba2cce99a14b2b881d548b0b77697f8698a1b6f86",
+  "source_note": "Source document is a draft pharmacy transcription. Confirm medicine names, strengths and price units with pharmacy. Quantity refers to the price unit listed by pharmacy.",
+  "items": [
+    {
+      "code": "pharmacy_001",
+      "source_number": 1,
+      "name": "Cap Amoxil 500mg",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_002",
+      "source_number": 2,
+      "name": "Cap Ampiclox 500mg",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_003",
+      "source_number": 3,
+      "name": "Cap Aither",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_004",
+      "source_number": 4,
+      "name": "Cap Acymin",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_005",
+      "source_number": 5,
+      "name": "Cap Avodart",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "350"
+    },
+    {
+      "code": "pharmacy_006",
+      "source_number": 6,
+      "name": "Cap Celebrex 200mg",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_007",
+      "source_number": 7,
+      "name": "Cap Chemiron",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_008",
+      "source_number": 8,
+      "name": "Cap Antalgex",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "450"
+    },
+    {
+      "code": "pharmacy_009",
+      "source_number": 9,
+      "name": "Cap Clindamycin",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_010",
+      "source_number": 10,
+      "name": "Cap Cod Liver Oil",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_011",
+      "source_number": 11,
+      "name": "Cap Cognitol",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_012",
+      "source_number": 12,
+      "name": "Cap Doxycycline",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_013",
+      "source_number": 13,
+      "name": "Cap Fluconazole 200mg",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_014",
+      "source_number": 14,
+      "name": "Cap Fluoxetine",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_015",
+      "source_number": 15,
+      "name": "Cap Gabapentin",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_016",
+      "source_number": 16,
+      "name": "Cap Esomeprazole",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_017",
+      "source_number": 17,
+      "name": "Cap Ginkgo Biloba",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_018",
+      "source_number": 18,
+      "name": "Cap Lincomycin",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_019",
+      "source_number": 19,
+      "name": "Cap Livolin Forte",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "350"
+    },
+    {
+      "code": "pharmacy_020",
+      "source_number": 20,
+      "name": "Cap Loperamide",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_021",
+      "source_number": 21,
+      "name": "Cap Mafivision",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_022",
+      "source_number": 22,
+      "name": "Cap Visum Plus",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "400"
+    },
+    {
+      "code": "pharmacy_023",
+      "source_number": 23,
+      "name": "Cap Omeprazole",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_024",
+      "source_number": 24,
+      "name": "Cap Omega-3",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_025",
+      "source_number": 25,
+      "name": "Cap Piroxicam",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_026",
+      "source_number": 26,
+      "name": "Cap Pregabalin",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_027",
+      "source_number": 27,
+      "name": "Cap Rabeprazole",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_028",
+      "source_number": 28,
+      "name": "Cap Tamsulosin 0.4mg",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_029",
+      "source_number": 29,
+      "name": "Cap Silybon (Silymarin)",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_030",
+      "source_number": 30,
+      "name": "Cap Vitamin A 10,000 IU",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_031",
+      "source_number": 31,
+      "name": "Cap Vitamin E",
+      "group": "Capsules",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_032",
+      "source_number": 32,
+      "name": "Cream Acyclovir",
+      "group": "Creams",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1800"
+    },
+    {
+      "code": "pharmacy_033",
+      "source_number": 33,
+      "name": "Cream Clotrimazole",
+      "group": "Creams",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_034",
+      "source_number": 34,
+      "name": "Cream Neurogesic",
+      "group": "Creams",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1800"
+    },
+    {
+      "code": "pharmacy_035",
+      "source_number": 35,
+      "name": "Cream Permethrin",
+      "group": "Creams",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1800"
+    },
+    {
+      "code": "pharmacy_036",
+      "source_number": 36,
+      "name": "Cream Zetgel",
+      "group": "Creams",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_037",
+      "source_number": 37,
+      "name": "Blood Giving Set",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "350"
+    },
+    {
+      "code": "pharmacy_038",
+      "source_number": 38,
+      "name": "Drip Set",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_039",
+      "source_number": 39,
+      "name": "Insulin Syringe 1ml",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_040",
+      "source_number": 40,
+      "name": "Needle 21G",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_041",
+      "source_number": 41,
+      "name": "Needle 23G",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_042",
+      "source_number": 42,
+      "name": "Solu-Set",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_043",
+      "source_number": 43,
+      "name": "Syringe 2ml",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_044",
+      "source_number": 44,
+      "name": "Syringe 5ml",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_045",
+      "source_number": 45,
+      "name": "Syringe 10ml",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_046",
+      "source_number": 46,
+      "name": "Syringe 20ml",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_047",
+      "source_number": 47,
+      "name": "Cannula 16G",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "300"
+    },
+    {
+      "code": "pharmacy_048",
+      "source_number": 48,
+      "name": "Cannula 18G",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_049",
+      "source_number": 49,
+      "name": "Cannula 20G",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_050",
+      "source_number": 50,
+      "name": "Cannula 22G",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_051",
+      "source_number": 51,
+      "name": "Cannula 24G",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_052",
+      "source_number": 52,
+      "name": "Drop Antallerge",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3000"
+    },
+    {
+      "code": "pharmacy_053",
+      "source_number": 53,
+      "name": "Drop Atropine",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_054",
+      "source_number": 54,
+      "name": "Drop Betnesol-N Eye",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_055",
+      "source_number": 55,
+      "name": "Drop Brimopress",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6000"
+    },
+    {
+      "code": "pharmacy_056",
+      "source_number": 56,
+      "name": "Drop Ocuflur",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "4500"
+    },
+    {
+      "code": "pharmacy_057",
+      "source_number": 57,
+      "name": "Drop Ciprodex Eye",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_058",
+      "source_number": 58,
+      "name": "Drop Cerumax",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6500"
+    },
+    {
+      "code": "pharmacy_059",
+      "source_number": 59,
+      "name": "Drop Chloramphenicol",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_060",
+      "source_number": 60,
+      "name": "Drop Ciprofloxacin",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "code": "pharmacy_061",
+      "source_number": 61,
+      "name": "Drop Cromax 4",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "code": "pharmacy_062",
+      "source_number": 62,
+      "name": "Drop Diclofenac",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1800"
+    },
+    {
+      "code": "pharmacy_063",
+      "source_number": 63,
+      "name": "Drop Efemoline",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "8000"
+    },
+    {
+      "code": "pharmacy_064",
+      "source_number": 64,
+      "name": "Drop Efediten",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6500"
+    },
+    {
+      "code": "pharmacy_065",
+      "source_number": 65,
+      "name": "Drop Flucamed",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3500"
+    },
+    {
+      "code": "pharmacy_066",
+      "source_number": 66,
+      "name": "Drop Gentamycin",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_067",
+      "source_number": 67,
+      "name": "Drop Lantanoprost",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "7000"
+    },
+    {
+      "code": "pharmacy_068",
+      "source_number": 68,
+      "name": "Drop Misopt",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "7000"
+    },
+    {
+      "code": "pharmacy_069",
+      "source_number": 69,
+      "name": "Drop Moxifloxacin",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "code": "pharmacy_070",
+      "source_number": 70,
+      "name": "Drop Normal Saline Nasal",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3500"
+    },
+    {
+      "code": "pharmacy_071",
+      "source_number": 71,
+      "name": "Drop Maxtrol",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "7500"
+    },
+    {
+      "code": "pharmacy_072",
+      "source_number": 72,
+      "name": "Drop Nepafenac",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "code": "pharmacy_073",
+      "source_number": 73,
+      "name": "Drop Otomed Ear",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_074",
+      "source_number": 74,
+      "name": "Drop Tear Natural",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6000"
+    },
+    {
+      "code": "pharmacy_075",
+      "source_number": 75,
+      "name": "Drop Timolol",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "code": "pharmacy_076",
+      "source_number": 76,
+      "name": "Oint Chloramphenicol",
+      "group": "Ointments",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_077",
+      "source_number": 77,
+      "name": "Drop Vitrolent",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3500"
+    },
+    {
+      "code": "pharmacy_078",
+      "source_number": 78,
+      "name": "Drop Hypromellose",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6000"
+    },
+    {
+      "code": "pharmacy_079",
+      "source_number": 79,
+      "name": "Drop Xalatan",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "11500"
+    },
+    {
+      "code": "pharmacy_080",
+      "source_number": 80,
+      "name": "IVF D/S 1⁄2L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_081",
+      "source_number": 81,
+      "name": "IVF D/S 1L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2000"
+    },
+    {
+      "code": "pharmacy_082",
+      "source_number": 82,
+      "name": "IVF 4.3% D/S 1⁄2L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_083",
+      "source_number": 83,
+      "name": "IVF D/W 1⁄2L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_084",
+      "source_number": 84,
+      "name": "IVF 10% D/W 1⁄2L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_085",
+      "source_number": 85,
+      "name": "IVF 50% D/W",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_086",
+      "source_number": 86,
+      "name": "IVF D/W 1L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2000"
+    },
+    {
+      "code": "pharmacy_087",
+      "source_number": 87,
+      "name": "IVF Darrows F/Str.",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_088",
+      "source_number": 88,
+      "name": "IVF Darrows H/Str.",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_089",
+      "source_number": 89,
+      "name": "IVF Mannitol 10% 1⁄2L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2000"
+    },
+    {
+      "code": "pharmacy_090",
+      "source_number": 90,
+      "name": "IVF Mannitol 20% 1⁄2L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2000"
+    },
+    {
+      "code": "pharmacy_091",
+      "source_number": 91,
+      "name": "IVF N/S 1⁄2L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_092",
+      "source_number": 92,
+      "name": "IVF N/S 1L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2000"
+    },
+    {
+      "code": "pharmacy_093",
+      "source_number": 93,
+      "name": "IVF R/L 1⁄2L",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_094",
+      "source_number": 94,
+      "name": "IVF Tinidazole",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "code": "pharmacy_095",
+      "source_number": 95,
+      "name": "IVF Flagyl",
+      "group": "IV fluids",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "900"
+    },
+    {
+      "code": "pharmacy_096",
+      "source_number": 96,
+      "name": "Inhal. Isoflurane 1ml",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "500"
+    },
+    {
+      "code": "pharmacy_097",
+      "source_number": 97,
+      "name": "Inhal. Salbutamol (Ventolin)",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5000"
+    },
+    {
+      "code": "pharmacy_098",
+      "source_number": 98,
+      "name": "Inj Water",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_099",
+      "source_number": 99,
+      "name": "Inj Adrenaline",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "500"
+    },
+    {
+      "code": "pharmacy_100",
+      "source_number": 100,
+      "name": "Inj Aminophylline",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_101",
+      "source_number": 101,
+      "name": "Inj Anti-Snake Venom",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "15000"
+    },
+    {
+      "code": "pharmacy_102",
+      "source_number": 102,
+      "name": "Inj Anti-Rabies",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "10000"
+    },
+    {
+      "code": "pharmacy_103",
+      "source_number": 103,
+      "name": "Inj Artesunate",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3000"
+    },
+    {
+      "code": "pharmacy_104",
+      "source_number": 104,
+      "name": "Inj Atracurium",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3500"
+    },
+    {
+      "code": "pharmacy_105",
+      "source_number": 105,
+      "name": "Inj Atropine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "350"
+    },
+    {
+      "code": "pharmacy_106",
+      "source_number": 106,
+      "name": "Inj Augmentin 1.2g",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1800"
+    },
+    {
+      "code": "pharmacy_107",
+      "source_number": 107,
+      "name": "Inj Buscopan",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_108",
+      "source_number": 108,
+      "name": "Inj Calcium Gluconate",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "400"
+    },
+    {
+      "code": "pharmacy_109",
+      "source_number": 109,
+      "name": "Inj Ceftriaxone",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1200"
+    },
+    {
+      "code": "pharmacy_110",
+      "source_number": 110,
+      "name": "Inj Chlorapheniramine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_111",
+      "source_number": 111,
+      "name": "Inj Chlorpromazine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "300"
+    },
+    {
+      "code": "pharmacy_112",
+      "source_number": 112,
+      "name": "Inj Ciproxin",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_113",
+      "source_number": 113,
+      "name": "Inj Cutenox",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6500"
+    },
+    {
+      "code": "pharmacy_114",
+      "source_number": 114,
+      "name": "Inj Depixol 20mg",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6500"
+    },
+    {
+      "code": "pharmacy_115",
+      "source_number": 115,
+      "name": "Inj Dexamethasone",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_116",
+      "source_number": 116,
+      "name": "Inj Diclofenac",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_117",
+      "source_number": 117,
+      "name": "Inj Diazepam",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "600"
+    },
+    {
+      "code": "pharmacy_118",
+      "source_number": 118,
+      "name": "Inj Dicynone",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_119",
+      "source_number": 119,
+      "name": "Inj Dopamine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2000"
+    },
+    {
+      "code": "pharmacy_120",
+      "source_number": 120,
+      "name": "Inj Emal",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_121",
+      "source_number": 121,
+      "name": "Inj Ephedrine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5500"
+    },
+    {
+      "code": "pharmacy_122",
+      "source_number": 122,
+      "name": "Inj Ergometrine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_123",
+      "source_number": 123,
+      "name": "Inj Fortum",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "8500"
+    },
+    {
+      "code": "pharmacy_124",
+      "source_number": 124,
+      "name": "Inj Fluphenazine (Modecate)",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1200"
+    },
+    {
+      "code": "pharmacy_125",
+      "source_number": 125,
+      "name": "Inj Frusemide",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_126",
+      "source_number": 126,
+      "name": "Inj Gentamycin 80mg",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_127",
+      "source_number": 127,
+      "name": "Inj Heparin",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6000"
+    },
+    {
+      "code": "pharmacy_128",
+      "source_number": 128,
+      "name": "Inj Humulin R",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5500"
+    },
+    {
+      "code": "pharmacy_129",
+      "source_number": 129,
+      "name": "Inj Hydralazine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "400"
+    },
+    {
+      "code": "pharmacy_130",
+      "source_number": 130,
+      "name": "Inj Hydrocort",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "500"
+    },
+    {
+      "code": "pharmacy_131",
+      "source_number": 131,
+      "name": "Inj KCL",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_132",
+      "source_number": 132,
+      "name": "Inj Ketamine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5500"
+    },
+    {
+      "code": "pharmacy_133",
+      "source_number": 133,
+      "name": "Inj Largactil",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "400"
+    },
+    {
+      "code": "pharmacy_134",
+      "source_number": 134,
+      "name": "Inj Labetalol",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3000"
+    },
+    {
+      "code": "pharmacy_135",
+      "source_number": 135,
+      "name": "Inj Lignocain",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1200"
+    },
+    {
+      "code": "pharmacy_136",
+      "source_number": 136,
+      "name": "Inj Lignocain/Adrenaline",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1200"
+    },
+    {
+      "code": "pharmacy_137",
+      "source_number": 137,
+      "name": "Inj Macain Heavy",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2000"
+    },
+    {
+      "code": "pharmacy_138",
+      "source_number": 138,
+      "name": "Inj Magnesium Sulphate",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "600"
+    },
+    {
+      "code": "pharmacy_139",
+      "source_number": 139,
+      "name": "Inj Metoclopramide",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_140",
+      "source_number": 140,
+      "name": "Inj Neostigmine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_141",
+      "source_number": 141,
+      "name": "Inj Omeprazole",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "900"
+    },
+    {
+      "code": "pharmacy_142",
+      "source_number": 142,
+      "name": "Inj Oxytocin",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_143",
+      "source_number": 143,
+      "name": "Inj Pancuronium",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "code": "pharmacy_144",
+      "source_number": 144,
+      "name": "Inj Paracetamol",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_145",
+      "source_number": 145,
+      "name": "Inj Pentazocine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_146",
+      "source_number": 146,
+      "name": "Inj Pethidine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5500"
+    },
+    {
+      "code": "pharmacy_147",
+      "source_number": 147,
+      "name": "Inj Phenobarbitone",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1800"
+    },
+    {
+      "code": "pharmacy_148",
+      "source_number": 148,
+      "name": "Inj Phenytoin",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "700"
+    },
+    {
+      "code": "pharmacy_149",
+      "source_number": 149,
+      "name": "Inj Plasil",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_150",
+      "source_number": 150,
+      "name": "Inj Promethazine",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_151",
+      "source_number": 151,
+      "name": "Inj Propofol",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3500"
+    },
+    {
+      "code": "pharmacy_152",
+      "source_number": 152,
+      "name": "Inj Rabipur",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "10000"
+    },
+    {
+      "code": "pharmacy_153",
+      "source_number": 153,
+      "name": "Inj Suxamethonium",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "code": "pharmacy_154",
+      "source_number": 154,
+      "name": "Inj T.T 0.5ml",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "500"
+    },
+    {
+      "code": "pharmacy_155",
+      "source_number": 155,
+      "name": "Inj Trancholone",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "500"
+    },
+    {
+      "code": "pharmacy_156",
+      "source_number": 156,
+      "name": "Inj Tranaxemic Acid",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_157",
+      "source_number": 157,
+      "name": "Inj Vit B Co",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "350"
+    },
+    {
+      "code": "pharmacy_158",
+      "source_number": 158,
+      "name": "Inj Vit C",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "500"
+    },
+    {
+      "code": "pharmacy_159",
+      "source_number": 159,
+      "name": "Inj Vit K1",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "600"
+    },
+    {
+      "code": "pharmacy_160",
+      "source_number": 160,
+      "name": "Inj Vit K3",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "300"
+    },
+    {
+      "code": "pharmacy_161",
+      "source_number": 161,
+      "name": "Inj Streptomycin",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_162",
+      "source_number": 162,
+      "name": "Inj Levofloxacin",
+      "group": "Injections",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "code": "pharmacy_163",
+      "source_number": 163,
+      "name": "Oint Chloramphenicol",
+      "group": "Ointments",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_164",
+      "source_number": 164,
+      "name": "Oint Neurogesic",
+      "group": "Ointments",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1800"
+    },
+    {
+      "code": "pharmacy_165",
+      "source_number": 165,
+      "name": "ORS",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_166",
+      "source_number": 166,
+      "name": "Supp. Dulcolax",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "450"
+    },
+    {
+      "code": "pharmacy_167",
+      "source_number": 167,
+      "name": "Susp. Ceporex 250mg",
+      "group": "Suspensions",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_168",
+      "source_number": 168,
+      "name": "Susp. Gestid",
+      "group": "Suspensions",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_169",
+      "source_number": 169,
+      "name": "Syr. Amoxil",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1200"
+    },
+    {
+      "code": "pharmacy_170",
+      "source_number": 170,
+      "name": "Syr. Augmentin",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_171",
+      "source_number": 171,
+      "name": "Syr. Broncholyte",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_172",
+      "source_number": 172,
+      "name": "Susp. Cefuroxime",
+      "group": "Suspensions",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2800"
+    },
+    {
+      "code": "pharmacy_173",
+      "source_number": 173,
+      "name": "Syr. Cefixime",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3000"
+    },
+    {
+      "code": "pharmacy_174",
+      "source_number": 174,
+      "name": "Syr. Flagyl",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_175",
+      "source_number": 175,
+      "name": "Syr. Ibuprofen",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1200"
+    },
+    {
+      "code": "pharmacy_176",
+      "source_number": 176,
+      "name": "Syr. Liquid Paraffin",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_177",
+      "source_number": 177,
+      "name": "Syr. Liquid Quinine",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "2500"
+    },
+    {
+      "code": "pharmacy_178",
+      "source_number": 178,
+      "name": "Syr. Lonart (Unbranded)",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "code": "pharmacy_179",
+      "source_number": 179,
+      "name": "Syr. Loratadine",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    },
+    {
+      "code": "pharmacy_180",
+      "source_number": 180,
+      "name": "Syr. Multivitamin",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_181",
+      "source_number": 181,
+      "name": "Syr. Phenobarbitone",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1800"
+    },
+    {
+      "code": "pharmacy_182",
+      "source_number": 182,
+      "name": "Syr. Paracetamol",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_183",
+      "source_number": 183,
+      "name": "Syr. Piriton",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1000"
+    },
+    {
+      "code": "pharmacy_184",
+      "source_number": 184,
+      "name": "Syr. Promethazine",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_185",
+      "source_number": 185,
+      "name": "Syr. Sinufed",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "4000"
+    },
+    {
+      "code": "pharmacy_186",
+      "source_number": 186,
+      "name": "Syr. Vitamin C",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "800"
+    },
+    {
+      "code": "pharmacy_187",
+      "source_number": 187,
+      "name": "Syr. Lactulose",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "6500"
+    },
+    {
+      "code": "pharmacy_188",
+      "source_number": 188,
+      "name": "Syr. Azithromycin",
+      "group": "Syrups",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1800"
+    },
+    {
+      "code": "pharmacy_189",
+      "source_number": 189,
+      "name": "Tab Acetazolamide 250mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_190",
+      "source_number": 190,
+      "name": "Tab Albendazole",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "400"
+    },
+    {
+      "code": "pharmacy_191",
+      "source_number": 191,
+      "name": "Tab Aldomet 250mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_192",
+      "source_number": 192,
+      "name": "Tab Alphabetic",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "600"
+    },
+    {
+      "code": "pharmacy_193",
+      "source_number": 193,
+      "name": "Tab Amlodipine 10mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "80"
+    },
+    {
+      "code": "pharmacy_194",
+      "source_number": 194,
+      "name": "Tab Amlodipine 5mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "80"
+    },
+    {
+      "code": "pharmacy_195",
+      "source_number": 195,
+      "name": "Tab Aminophylline 100mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_196",
+      "source_number": 196,
+      "name": "Tab Amiodarone 200mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_197",
+      "source_number": 197,
+      "name": "Tab Artemether/Lumefantrine 20/120",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_198",
+      "source_number": 198,
+      "name": "Tab Artemether/Lumefantrine 80/480",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1200"
+    },
+    {
+      "code": "pharmacy_199",
+      "source_number": 199,
+      "name": "Tab Amitriptyline",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_200",
+      "source_number": 200,
+      "name": "Tab Arthocare Forte",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "350"
+    },
+    {
+      "code": "pharmacy_201",
+      "source_number": 201,
+      "name": "Tab Arthogratis",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_202",
+      "source_number": 202,
+      "name": "Tab Atenolol 50mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_203",
+      "source_number": 203,
+      "name": "Tab Atorvastatin 20mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_204",
+      "source_number": 204,
+      "name": "Tab Augmentin 375mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_205",
+      "source_number": 205,
+      "name": "Tab Augmentin 625mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_206",
+      "source_number": 206,
+      "name": "Tab Avodart",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "550"
+    },
+    {
+      "code": "pharmacy_207",
+      "source_number": 207,
+      "name": "Tab Avomin",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_208",
+      "source_number": 208,
+      "name": "Tab Azithromycin",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "350"
+    },
+    {
+      "code": "pharmacy_209",
+      "source_number": 209,
+      "name": "Tab Acyclovir",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_210",
+      "source_number": 210,
+      "name": "Tab Bisoprolol",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_211",
+      "source_number": 211,
+      "name": "Tab Benzhexol 5mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_212",
+      "source_number": 212,
+      "name": "Tab Brimo Criptine",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "400"
+    },
+    {
+      "code": "pharmacy_213",
+      "source_number": 213,
+      "name": "Tab Buscopan",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "80"
+    },
+    {
+      "code": "pharmacy_214",
+      "source_number": 214,
+      "name": "Tab Calcium Carbonate",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_215",
+      "source_number": 215,
+      "name": "Tab Calcium Lactate",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_216",
+      "source_number": 216,
+      "name": "Tab Carbamazepine (Tegretol)",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_217",
+      "source_number": 217,
+      "name": "Tab Cataflam 50mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "80"
+    },
+    {
+      "code": "pharmacy_218",
+      "source_number": 218,
+      "name": "Tab Cefixime 200mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_219",
+      "source_number": 219,
+      "name": "Tab Cefuroxime 500mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "350"
+    },
+    {
+      "code": "pharmacy_220",
+      "source_number": 220,
+      "name": "Tab Citicholin",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "500"
+    },
+    {
+      "code": "pharmacy_221",
+      "source_number": 221,
+      "name": "Tab Chmoral",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "80"
+    },
+    {
+      "code": "pharmacy_222",
+      "source_number": 222,
+      "name": "Tab Cimetidine 400mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_223",
+      "source_number": 223,
+      "name": "Tab Ciprofloxacin 500mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_224",
+      "source_number": 224,
+      "name": "Tab Clarithromycin 500mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "350"
+    },
+    {
+      "code": "pharmacy_225",
+      "source_number": 225,
+      "name": "Tab Clomid",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_226",
+      "source_number": 226,
+      "name": "Tab Clopidogrel 75mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_227",
+      "source_number": 227,
+      "name": "Tab Clotrimazole Vaginal",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_228",
+      "source_number": 228,
+      "name": "Tab Coartem (B4 24)",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_229",
+      "source_number": 229,
+      "name": "Tab Cocodamol",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "450"
+    },
+    {
+      "code": "pharmacy_230",
+      "source_number": 230,
+      "name": "Tab Cognitol",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_231",
+      "source_number": 231,
+      "name": "Tab Cotrimoxazole 960mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_232",
+      "source_number": 232,
+      "name": "Tab Crestor 10mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_233",
+      "source_number": 233,
+      "name": "Tab Cytotec",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "650"
+    },
+    {
+      "code": "pharmacy_234",
+      "source_number": 234,
+      "name": "Tab Dexamethasone",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_235",
+      "source_number": 235,
+      "name": "Tab DF118 (Dihydrocodeine)",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "600"
+    },
+    {
+      "code": "pharmacy_236",
+      "source_number": 236,
+      "name": "Tab Diazepam",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_237",
+      "source_number": 237,
+      "name": "Tab Diclofenac 50mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_238",
+      "source_number": 238,
+      "name": "Tab Diclofenac 100mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_239",
+      "source_number": 239,
+      "name": "Tab Dicynone",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "700"
+    },
+    {
+      "code": "pharmacy_240",
+      "source_number": 240,
+      "name": "Tab Digoxin 0.25mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_241",
+      "source_number": 241,
+      "name": "Tab Doldmeta B",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_242",
+      "source_number": 242,
+      "name": "Tab Dulcolax",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_243",
+      "source_number": 243,
+      "name": "Tab Diamox",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_244",
+      "source_number": 244,
+      "name": "Tab Erythromycin 500mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_245",
+      "source_number": 245,
+      "name": "Tab Fansidar",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "400"
+    },
+    {
+      "code": "pharmacy_246",
+      "source_number": 246,
+      "name": "Tab Ferrous Sulphate",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "10"
+    },
+    {
+      "code": "pharmacy_247",
+      "source_number": 247,
+      "name": "Tab Finasteride",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_248",
+      "source_number": 248,
+      "name": "Tab Folic Acid",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "10"
+    },
+    {
+      "code": "pharmacy_249",
+      "source_number": 249,
+      "name": "Tab Fluoxetine",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_250",
+      "source_number": 250,
+      "name": "Tab Frusemide 40mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_251",
+      "source_number": 251,
+      "name": "Tab Glibenclamide",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_252",
+      "source_number": 252,
+      "name": "Tab Glimepiride",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_253",
+      "source_number": 253,
+      "name": "Tab Glycophage",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "70"
+    },
+    {
+      "code": "pharmacy_254",
+      "source_number": 254,
+      "name": "Tab Haloperide",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_255",
+      "source_number": 255,
+      "name": "Tab Esidrex 25mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_256",
+      "source_number": 256,
+      "name": "Tab Ibuprofen 400mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_257",
+      "source_number": 257,
+      "name": "Tab Inderal (Propranolol)",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_258",
+      "source_number": 258,
+      "name": "Tab Isordil 10mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_259",
+      "source_number": 259,
+      "name": "Tab Immunace",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "300"
+    },
+    {
+      "code": "pharmacy_260",
+      "source_number": 260,
+      "name": "Tab Largactil",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_261",
+      "source_number": 261,
+      "name": "Tab Levocetirizine",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "70"
+    },
+    {
+      "code": "pharmacy_262",
+      "source_number": 262,
+      "name": "Tab Levofloxacin 500mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_263",
+      "source_number": 263,
+      "name": "Tab Lexotan 3mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_264",
+      "source_number": 264,
+      "name": "Tab Lisinopril 10mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_265",
+      "source_number": 265,
+      "name": "Tab Lomotil",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "30"
+    },
+    {
+      "code": "pharmacy_266",
+      "source_number": 266,
+      "name": "Tab Loratadine 10mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "70"
+    },
+    {
+      "code": "pharmacy_267",
+      "source_number": 267,
+      "name": "Tab Losartan 50mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_268",
+      "source_number": 268,
+      "name": "Tab Losartan H.",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_269",
+      "source_number": 269,
+      "name": "Tab Meloxicam",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_270",
+      "source_number": 270,
+      "name": "Tab Methyldopa",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "80"
+    },
+    {
+      "code": "pharmacy_271",
+      "source_number": 271,
+      "name": "Tab Metoclopramide",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_272",
+      "source_number": 272,
+      "name": "Tab Metoprolol",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_273",
+      "source_number": 273,
+      "name": "Tab Metronidazole 200mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_274",
+      "source_number": 274,
+      "name": "Tab Moduretic",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_275",
+      "source_number": 275,
+      "name": "Tab Montelukast",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_276",
+      "source_number": 276,
+      "name": "Tab Multivitamin",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "10"
+    },
+    {
+      "code": "pharmacy_277",
+      "source_number": 277,
+      "name": "Tab Naproxen 500mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_278",
+      "source_number": 278,
+      "name": "Tab Neurovite",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "300"
+    },
+    {
+      "code": "pharmacy_279",
+      "source_number": 279,
+      "name": "Tab Neurocalm 75mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "450"
+    },
+    {
+      "code": "pharmacy_280",
+      "source_number": 280,
+      "name": "Tab Nicotinic Acid",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_281",
+      "source_number": 281,
+      "name": "Tab Nifedipine 20mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "30"
+    },
+    {
+      "code": "pharmacy_282",
+      "source_number": 282,
+      "name": "Tab Nitrazepam",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_283",
+      "source_number": 283,
+      "name": "Tab Ofloxacin 200mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_284",
+      "source_number": 284,
+      "name": "Tab Olanzepine 5mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_285",
+      "source_number": 285,
+      "name": "Tab Paracetamol 500mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_286",
+      "source_number": 286,
+      "name": "Tab Perfloxacin",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_287",
+      "source_number": 287,
+      "name": "Tab Phenobarbitone",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "250"
+    },
+    {
+      "code": "pharmacy_288",
+      "source_number": 288,
+      "name": "Tab Proguanil 100mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_289",
+      "source_number": 289,
+      "name": "Tab Piridon 4mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_290",
+      "source_number": 290,
+      "name": "Tab Prednisolone 5mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_291",
+      "source_number": 291,
+      "name": "Tab Promethazine",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_292",
+      "source_number": 292,
+      "name": "Tab Propranolol",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_293",
+      "source_number": 293,
+      "name": "Tab Pyridoxine",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_294",
+      "source_number": 294,
+      "name": "Tab Risperidone 2mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_295",
+      "source_number": 295,
+      "name": "Tab Robinax 500mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_296",
+      "source_number": 296,
+      "name": "Tab Rovigon",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_297",
+      "source_number": 297,
+      "name": "Tab Salbutamol 4mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_298",
+      "source_number": 298,
+      "name": "Tab Simvastatin 10mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_299",
+      "source_number": 299,
+      "name": "Tab Sinufed",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_300",
+      "source_number": 300,
+      "name": "Tab Sirdalud",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "450"
+    },
+    {
+      "code": "pharmacy_301",
+      "source_number": 301,
+      "name": "Tab Spirinolactone 25mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_302",
+      "source_number": 302,
+      "name": "Tab Stelazine",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_303",
+      "source_number": 303,
+      "name": "Tab Stemetil",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_304",
+      "source_number": 304,
+      "name": "Tab Stugeron",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_305",
+      "source_number": 305,
+      "name": "Tab Telmisartan 80mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_306",
+      "source_number": 306,
+      "name": "Tab Torsemide",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "200"
+    },
+    {
+      "code": "pharmacy_307",
+      "source_number": 307,
+      "name": "Tab Tinidazole 500mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_308",
+      "source_number": 308,
+      "name": "Tab Vasoprin 75mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_309",
+      "source_number": 309,
+      "name": "Tab Vit. B Complex",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "10"
+    },
+    {
+      "code": "pharmacy_310",
+      "source_number": 310,
+      "name": "Tab Vit. C 1g",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "100"
+    },
+    {
+      "code": "pharmacy_311",
+      "source_number": 311,
+      "name": "Tab Vit. C 100mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "10"
+    },
+    {
+      "code": "pharmacy_312",
+      "source_number": 312,
+      "name": "Tab Valsartan",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "500"
+    },
+    {
+      "code": "pharmacy_313",
+      "source_number": 313,
+      "name": "Tab Yeast",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20"
+    },
+    {
+      "code": "pharmacy_314",
+      "source_number": 314,
+      "name": "Tab Zerodol 100mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_315",
+      "source_number": 315,
+      "name": "Tab Zinc 20mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "50"
+    },
+    {
+      "code": "pharmacy_316",
+      "source_number": 316,
+      "name": "Tab Zinc 100mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "150"
+    },
+    {
+      "code": "pharmacy_317",
+      "source_number": 317,
+      "name": "Tab Vildagliptin/Metformin 50/1000",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "400"
+    },
+    {
+      "code": "pharmacy_318",
+      "source_number": 318,
+      "name": "Tab Vildagliptin 50mg",
+      "group": "Tablets",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "300"
+    },
+    {
+      "code": "pharmacy_319",
+      "source_number": 319,
+      "name": "Drop Olopatadin",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "3500"
+    },
+    {
+      "code": "pharmacy_320",
+      "source_number": 320,
+      "name": "Drop Otrivin (Adult)",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "4000"
+    },
+    {
+      "code": "pharmacy_321",
+      "source_number": 321,
+      "name": "Drop Otrivin (Children)",
+      "group": "Drops",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "4000"
+    },
+    {
+      "code": "pharmacy_322",
+      "source_number": 322,
+      "name": "Sachet Floranorm",
+      "group": "Other pharmacy items",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
+    }
+  ]
+}

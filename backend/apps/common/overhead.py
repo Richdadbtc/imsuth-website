@@ -14,27 +14,30 @@ class OverheadSelection(serializers.Serializer):
     unit_amount=serializers.DecimalField(max_digits=19,decimal_places=2,min_value=Decimal('0.01'),max_value=Decimal('1000000000'),required=False)
 
 
-def price_basket(selections,patient_type):
+def price_basket(selections,patient_type,catalogue=CATALOGUE):
+    known={item['code']:item for item in catalogue['items']}
+    label=catalogue.get('label','Over-head')
+    error_field='drf_items' if label=='DRF pharmacy' else 'overhead_items'
     seen=set();lines=[];surcharge=False
     for selection in selections:
-        code=selection['code'];item=ITEMS.get(code)
-        if not item or code in seen:raise serializers.ValidationError({'overhead_items':'Select valid services only once; use quantity for repeats.'})
+        code=selection['code'];item=known.get(code)
+        if not item or code in seen:raise serializers.ValidationError({error_field:'Select valid services only once; use quantity for repeats.'})
         seen.add(code);quantity=selection['quantity']
         if item['kind']=='percentage':
             if quantity!=1 or 'unit_amount' in selection:raise serializers.ValidationError('Surcharge is fixed at 10%.')
             surcharge=True;continue
         if item['kind']=='editable':
-            if 'unit_amount' not in selection:raise serializers.ValidationError({'overhead_items':f"Enter a price for {item['name']}."})
+            if 'unit_amount' not in selection:raise serializers.ValidationError({error_field:f"Enter a price for {item['name']}."})
             unit=selection['unit_amount']
         else:
             unit=Decimal(item['amount'])
-            if 'unit_amount' in selection and selection['unit_amount']!=unit:raise serializers.ValidationError('Fixed Over-head prices cannot be changed.')
+            if 'unit_amount' in selection and selection['unit_amount']!=unit:raise serializers.ValidationError(f'Fixed {label} prices cannot be changed.')
         amount=unit*quantity
         if item['kind']=='tiered':amount=unit+Decimal(item['subsequent_amount'])*(quantity-1)
         description=item['name']+(f" — {quantity} {item['unit']}{'s' if quantity!=1 else ''}" if quantity>1 or item['unit']!='unit' else '')
         if item['kind']=='tiered':description+=f" (first day {unit}; subsequent {item['subsequent_amount']})"
-        lines.append({'code':code,'kind':item['kind'],'name':item['name'],'description':description,'quantity':quantity,'unit':item['unit'],'unit_amount':str(unit),'gross_amount':str(amount.quantize(CENT))})
-    if not lines:raise serializers.ValidationError({'overhead_items':'Add at least one Over-head service.'})
+        lines.append({'code':code,'kind':item['kind'],'name':item['name'],'description':description,'source_number':item.get('source_number'),'quantity':quantity,'unit':item['unit'],'unit_amount':str(unit),'gross_amount':str(amount.quantize(CENT))})
+    if not lines:raise serializers.ValidationError({error_field:f'Add at least one {label} item.'})
     subtotal=sum((Decimal(row['gross_amount']) for row in lines),Decimal('0'))
     surcharge_amount=(subtotal*Decimal('0.10')).quantize(CENT,rounding=ROUND_HALF_UP) if surcharge else Decimal('0.00')
     if surcharge:lines.append({'code':'surcharge','name':'Surcharge 10%','description':'Surcharge — 10% of selected Over-head subtotal','quantity':1,'unit':'unit','unit_amount':str(surcharge_amount),'gross_amount':str(surcharge_amount)})
@@ -50,4 +53,4 @@ def price_basket(selections,patient_type):
     remainder=net_cents-sum(cents)
     for index in sorted(range(len(lines)),key=lambda i:numerators[i]%base_cents,reverse=True)[:remainder]:cents[index]+=1
     for row,value in zip(lines,cents):row['net_amount']=str((Decimal(value)/100).quantize(CENT))
-    return {'version':CATALOGUE['version'],'items':lines,'subtotal':str(subtotal.quantize(CENT)),'surcharge':str(surcharge_amount),'base_total':str(base),'discount_total':str(discount),'net_total':str(net)}
+    return {'source_sha256':catalogue.get('source_sha256'),'label':label,'version':catalogue['version'],'items':lines,'subtotal':str(subtotal.quantize(CENT)),'surcharge':str(surcharge_amount),'base_total':str(base),'discount_total':str(discount),'net_total':str(net)}

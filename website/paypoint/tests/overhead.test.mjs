@@ -18,3 +18,12 @@ test('editable prices, days, weeks and zero-price items keep exact cent totals',
 test('invalid choices and incomplete editable prices cannot produce a payable basket',()=>{
  for(const rows of [[],[{code:'unknown',quantity:1}],[{code:'phototherapy',quantity:1}],[{code:'card',quantity:0}],[{code:'card',quantity:1},{code:'card',quantity:1}],[{code:'surcharge',quantity:1}]])assert.equal(calculateOverhead(catalogue,rows).valid,false);
 });
+
+test('DRF pharmacy baskets use fixed prices, quantities and patient discounts without surcharge',()=>{
+ const drf={label:'DRF pharmacy',items:[{code:'pharmacy_001',name:'Cap Amoxil 500mg',kind:'fixed',amount:'100',unit:'unit'},{code:'pharmacy_322',name:'Sachet Floranorm',kind:'fixed',amount:'1500',unit:'unit'}]};
+ const selected=[{code:'pharmacy_001',quantity:2},{code:'pharmacy_322',quantity:1}];
+ assert.equal(calculateOverhead(drf,selected).netCents,170000);
+ for(const patientType of ['nhis','imshia']){const result=calculateOverhead(drf,selected,patientType);assert.equal(result.netCents,153000);assert.equal(result.surchargeCents,0);}
+ assert.equal(calculateOverhead(drf,[{code:'surcharge',quantity:1}]).valid,false);
+ assert.match(calculateOverhead(drf,[]).error,/DRF pharmacy/);
+});

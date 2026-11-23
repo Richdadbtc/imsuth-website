@@ -18,6 +18,7 @@ from apps.billing.serializers import InvoiceSerializer
 from apps.payments.models import Payment, Receipt
 from apps.payments.serializers import PaymentSerializer
 from apps.auditlog.models import AuditEvent
+from .drf import CATALOGUE as DRF_CATALOGUE
 from .overhead import CATALOGUE as OVERHEAD_CATALOGUE, OverheadSelection, price_basket
 from .models import Sequence, CashPoint, CashOrder, RecordedPayment, Alert
 from .revenue_api import scoped_cash_points, scoped_cash_orders, scoped, scoped_receipts
@@ -40,8 +41,12 @@ class CaptureInput(serializers.Serializer):
         if data['sub_head']=='overhead':
             if not data['overhead_items'] or data['service'] or data['quantity']!=1:raise serializers.ValidationError({'overhead_items':'Select Over-head services from the list.'})
         elif data['overhead_items']:raise serializers.ValidationError({'overhead_items':'These services apply only to Over-head.'})
+        if data['sub_head']=='drf':
+            if not data['drf_items'] or data['service'] or data['quantity']!=1:raise serializers.ValidationError({'drf_items':'Select DRF pharmacy items from the list.'})
+        elif data['drf_items']:raise serializers.ValidationError({'drf_items':'These items apply only to DRF.'})
         return data
 
+    drf_items = OverheadSelection(many=True,required=False,default=list,allow_empty=True,max_length=322)
     overhead_items = OverheadSelection(many=True,required=False,default=list,allow_empty=True,max_length=100)
     payment_received = serializers.BooleanField(default=False)
     patient = serializers.UUIDField(required=False,allow_null=True,default=None)
@@ -70,7 +75,7 @@ class CaptureInput(serializers.Serializer):
 
 
 def capture_payload(context):
-    return {'payment':PaymentSerializer(context.payment).data,'invoice':InvoiceSerializer(context.payment.invoice).data,'price_changed':context.entered_total!=context.approved_total,'receipt_issued':hasattr(context.payment,'receipt'),'sub_head':context.sub_head,'sub_head_label':context.get_sub_head_display(),'patient_type':context.patient_type,'base_total':context.base_total,'discount_total':context.discount_total,'amount_due':context.approved_total,'overhead_breakdown':context.overhead_breakdown}
+    return {'payment':PaymentSerializer(context.payment).data,'invoice':InvoiceSerializer(context.payment.invoice).data,'price_changed':context.entered_total!=context.approved_total,'receipt_issued':hasattr(context.payment,'receipt'),'sub_head':context.sub_head,'sub_head_label':context.get_sub_head_display(),'patient_type':context.patient_type,'base_total':context.base_total,'discount_total':context.discount_total,'amount_due':context.approved_total,'drf_breakdown':context.drf_breakdown,'overhead_breakdown':context.overhead_breakdown}
 
 
 class RecordPaymentView(APIView):
@@ -92,7 +97,7 @@ class RecordPaymentView(APIView):
         current_tariff=TariffVersion.objects.filter(service_id=OuterRef('pk'),is_approved=True,currency='NGN',effective_from__lte=now).filter(Q(effective_until__isnull=True)|Q(effective_until__gt=now)).order_by('-effective_from')
         services=Service.objects.filter(department__in=departments,is_active=True).annotate(amount=Subquery(current_tariff.values('amount')[:1])).order_by('name','pk')
         receiver=request.user.get_full_name().strip() or request.user.username
-        return Response({'overhead_catalogue':OVERHEAD_CATALOGUE,'sub_heads':[{'value':value,'label':label} for value,label in RecordedPayment.SUB_HEAD_CHOICES],'services':list(services.values('id','name','department_id','amount')),'departments':list(departments.order_by('name').values('id','name','is_active')),'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receiver':receiver,'cash_receiver_automatic':True,'cash_receivers':[receiver],'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
+        return Response({'drf_catalogue':DRF_CATALOGUE,'overhead_catalogue':OVERHEAD_CATALOGUE,'sub_heads':[{'value':value,'label':label} for value,label in RecordedPayment.SUB_HEAD_CHOICES],'services':list(services.values('id','name','department_id','amount')),'departments':list(departments.order_by('name').values('id','name','is_active')),'staff_received_confirmation':True,'unregistered_patient_entry':True,'cash_receiver':receiver,'cash_receiver_automatic':True,'cash_receivers':[receiver],'manual_service_entry':True,'cash_points':[{'id':str(p.pk),'name':p.name,'department':str(p.department_id) if p.department_id else None} for p in points],'cash_orders':[{'id':str(o.pk),'cash_point':str(o.cash_point_id),'amount':o.amount,'purpose':o.purpose} for o in orders],'receipts':latest,'can_record':request.user.role in {'super_admin','finance','cashier'}})
 
     def post(self,request):
         if request.user.role not in {'super_admin','finance','cashier'}: raise PermissionDenied('Only collection officers and finance administrators may record payments.')
@@ -126,10 +131,11 @@ class RecordPaymentView(APIView):
                     patient=patient_view.get_queryset().filter(status='active',pk=data['patient']).first()
                     if not patient:raise ValidationError({'patient':'Select an active patient within your access scope.'})
                 patient_name=str(patient) if patient else data['patient_name'].strip()
-                overhead=data['sub_head']=='overhead'
-                breakdown=price_basket(data['overhead_items'],data['patient_type']) if overhead else None
+                basket_mode=data['sub_head'] in {'overhead','drf'}
+                drf=data['sub_head']=='drf'
+                breakdown=price_basket(data['drf_items'] if drf else data['overhead_items'],data['patient_type'],DRF_CATALOGUE if drf else OVERHEAD_CATALOGUE) if basket_mode else None
                 manual=not data['service']
-                if overhead:
+                if basket_mode:
                     service=None;base=Decimal(breakdown['base_total'])
                 elif manual:
                     if not data['service_description'].strip() or 'base_amount' not in data or data['quantity']!=1:
@@ -155,9 +161,9 @@ class RecordPaymentView(APIView):
                 if manual:
                     year=timezone.localdate().year
                     invoice=Invoice.objects.create(invoice_number=f"INV-{year}-{Sequence.next_value(f'invoice:{year}'):08d}",payment_reference=f"PAY-{year}-{Sequence.next_value(f'payment-reference:{year}'):010d}",patient=patient,patient_name=patient_name,department=department,created_by=request.user,idempotency_key='record:'+str(data['idempotency_key']),total_amount=approved,currency='NGN')
-                    if overhead:
+                    if basket_mode:
                         for row in breakdown['items']:
-                            InvoiceItem.objects.create(invoice=invoice,is_manual=True,service_code='OH-'+row['code'],description=row['description'],quantity=1,unit_amount=Decimal(row['net_amount']),currency='NGN')
+                            InvoiceItem.objects.create(invoice=invoice,is_manual=True,service_code=('DRF-' if drf else 'OH-')+row['code'],description=row['description'],quantity=1,unit_amount=Decimal(row['net_amount']),currency='NGN')
                     else:InvoiceItem.objects.create(invoice=invoice,is_manual=True,service_code='MANUAL',description=data['service_description'].strip(),quantity=1,unit_amount=approved,currency='NGN')
                 else:
                     if data['amount']!=approved and len(data['override_reason'].strip())<5:raise ValidationError('A price override requires a reason of at least five characters.')
@@ -172,9 +178,9 @@ class RecordPaymentView(APIView):
                     if point.daily_limit is not None and used+data['amount']>point.daily_limit:raise ValidationError({'cash_point':'This cash point daily collection limit would be exceeded.'})
                 payment=Payment.create_intent(invoice=invoice,channel=data['channel'],initiated_by=request.user,idempotency_key='record:'+str(data['idempotency_key']))
                 payment.cash_receiver=data['cash_receiver'];payment.submitted_reference=data['submitted_reference'];payment.reported_paid_at=data['reported_paid_at'];payment.remarks=data['remarks'];payment.save(update_fields=['cash_receiver','submitted_reference','reported_paid_at','remarks','updated_at'])
-                context=RecordedPayment.objects.create(idempotency_key=str(data['idempotency_key']),fingerprint=fingerprint,created_by=request.user,cash_point=point,cash_order=order,payment=payment,overhead_breakdown=breakdown or {},sub_head=data['sub_head'],patient_type=data['patient_type'],base_total=base,discount_total=discount,approved_total=approved,entered_total=data['amount'],override_reason=data['override_reason'])
-                AuditEvent.record('payment.recorded_at_point',actor=request.user,obj=payment,request=request,metadata={'sub_head':context.sub_head,'overhead_breakdown':context.overhead_breakdown,'cash_receiver':payment.cash_receiver,'cash_point':str(point.pk),'cash_order':str(order.pk) if order else None,'patient_type':data['patient_type'],'base_total':str(base),'discount_total':str(discount),'manual_service':manual,'service_description':data['service_description'] if manual else service.name,'approved_total':str(approved),'entered_total':str(data['amount']),'override_reason':data['override_reason']})
-                if (manual and not overhead) or (overhead and any(row.get('kind')=='editable' for row in breakdown['items'])) or approved!=data['amount']:
+                context=RecordedPayment.objects.create(idempotency_key=str(data['idempotency_key']),fingerprint=fingerprint,created_by=request.user,cash_point=point,cash_order=order,payment=payment,drf_breakdown=breakdown if drf else {},overhead_breakdown=breakdown if basket_mode and not drf else {},sub_head=data['sub_head'],patient_type=data['patient_type'],base_total=base,discount_total=discount,approved_total=approved,entered_total=data['amount'],override_reason=data['override_reason'])
+                AuditEvent.record('payment.recorded_at_point',actor=request.user,obj=payment,request=request,metadata={'sub_head':context.sub_head,'drf_breakdown':context.drf_breakdown,'overhead_breakdown':context.overhead_breakdown,'cash_receiver':payment.cash_receiver,'cash_point':str(point.pk),'cash_order':str(order.pk) if order else None,'patient_type':data['patient_type'],'base_total':str(base),'discount_total':str(discount),'manual_service':manual,'service_description':data['service_description'] if manual else service.name,'approved_total':str(approved),'entered_total':str(data['amount']),'override_reason':data['override_reason']})
+                if (manual and not basket_mode) or (basket_mode and any(row.get('kind')=='editable' for row in breakdown['items'])) or approved!=data['amount']:
                     Alert.objects.create(department=department,alert_type='service_price_change',severity='medium',description='Manual service and officer-entered full price require review.' if manual else 'Recorded payment differs from the approved tariff; review the recorded reason.',related_type='payments.Payment',related_id=str(payment.pk))
                 if data['payment_received']:
                     # The authenticated collection officer explicitly attests receipt of funds.

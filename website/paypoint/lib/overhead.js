@@ -15,7 +15,7 @@ export function calculateOverhead(catalogue,selections,patientType='regular'){
     if(!Number.isSafeInteger(amount)||!Number.isSafeInteger(subtotalCents+amount))return fail('The selected total is too large.');
     subtotalCents+=amount;rows.push({code:item.code,amountCents:amount});
   }
-  if(!rows.length)return fail('Add at least one Over-head service.');
+  if(!rows.length)return fail('Add at least one '+(catalogue?.label||'Over-head')+' item.');
   const surchargeCents=surcharge?Math.floor((subtotalCents+5)/10):0,baseCents=subtotalCents+surchargeCents;
   if(!Number.isSafeInteger(baseCents))return fail('The selected total is too large.');
   const discountCents=patientType==='regular'?0:Math.floor((baseCents+5)/10);

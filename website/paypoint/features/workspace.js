@@ -330,8 +330,9 @@ async function enhancedRecordPaymentPreview(capture) {
     content.querySelector('[data-rp-receipt-card]').hidden = false;
     content.querySelector('[data-rp-receipt]').textContent='The receipt appears here after verification.';
   };
-  let configuredServices=[],overheadPicker=null;
-  const overheadMode=()=>el('sub_head').value==='overhead';
+  let configuredServices=[],basketPicker=null;
+  const basketMode=()=>['overhead','drf'].includes(el('sub_head').value);
+  const drfMode=()=>el('sub_head').value==='drf';
   const chooseService = () => {
     service=configuredServices.length?configuredServices.find(row=>String(row.id)===el('service').value)||null:el('service').value.trim()?{name:el('service').value.trim()}:null;
     if(configuredServices.length){el('paid').value=service?.amount??'';el('override_reason').value='';el('override_reason').required=false;}
@@ -340,11 +341,11 @@ async function enhancedRecordPaymentPreview(capture) {
   const updateServiceField = () => {
     configuredServices=services.filter(row=>String(row.department_id)===el('department').value);
     const field=root.querySelector('[data-rp-service-field]');
-    overheadPicker=null;field.classList.toggle('overhead-service-field',overheadMode());el('paid').readOnly=overheadMode();
-    if(overheadMode()){
-      configuredServices=[];service={name:'Over-head services'};
-      field.innerHTML='<span>Service paid for</span><input type="hidden" name="service" value="Over-head services"><div data-overhead-picker></div>';
-      overheadPicker=mountOverheadPicker(field.querySelector('[data-overhead-picker]'),{catalogue:capture.overhead_catalogue,escapeHtml,money,getPatientType:()=>el('category').value==='self_pay'?'regular':el('category').value,onChange:state=>{delete form.dataset.requestKey;delete form.dataset.lastPayment;el('paid').value=state.valid?(state.baseCents/100).toFixed(2):'';fees();clearReceipt();}});
+    basketPicker=null;field.classList.toggle('overhead-service-field',basketMode());el('paid').readOnly=basketMode();
+    if(basketMode()){
+      configuredServices=[];service={name:drfMode()?'DRF pharmacy items':'Over-head services'};
+      field.innerHTML='<span>Service paid for</span><input type="hidden" name="service" value="Catalogue items"><div data-overhead-picker></div>';
+      basketPicker=mountOverheadPicker(field.querySelector('[data-overhead-picker]'),{catalogue:drfMode()?capture.drf_catalogue:capture.overhead_catalogue,escapeHtml,money,getPatientType:()=>el('category').value==='self_pay'?'regular':el('category').value,onChange:state=>{delete form.dataset.requestKey;delete form.dataset.lastPayment;el('paid').value=state.valid?(state.baseCents/100).toFixed(2):'';fees();clearReceipt();}});
       return;
     }
     field.innerHTML='<label>Service paid for'+(configuredServices.length?`<select name="service" required><option value="">Select service</option>${configuredServices.map(row=>`<option value="${escapeHtml(row.id)}" ${row.amount==null?'disabled':''}>${escapeHtml(row.name)} — ${row.amount==null?'No approved price':money(row.amount)}</option>`).join('')}</select>`:`<input name="service" required maxlength="200" placeholder="${el('department').value?'Enter service paid for':'Select department first'}" ${el('department').value?'':'disabled'}>`)+'</label>';
@@ -415,7 +416,7 @@ async function enhancedRecordPaymentPreview(capture) {
     if(el('channel').value!=='online'&&(!capture.staff_received_confirmation||!el('payment_received').checked)){message.textContent='Confirm funds were received. If unavailable, update the backend first.';return;}
     if(!capture.unregistered_patient_entry){message.textContent='Update the backend to enable payments without patient registration.';return;}
     if(departments.find(d=>String(d.id)===el('department').value)?.is_active===false){message.textContent='This department is inactive. Complete department activation before recording payments.';return;}
-    if(overheadMode()){const state=overheadPicker?.read();if(!state?.valid||state.netCents<=0){message.textContent=state?.error||'No payment is due. A paid receipt requires a positive total.';return;}}
+    if(basketMode()){const state=basketPicker?.read();if(!state?.valid||state.netCents<=0){message.textContent=state?.error||'No payment is due. A paid receipt requires a positive total.';return;}}
     if (!el('sub_head').value || !el('patient_query').value.trim() || !el('service').value.trim() || !Number.isInteger(quantity) || quantity < 1 || quantity > 100 || (el('channel').value==='cash'?!receiver:!reference) || !el('cash_point').value || !Number.isFinite(paid) || paid<=0) {
       message.textContent = 'Select a cash point, department and SUB-HEAD, enter the patient name and service, enter a payment reference when required, and enter a positive full service amount.';
       return;
@@ -431,7 +432,7 @@ async function enhancedRecordPaymentPreview(capture) {
         el('occurred').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
         const key = form.dataset.requestKey || (form.dataset.requestKey = crypto.randomUUID());
         const recorded=await api('record-payment/',{method:'POST',body:JSON.stringify({
-          patient_name:el('patient_query').value.trim(),department:el('department').value,sub_head:el('sub_head').value,overhead_items:overheadMode()?overheadPicker.selections():[],service:configuredServices.length?service?.id:null,service_description:service?.name||el('service').value.trim(),patient_type:el('category').value==='self_pay'?'regular':el('category').value,base_amount:Number(el('paid').value).toFixed(2),quantity,
+          patient_name:el('patient_query').value.trim(),department:el('department').value,sub_head:el('sub_head').value,drf_items:drfMode()?basketPicker.selections():[],overhead_items:basketMode()&&!drfMode()?basketPicker.selections():[],service:configuredServices.length?service?.id:null,service_description:service?.name||el('service').value.trim(),patient_type:el('category').value==='self_pay'?'regular':el('category').value,base_amount:Number(el('paid').value).toFixed(2),quantity,
           cash_point:el('cash_point').value,cash_order:el('cash_order').value||null,
           amount:paid.toFixed(2),override_reason:el('override_reason').value.trim(),channel:el('channel').value,
           payment_received:el('channel').value!=='online'&&el('payment_received').checked,cash_receiver:receiver,submitted_reference:reference,reported_paid_at:new Date(el('occurred').value).toISOString(),
