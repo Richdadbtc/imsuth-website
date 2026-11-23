@@ -12,12 +12,20 @@ class User(AbstractUser):
         FRONT_DESK = "front_desk", "Front Desk Officer"
         CASHIER = "cashier", "Cashier / PayPoint Officer"
 
+    banned_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     page_access = models.JSONField(null=True,blank=True,default=None)
     role = models.CharField(max_length=32, choices=Role.choices, blank=True)
     employee_id = models.CharField(max_length=32, unique=True, null=True, blank=True)
     department = models.ForeignKey("catalogue.Department", null=True, blank=True, on_delete=models.PROTECT, related_name="staff")
     paypoint_code = models.CharField(max_length=32, blank=True)
     must_change_password = models.BooleanField(default=True)
+
+    def save(self,*args,**kwargs):
+        if self.banned_at or self.deleted_at:
+            self.is_active=False
+            if kwargs.get('update_fields') is not None:kwargs['update_fields']=set(kwargs['update_fields'])|{'is_active'}
+        return super().save(*args,**kwargs)
 
     def has_paypoint_role(self, *roles):
         return self.is_active and self.role in roles

@@ -61,8 +61,8 @@ class StaffSerializer(serializers.ModelSerializer):
     phone = serializers.CharField(source='account_profile.phone',required=False,allow_blank=True,max_length=30,default='')
     class Meta:
         model = User
-        fields = ('id','username','employee_id','first_name','last_name','full_name','email','role','page_access','department','is_active','date_joined','last_login','must_change_password','has_usable_password','password','phone')
-        read_only_fields = ('id','date_joined','last_login','must_change_password')
+        fields = ('id','username','employee_id','first_name','last_name','full_name','email','role','page_access','department','is_active','banned_at','deleted_at','date_joined','last_login','must_change_password','has_usable_password','password','phone')
+        read_only_fields = ('id','banned_at','deleted_at','date_joined','last_login','must_change_password')
     def get_full_name(self, obj) -> str:
         return obj.get_full_name() or obj.username
     def validate(self, data):
@@ -71,6 +71,8 @@ class StaffSerializer(serializers.ModelSerializer):
             raise ValidationError('Only a Django superuser may assign the system administrator role.')
         if self.instance and self.instance.pk == self.context['request'].user.pk and (data.get('is_active') is False or 'role' in data and data['role'] != self.instance.role):
             raise ValidationError('You cannot deactivate or change your own administrative role here.')
+        if self.instance and self.instance.deleted_at:raise ValidationError('Deleted accounts cannot be changed.')
+        if self.instance and self.instance.banned_at and data.get('is_active') is True:raise ValidationError('Unban this account before activating it.')
         from apps.accounts.page_access import role_pages
         role=data.get('role',getattr(self.instance,'role',''))
         selected=data.get('page_access',getattr(self.instance,'page_access',None))
@@ -95,6 +97,9 @@ class StaffSerializer(serializers.ModelSerializer):
         if profile:AccountProfile.objects.update_or_create(user=user,defaults=profile)
         return user
     def update(self, instance, data):
+        from apps.accounts.lifecycle import guard_change, revoke_sessions
+        guard_change(self.context['request'].user,instance,role=data.get('role'),active=data.get('is_active'))
+        previous_access=(instance.role,instance.page_access)
         profile=data.pop('account_profile',None)
         password = data.pop('password', None)
         if password:
@@ -102,11 +107,12 @@ class StaffSerializer(serializers.ModelSerializer):
             instance.must_change_password = True
         user=super().update(instance, data)
         if profile is not None:AccountProfile.objects.update_or_create(user=user,defaults=profile)
+        if not user.is_active or previous_access!=(user.role,user.page_access):revoke_sessions(user)
         return user
 
 
 class StaffViewSet(LoggedViewSet):
-    queryset = User.objects.select_related('account_profile').all().order_by('username')
+    queryset = User.objects.select_related('account_profile').filter(deleted_at__isnull=True).order_by('username')
     serializer_class = StaffSerializer
     permission_classes = [AdminOnly]
     search_fields = ('username','first_name','last_name','email','employee_id')

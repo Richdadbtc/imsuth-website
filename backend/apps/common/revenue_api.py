@@ -444,7 +444,40 @@ class RevenueDashboardView(APIView):
 
 
 class UsersViewSet(StaffViewSet):
-    http_method_names=('get','post','patch','head','options')
+    http_method_names=('get','post','patch','delete','head','options')
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted_at__isnull=True)
+
+    @transaction.atomic
+    def destroy(self,request,*args,**kwargs):
+        from apps.accounts.lifecycle import guard_change,revoke_sessions
+        target=self.get_object();guard_change(request.user,target,active=False)
+        target.deleted_at=timezone.now();target.is_active=False
+        target.save(update_fields=['deleted_at','is_active'])
+        revoke_sessions(target)
+        AuditEvent.record('user.deleted',actor=request.user,obj=target,request=request,metadata={'username':target.username,'history_retained':True})
+        return Response(status=204)
+
+    @action(detail=True,methods=['post'])
+    @transaction.atomic
+    def ban(self,request,pk=None):
+        from apps.accounts.lifecycle import guard_change,revoke_sessions
+        target=self.get_object();guard_change(request.user,target,active=False)
+        target.banned_at=timezone.now();target.is_active=False
+        target.save(update_fields=['banned_at','is_active']);revoke_sessions(target)
+        AuditEvent.record('user.banned',actor=request.user,obj=target,request=request)
+        return Response(self.get_serializer(target).data)
+
+    @action(detail=True,methods=['post'])
+    @transaction.atomic
+    def unban(self,request,pk=None):
+        from apps.accounts.lifecycle import guard_change,revoke_sessions
+        target=self.get_object();guard_change(request.user,target)
+        target.banned_at=None;target.is_active=True
+        target.save(update_fields=['banned_at','is_active']);revoke_sessions(target)
+        AuditEvent.record('user.unbanned',actor=request.user,obj=target,request=request)
+        return Response(self.get_serializer(target).data)
+
     @transaction.atomic
     def perform_update(self,serializer):
         before=serializer.instance.role
