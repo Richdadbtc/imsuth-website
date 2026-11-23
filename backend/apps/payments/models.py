@@ -11,7 +11,7 @@ from apps.common.models import Sequence, TimeStampedModel
 
 class Payment(TimeStampedModel):
     class Channel(models.TextChoices):
-        BANK_TRANSFER = "bank_transfer", "Bank transfer"
+        BANK_TRANSFER = "bank_transfer", "POS transfer"
         POS = "pos", "POS"
         CASH = "cash", "Cash"
         ONLINE = "online", "Online gateway"

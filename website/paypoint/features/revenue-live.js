@@ -6,7 +6,7 @@ export async function submitJSON(path, body, method='POST') {
 }
 export async function refreshOverview(root,escapeHtml,moneyWhole) {
   const select=root.querySelector('[data-overview-period]');let sequence=0;
-  const names={pos:'POS/card',bank_transfer:'Bank transfer',bank_teller:'Bank teller',ussd:'USSD',cash:'Cash',online:'Online gateway'};
+  const names={pos:'POS/card',bank_transfer:'POS transfer',bank_teller:'Bank teller',ussd:'USSD',cash:'Cash',online:'Online gateway'};
   const colours={pos:'var(--source-pos)',bank_transfer:'var(--source-transfer)',bank_teller:'var(--source-teller)',ussd:'var(--source-ussd)',cash:'var(--source-cash)',online:'#7089a6'};
   const refresh=async()=>{
     const current=++sequence,period=select.value==='1'?'today':select.value,query='?period='+encodeURIComponent(period);
