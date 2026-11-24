@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-22.1",
+  "version": "2026-11-24.2",
   "items": [
     {
       "group": "Medical certificate",
@@ -370,7 +370,7 @@
       "name": "Bench fee",
       "kind": "fixed",
       "unit": "unit",
-      "amount": "5500"
+      "amount": "15000"
     },
     {
       "group": "Admission fee",
