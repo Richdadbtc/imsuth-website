@@ -1,0 +1,329 @@
+{
+  "version": "2026-11-24.1",
+  "label": "R/F",
+  "error_field": "rf_items",
+  "source_sha256": "56783a0c07c15c0efadf3c0417b07654cece04b12aac2d21a1f7b9279c890588",
+  "source_note": "Hospital departmental list: draft for validation. Entries with unconfirmed prices, units or amendments are unavailable until confirmed. Quantity follows the stated billing unit.",
+  "departments": [
+    {
+      "code": "rehabilitation_services_department_unconfirmed",
+      "name": "Rehabilitation services (department unconfirmed)"
+    },
+    {
+      "code": "ophthalmology",
+      "name": "Ophthalmology"
+    },
+    {
+      "code": "chemical_pathology",
+      "name": "Chemical Pathology"
+    },
+    {
+      "code": "accident_and_emergency",
+      "name": "Accident and Emergency"
+    },
+    {
+      "code": "microbiology",
+      "name": "Microbiology"
+    },
+    {
+      "code": "radiology",
+      "name": "Radiology"
+    },
+    {
+      "code": "haematology",
+      "name": "Haematology"
+    }
+  ],
+  "items": [
+    {
+      "code": "rf_01_001",
+      "source_number": 1,
+      "department": "rehabilitation_services_department_unconfirmed",
+      "name": "Adult outpatient",
+      "group": "Rehabilitation services (department unconfirmed)",
+      "amount": "60000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "60,000 for 12 sessions (12x)"
+    },
+    {
+      "code": "rf_01_002",
+      "source_number": 2,
+      "department": "rehabilitation_services_department_unconfirmed",
+      "name": "Adult ward patient",
+      "group": "Rehabilitation services (department unconfirmed)",
+      "amount": "20000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "20,000/week (4x) — verify overwritten figure"
+    },
+    {
+      "code": "rf_01_003",
+      "source_number": 3,
+      "department": "rehabilitation_services_department_unconfirmed",
+      "name": "VIP treatment",
+      "group": "Rehabilitation services (department unconfirmed)",
+      "amount": "10000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "10,000 per visit"
+    },
+    {
+      "code": "rf_01_004",
+      "source_number": 4,
+      "department": "rehabilitation_services_department_unconfirmed",
+      "name": "Weight program",
+      "group": "Rehabilitation services (department unconfirmed)",
+      "amount": "40000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "40,000 per month"
+    },
+    {
+      "code": "rf_01_005",
+      "source_number": 5,
+      "department": "rehabilitation_services_department_unconfirmed",
+      "name": "Massage therapy",
+      "group": "Rehabilitation services (department unconfirmed)",
+      "amount": "10000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "10,000 per visit"
+    },
+    {
+      "code": "rf_01_006",
+      "source_number": 6,
+      "department": "rehabilitation_services_department_unconfirmed",
+      "name": "Paediatric outpatient",
+      "group": "Rehabilitation services (department unconfirmed)",
+      "amount": "40000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "40,000 — unit cropped"
+    },
+    {
+      "code": "rf_01_007",
+      "source_number": 7,
+      "department": "rehabilitation_services_department_unconfirmed",
+      "name": "Paediatric ward patient",
+      "group": "Rehabilitation services (department unconfirmed)",
+      "amount": "15000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "15,000 — unit cropped"
+    },
+    {
+      "code": "rf_02_001",
+      "source_number": 1,
+      "department": "ophthalmology",
+      "name": "CVF",
+      "group": "Ophthalmology",
+      "amount": "10000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": true,
+      "source_rate": "10,000"
+    },
+    {
+      "code": "rf_02_002",
+      "source_number": 2,
+      "department": "ophthalmology",
+      "name": "PA tonometry",
+      "group": "Ophthalmology",
+      "amount": "3000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": true,
+      "source_rate": "3,000"
+    },
+    {
+      "code": "rf_04_016",
+      "source_number": 16,
+      "department": "chemical_pathology",
+      "name": "Liver function test",
+      "group": "Chemical Pathology",
+      "amount": null,
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "Unconfirmed (10,000 crossed out; replacement cropped)"
+    },
+    {
+      "code": "rf_06_009",
+      "source_number": 9,
+      "department": "accident_and_emergency",
+      "name": "Nurses critical care",
+      "group": "Accident and Emergency",
+      "amount": "6000",
+      "kind": "tiered",
+      "unit": "day",
+      "available": true,
+      "source_rate": "6,000 day one; 3,000 subsequently",
+      "subsequent_amount": "3000"
+    },
+    {
+      "code": "rf_06_010",
+      "source_number": 10,
+      "department": "accident_and_emergency",
+      "name": "Doctors critical care",
+      "group": "Accident and Emergency",
+      "amount": "10000",
+      "kind": "tiered",
+      "unit": "day",
+      "available": true,
+      "source_rate": "10,000 day one; 5,000 subsequently",
+      "subsequent_amount": "5000"
+    },
+    {
+      "code": "rf_06_013",
+      "source_number": 13,
+      "department": "accident_and_emergency",
+      "name": "Suctioning tube (duplicate in source)",
+      "group": "Accident and Emergency",
+      "amount": "1500",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "1,500 each"
+    },
+    {
+      "code": "rf_06_027",
+      "source_number": 27,
+      "department": "accident_and_emergency",
+      "name": "Lotion",
+      "group": "Accident and Emergency",
+      "amount": "1000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "1,000–5,000 depending on case"
+    },
+    {
+      "code": "rf_07_030",
+      "source_number": 30,
+      "department": "accident_and_emergency",
+      "name": "Dressing procedure (minor)",
+      "group": "Accident and Emergency",
+      "amount": null,
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "Unconfirmed — cropped"
+    },
+    {
+      "code": "rf_08_001",
+      "source_number": 1,
+      "department": "microbiology",
+      "name": "Urinalysis",
+      "group": "Microbiology",
+      "amount": "1500",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": true,
+      "source_rate": "1,500"
+    },
+    {
+      "code": "rf_08_020",
+      "source_number": 20,
+      "department": "microbiology",
+      "name": "Hepatitis C (HCV)",
+      "group": "Microbiology",
+      "amount": "2000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "2,000 — marked, verify"
+    },
+    {
+      "code": "rf_09_033",
+      "source_number": 33,
+      "department": "microbiology",
+      "name": "Sputum AFB",
+      "group": "Microbiology",
+      "amount": null,
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "Nil (as written)"
+    },
+    {
+      "code": "rf_10_023",
+      "source_number": 23,
+      "department": "radiology",
+      "name": "Elbow (handwritten revision)",
+      "group": "Radiology",
+      "amount": "7000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "7,000"
+    },
+    {
+      "code": "rf_10_032",
+      "source_number": 32,
+      "department": "radiology",
+      "name": "Wrist",
+      "group": "Radiology",
+      "amount": "7000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "7,000"
+    },
+    {
+      "code": "rf_10_033",
+      "source_number": 33,
+      "department": "radiology",
+      "name": "Hand",
+      "group": "Radiology",
+      "amount": "7000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "7,000"
+    },
+    {
+      "code": "rf_10_034",
+      "source_number": 34,
+      "department": "radiology",
+      "name": "Ankle",
+      "group": "Radiology",
+      "amount": "7000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "7,000"
+    },
+    {
+      "code": "rf_10_035",
+      "source_number": 35,
+      "department": "radiology",
+      "name": "Foot",
+      "group": "Radiology",
+      "amount": "7000",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "7,000"
+    },
+    {
+      "code": "rf_13_002",
+      "source_number": 2,
+      "department": "haematology",
+      "name": "PCV",
+      "group": "Haematology",
+      "amount": "1900",
+      "kind": "fixed",
+      "unit": "unit",
+      "available": false,
+      "source_rate": "1,900 — verify handwriting"
+    }
+  ]
+}

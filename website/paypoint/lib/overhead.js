@@ -5,7 +5,7 @@ export function calculateOverhead(catalogue,selections,patientType='regular'){
   const fail=error=>({valid:false,error,rows,subtotalCents:0,surchargeCents:0,baseCents:0,discountCents:0,netCents:0});
   for(const selected of selections){
     const item=known.get(selected.code),quantity=Number(selected.quantity);
-    if(!item||seen.has(selected.code))return fail('Select each service once and use quantity for repeats.');
+    if(!item||item.available===false||seen.has(selected.code))return fail('Select each service once and use quantity for repeats.');
     seen.add(selected.code);
     if(!Number.isInteger(quantity)||quantity<1||quantity>3650)return fail('Enter a quantity or number of days between 1 and 3650.');
     if(item.kind==='percentage'){surcharge=true;continue;}

@@ -121,7 +121,7 @@ def print_receipt(self,request,pk=None):
     from .receipt_assets import receipt_images
     collection=getattr(obj.payment,'recorded_context',None)
     officer=collection.created_by if collection else obj.payment.initiated_by
-    collection_details={'overhead_breakdown':(collection.drf_breakdown or collection.overhead_breakdown) if collection else {},'department_paid_for':obj.invoice.department.name,'cash_point_name':collection.cash_point.name if collection else 'Not recorded','recorded_by':(officer.get_full_name() or officer.username) if officer else 'Not recorded'}
+    collection_details={'overhead_breakdown':(collection.rf_breakdown or collection.drf_breakdown or collection.overhead_breakdown) if collection else {},'department_paid_for':obj.invoice.department.name,'cash_point_name':collection.cash_point.name if collection else 'Not recorded','recorded_by':(officer.get_full_name() or officer.username) if officer else 'Not recorded'}
     html=render_to_string('paypoint/receipt.html',{'receipt':obj,'items':obj.invoice.items.all(),'thermal':paper=='thermal',**collection_details,**receipt_images(obj)})
     response=HttpResponse(html);response['Cache-Control']='private, no-store';return response
 

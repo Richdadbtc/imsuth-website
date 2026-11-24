@@ -27,3 +27,15 @@ test('DRF pharmacy baskets use fixed prices, quantities and patient discounts wi
  assert.equal(calculateOverhead(drf,[{code:'surcharge',quantity:1}]).valid,false);
  assert.match(calculateOverhead(drf,[]).error,/DRF pharmacy/);
 });
+
+// Exercise the imported department catalogue rather than synthetic tariff copies.
+test('R/F departments isolate services and reject source entries awaiting confirmation',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const source=JSON.parse(await readFile(new URL('./fixtures/rf-services.json',import.meta.url),'utf8'));
+ const ophthalmology={...source,items:source.items.filter(i=>i.department==='ophthalmology')};
+ assert.equal(calculateOverhead(ophthalmology,[{code:'rf_02_001',quantity:2},{code:'rf_02_002',quantity:1}],'nhis').netCents,2070000);
+ assert.equal(calculateOverhead(ophthalmology,[{code:'rf_08_001',quantity:1}]).valid,false);
+ for(const item of source.items.filter(i=>!i.available))assert.equal(calculateOverhead(source,[{code:item.code,quantity:1}]).valid,false);
+ const emergency={...source,items:source.items.filter(i=>i.department==='accident_and_emergency')};
+ assert.equal(calculateOverhead(emergency,[{code:'rf_06_009',quantity:3},{code:'rf_06_010',quantity:3}]).netCents,3200000);
+});

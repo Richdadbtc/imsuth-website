@@ -331,7 +331,9 @@ async function enhancedRecordPaymentPreview(capture) {
     content.querySelector('[data-rp-receipt]').textContent='The receipt appears here after verification.';
   };
   let configuredServices=[],basketPicker=null;
-  const basketMode=()=>['overhead','drf'].includes(el('sub_head').value);
+  const basketMode=()=>['overhead','drf','rf'].includes(el('sub_head').value);
+  const rfMode=()=>el('sub_head').value==='rf';
+  const rfDepartmentField=document.createElement('div');rfDepartmentField.hidden=true;rfDepartmentField.innerHTML=`<label>R/F service department<select name="rf_department"><option value="">Select R/F department</option>${(capture.rf_catalogue?.departments||[]).map(d=>`<option value="${escapeHtml(d.code)}">${escapeHtml(d.name)}</option>`).join('')}</select></label>`;root.querySelector('[data-rp-service-field]').before(rfDepartmentField);
   const drfMode=()=>el('sub_head').value==='drf';
   const chooseService = () => {
     service=configuredServices.length?configuredServices.find(row=>String(row.id)===el('service').value)||null:el('service').value.trim()?{name:el('service').value.trim()}:null;
@@ -341,11 +343,15 @@ async function enhancedRecordPaymentPreview(capture) {
   const updateServiceField = () => {
     configuredServices=services.filter(row=>String(row.department_id)===el('department').value);
     const field=root.querySelector('[data-rp-service-field]');
+    rfDepartmentField.hidden=!rfMode();el('rf_department').disabled=!rfMode();el('rf_department').required=rfMode();
     basketPicker=null;field.classList.toggle('overhead-service-field',basketMode());el('paid').readOnly=basketMode();
     if(basketMode()){
-      configuredServices=[];service={name:drfMode()?'DRF pharmacy items':'Over-head services'};
+      configuredServices=[];service={name:rfMode()?'R/F departmental services':drfMode()?'DRF pharmacy items':'Over-head services'};
       field.innerHTML='<span>Service paid for</span><input type="hidden" name="service" value="Catalogue items"><div data-overhead-picker></div>';
-      basketPicker=mountOverheadPicker(field.querySelector('[data-overhead-picker]'),{catalogue:drfMode()?capture.drf_catalogue:capture.overhead_catalogue,escapeHtml,money,getPatientType:()=>el('category').value==='self_pay'?'regular':el('category').value,onChange:state=>{delete form.dataset.requestKey;delete form.dataset.lastPayment;el('paid').value=state.valid?(state.baseCents/100).toFixed(2):'';fees();clearReceipt();}});
+      if(rfMode()&&!el('rf_department').value){field.querySelector('[data-overhead-picker]').textContent='Select an R/F service department to see its services and prices.';el('paid').value='';fees();clearReceipt();return;}
+      const rfDepartment=capture.rf_catalogue?.departments.find(d=>d.code===el('rf_department').value);
+      const rfCatalogue=rfDepartment?{...capture.rf_catalogue,label:'R/F — '+rfDepartment.name,items:capture.rf_catalogue.items.filter(i=>i.department===rfDepartment.code)}:null;
+      basketPicker=mountOverheadPicker(field.querySelector('[data-overhead-picker]'),{catalogue:rfMode()?rfCatalogue:drfMode()?capture.drf_catalogue:capture.overhead_catalogue,escapeHtml,money,getPatientType:()=>el('category').value==='self_pay'?'regular':el('category').value,onChange:state=>{delete form.dataset.requestKey;delete form.dataset.lastPayment;el('paid').value=state.valid?(state.baseCents/100).toFixed(2):'';fees();clearReceipt();}});
       return;
     }
     field.innerHTML='<label>Service paid for'+(configuredServices.length?`<select name="service" required><option value="">Select service</option>${configuredServices.map(row=>`<option value="${escapeHtml(row.id)}" ${row.amount==null?'disabled':''}>${escapeHtml(row.name)} — ${row.amount==null?'No approved price':money(row.amount)}</option>`).join('')}</select>`:`<input name="service" required maxlength="200" placeholder="${el('department').value?'Enter service paid for':'Select department first'}" ${el('department').value?'':'disabled'}>`)+'</label>';
@@ -369,11 +375,12 @@ async function enhancedRecordPaymentPreview(capture) {
     form.querySelector('[type=submit]').disabled=!capture.can_record||!capture.manual_service_entry||inactive;
     delete form.dataset.requestKey;delete form.dataset.lastPayment;
     const subHead=root.querySelector('[data-rp-sub-head-field]');
-    subHead.hidden=!department;el('sub_head').disabled=!department;el('sub_head').required=Boolean(department);el('sub_head').value='';
+    subHead.hidden=!department;el('sub_head').disabled=!department;el('sub_head').required=Boolean(department);el('sub_head').value='';el('rf_department').value='';
     updateServiceField();
   });
   updateServiceField();
-  el('sub_head').addEventListener('change',updateServiceField);
+  el('rf_department').addEventListener('change',()=>{delete form.dataset.requestKey;delete form.dataset.lastPayment;updateServiceField();});
+  el('sub_head').addEventListener('change',()=>{el('rf_department').value='';updateServiceField();});
   el('category').addEventListener('change',()=>{fees();clearReceipt();});
   el('quantity').addEventListener('input', () => {
     fees();
@@ -432,7 +439,7 @@ async function enhancedRecordPaymentPreview(capture) {
         el('occurred').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
         const key = form.dataset.requestKey || (form.dataset.requestKey = crypto.randomUUID());
         const recorded=await api('record-payment/',{method:'POST',body:JSON.stringify({
-          patient_name:el('patient_query').value.trim(),department:el('department').value,sub_head:el('sub_head').value,drf_items:drfMode()?basketPicker.selections():[],overhead_items:basketMode()&&!drfMode()?basketPicker.selections():[],service:configuredServices.length?service?.id:null,service_description:service?.name||el('service').value.trim(),patient_type:el('category').value==='self_pay'?'regular':el('category').value,base_amount:Number(el('paid').value).toFixed(2),quantity,
+          patient_name:el('patient_query').value.trim(),department:el('department').value,sub_head:el('sub_head').value,rf_department:rfMode()?el('rf_department').value:'',rf_items:rfMode()?basketPicker.selections():[],drf_items:drfMode()?basketPicker.selections():[],overhead_items:basketMode()&&!drfMode()&&!rfMode()?basketPicker.selections():[],service:configuredServices.length?service?.id:null,service_description:service?.name||el('service').value.trim(),patient_type:el('category').value==='self_pay'?'regular':el('category').value,base_amount:Number(el('paid').value).toFixed(2),quantity,
           cash_point:el('cash_point').value,cash_order:el('cash_order').value||null,
           amount:paid.toFixed(2),override_reason:el('override_reason').value.trim(),channel:el('channel').value,
           payment_received:el('channel').value!=='online'&&el('payment_received').checked,cash_receiver:receiver,submitted_reference:reference,reported_paid_at:new Date(el('occurred').value).toISOString(),
