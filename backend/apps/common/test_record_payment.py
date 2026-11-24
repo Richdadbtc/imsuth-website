@@ -32,7 +32,7 @@ class RecordPaymentTests(TestCase):
         self.point.daily_limit=None;self.point.save()
         for value,label in [('overhead','Over-head'),('rf','R/F'),('drf','DRF')]:
             self.data.update(sub_head=value,idempotency_key=str(uuid4()))
-            self.data.update(overhead_items=[{'code':'card','quantity':1}] if value=='overhead' else [],drf_items=[{'code':'pharmacy_001','quantity':1}] if value=='drf' else [],service=None if value in {'overhead','drf'} else str(self.service.pk),amount='1000' if value=='overhead' else '100')
+            self.data.update(overhead_items=[{'code':'card','quantity':1}] if value=='overhead' else [],drf_items=[{'code':'pharmacy_001','quantity':1,'unit_amount':'100'}] if value=='drf' else [],service=None if value in {'overhead','drf'} else str(self.service.pk),amount='1000' if value=='overhead' else '100')
             response=self.post();self.assertEqual(response.status_code,201,response.data)
             self.assertEqual(response.data['sub_head'],value)
             self.assertEqual(response.data['sub_head_label'],label)

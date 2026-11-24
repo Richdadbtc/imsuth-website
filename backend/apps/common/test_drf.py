@@ -13,16 +13,17 @@ class DRFPaymentTests(TestCase):
     def setUpTestData(cls):RevenueControlTests.setUpTestData.__func__(cls)
     def setUp(self):
         self.client=APIClient();self.client.force_authenticate(self.cashier)
-        self.data={'patient_name':'Synthetic pharmacy patient','department':str(self.dep.pk),'sub_head':'drf','cash_point':str(CashPoint.objects.get(name='OPD CASH POINT').pk),'quantity':1,'channel':'cash','amount':'1700','payment_received':True,'drf_items':[{'code':'pharmacy_001','quantity':2},{'code':'pharmacy_322','quantity':1}],'reported_paid_at':timezone.now().isoformat(),'idempotency_key':str(uuid4())}
+        self.data={'patient_name':'Synthetic pharmacy patient','department':str(self.dep.pk),'sub_head':'drf','cash_point':str(CashPoint.objects.get(name='OPD CASH POINT').pk),'quantity':1,'channel':'cash','amount':'1700','payment_received':True,'drf_items':[{'code':'pharmacy_001','quantity':2,'unit_amount':'100'},{'code':'pharmacy_322','quantity':1,'unit_amount':'1500'}],'reported_paid_at':timezone.now().isoformat(),'idempotency_key':str(uuid4())}
     def post(self):return self.client.post('/api/v1/record-payment/',self.data,format='json')
     def test_complete_source_catalogue(self):
         rows=self.client.get('/api/v1/record-payment/').data['drf_catalogue']['items']
         self.assertEqual([r['source_number'] for r in rows],list(range(1,323)))
-        self.assertEqual(sum(Decimal(r['amount']) for r in rows),Decimal('382290'))
+        self.assertTrue(all('amount' not in r for r in rows))
+        self.assertTrue(self.client.get('/api/v1/record-payment/').data['drf_catalogue']['manual_prices'])
         self.assertEqual(rows[0]['name'],'Cap Amoxil 500mg')
         self.assertEqual(rows[-1]['name'],'Sachet Floranorm')
         self.assertEqual(rows[75]['name'],rows[162]['name']) # Preserve duplicate source entries.
-        self.assertTrue(all(r['kind']=='fixed' for r in rows))
+        self.assertTrue(all(r['kind']=='editable' for r in rows))
     def test_multiple_items_discounts_receipt_and_idempotency(self):
         self.data.update(patient_type='nhis',amount='1530')
         response=self.post();self.assertEqual(response.status_code,201,response.data)
@@ -39,6 +40,14 @@ class DRFPaymentTests(TestCase):
         self.assertEqual(RecordedPayment.objects.count(),1)
     def test_reject_tampered_prices_mixed_heads_unknown_duplicate_and_wrong_amount(self):
         before=Invoice.objects.count()
-        for change in [dict(drf_items=[{'code':'pharmacy_001','quantity':1,'unit_amount':'1'}]),dict(drf_items=[{'code':'surcharge','quantity':1}]),dict(overhead_items=[{'code':'card'}]),dict(sub_head='rf'),dict(drf_items=[]),dict(drf_items=[{'code':'pharmacy_001'},{'code':'pharmacy_001'}]),dict(amount='1')]:
+        for change in [dict(drf_items=[{'code':'pharmacy_001','quantity':1}]),dict(drf_items=[{'code':'pharmacy_001','unit_amount':'0'}]),dict(drf_items=[{'code':'pharmacy_001','unit_amount':'-1'}]),dict(drf_items=[{'code':'pharmacy_001','unit_amount':'1.001'}]),dict(drf_items=[{'code':'surcharge','quantity':1}]),dict(overhead_items=[{'code':'card'}]),dict(sub_head='rf'),dict(drf_items=[]),dict(drf_items=[{'code':'pharmacy_001'},{'code':'pharmacy_001'}]),dict(amount='1')]:
             original=self.data.copy();self.data.update(change,idempotency_key=str(uuid4()))
             result=self.post();self.assertEqual(result.status_code,400,result.data);self.assertEqual(Invoice.objects.count(),before);self.data=original
+
+    def test_current_entered_price_replaces_source_price(self):
+        self.data.update(drf_items=[{'code':'pharmacy_001','quantity':3,'unit_amount':'250.50'}],amount='751.50')
+        result=self.post();self.assertEqual(result.status_code,201,result.data)
+        context=RecordedPayment.objects.get()
+        self.assertEqual(context.drf_breakdown['items'][0]['unit_amount'],'250.50')
+        self.assertEqual(context.payment.amount,Decimal('751.50'))
+        self.assertEqual(context.drf_breakdown['items'][0]['gross_amount'],'751.50')

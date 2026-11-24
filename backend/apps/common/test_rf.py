@@ -1,11 +1,15 @@
 from decimal import Decimal
 from uuid import uuid4
-from .test_drf import DRFPaymentTests
+from . import test_drf
+from django.test import TestCase
 from .rf import CATALOGUE
 
-class RFPaymentTests(DRFPaymentTests):
+class RFPaymentTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):test_drf.DRFPaymentTests.setUpTestData.__func__(cls)
+    def post(self):return self.client.post('/api/v1/record-payment/',self.data,format='json')
     def setUp(self):
-        super().setUp()
+        test_drf.DRFPaymentTests.setUp(self)
         self.data.pop('drf_items')
         self.data.update(sub_head='rf',rf_department='ophthalmology',rf_items=[{'code':'rf_02_001','quantity':2},{'code':'rf_02_002','quantity':1}],amount='23000')
     def test_complete_source_catalogue(self):

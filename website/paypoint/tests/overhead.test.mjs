@@ -19,9 +19,9 @@ test('invalid choices and incomplete editable prices cannot produce a payable ba
  for(const rows of [[],[{code:'unknown',quantity:1}],[{code:'phototherapy',quantity:1}],[{code:'card',quantity:0}],[{code:'card',quantity:1},{code:'card',quantity:1}],[{code:'surcharge',quantity:1}]])assert.equal(calculateOverhead(catalogue,rows).valid,false);
 });
 
-test('DRF pharmacy baskets use fixed prices, quantities and patient discounts without surcharge',()=>{
- const drf={label:'DRF pharmacy',items:[{code:'pharmacy_001',name:'Cap Amoxil 500mg',kind:'fixed',amount:'100',unit:'unit'},{code:'pharmacy_322',name:'Sachet Floranorm',kind:'fixed',amount:'1500',unit:'unit'}]};
- const selected=[{code:'pharmacy_001',quantity:2},{code:'pharmacy_322',quantity:1}];
+test('DRF pharmacy baskets use entered prices, quantities and patient discounts without surcharge',()=>{
+ const drf={label:'DRF pharmacy',items:[{code:'pharmacy_001',name:'Cap Amoxil 500mg',kind:'editable',unit:'unit'},{code:'pharmacy_322',name:'Sachet Floranorm',kind:'editable',unit:'unit'}]};
+ const selected=[{code:'pharmacy_001',quantity:2,unit_amount:'100'},{code:'pharmacy_322',quantity:1,unit_amount:'1500'}];
  assert.equal(calculateOverhead(drf,selected).netCents,170000);
  for(const patientType of ['nhis','imshia']){const result=calculateOverhead(drf,selected,patientType);assert.equal(result.netCents,153000);assert.equal(result.surchargeCents,0);}
  assert.equal(calculateOverhead(drf,[{code:'surcharge',quantity:1}]).valid,false);
@@ -38,4 +38,10 @@ test('R/F departments isolate services and reject source entries awaiting confir
  for(const item of source.items.filter(i=>!i.available))assert.equal(calculateOverhead(source,[{code:item.code,quantity:1}]).valid,false);
  const emergency={...source,items:source.items.filter(i=>i.department==='accident_and_emergency')};
  assert.equal(calculateOverhead(emergency,[{code:'rf_06_009',quantity:3},{code:'rf_06_010',quantity:3}]).netCents,3200000);
+});
+
+test('DRF price entry is required and recalculates from the officer-entered price',()=>{
+ const catalogue={label:'DRF pharmacy',manual_prices:true,items:[{code:'drug',name:'Drug',kind:'editable',unit:'unit'}]};
+ for(const value of [undefined,'','0','-1','1.001'])assert.equal(calculateOverhead(catalogue,[{code:'drug',quantity:1,unit_amount:value}]).valid,false);
+ assert.equal(calculateOverhead(catalogue,[{code:'drug',quantity:3,unit_amount:'250.50'}],'nhis').netCents,67635);
 });
