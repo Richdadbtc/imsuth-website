@@ -7,3 +7,7 @@ Administrators (`super_admin`) and auditors see Collections by paypoint staff wi
 GET `/api/v1/dashboard/collections-by-staff/` is restricted server-side to administrators and auditors. It aggregates confirmed NGN payments by the collecting account (`Payment.initiated_by`), using confirmation dates, not payment creation dates. Cash, POS/card, POS transfer, other channels and deposits count in amounts received. Pending, failed, refunded and reversed states are excluded. This is collected money, not certified bank settlement. Receipt users and entered cash receiver aliases are not used to merge distinct user accounts.
 
 Date bounds are inclusive in Africa/Lagos; invalid or reversed dates return HTTP 400. No passwords or unnecessary staff contact details are returned. Deploy backend and frontend; no migration is required.
+
+## SUB-HEAD totals
+
+Overview summary includes `sub_head_totals` for Over-head, R/F, DRF and Deposit. These sum actual confirmed NGN payment amounts (after any patient discount), grouped by the immutable payment capture SUB-HEAD. They use the same confirmation-date range and department access scope as overall collections. Empty categories return zero. `unclassified` accounts for confirmed payments without a recognized saved SUB-HEAD; it is displayed separately when present so category totals reconcile with overall collections. No category is inferred from service names or the patient's category. This change requires both deployments and no migration.

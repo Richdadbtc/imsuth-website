@@ -32,6 +32,12 @@ export async function refreshOverview(root,escapeHtml,moneyWhole,user={}) {
       const total=Number(summary.verified_collections),percent=amount=>(total?Number(amount)/total*100:0).toFixed(1)+'%';
       const row=channel=>channels.find(r=>r.channel===channel);
       const cards=[['Collected',moneyWhole(total),summary.verified_transactions+' confirmed payments','collected'],...['pos','bank_transfer','bank_teller','ussd'].map(channel=>[names[channel],moneyWhole(row(channel)?.amount||0),percent(row(channel)?.amount||0),channel]),['Cash received',moneyWhole(row('cash')?.amount||0),percent(row('cash')?.amount||0)+' of collections','cash'],['NHIS patients','Not configured','Category collection data unavailable','insurance'],['IMSHIA patients','Not configured','Category collection data unavailable','insurance'],['Unmatched','Loading…','Imported statement rows','unmatched'],['Open alerts',alerts.open,'View alerts','alerts']];
+      const exactMoney=value=>Number(value).toLocaleString('en-NG',{style:'currency',currency:'NGN',minimumFractionDigits:2,maximumFractionDigits:2});
+      for(const [value,label] of [['overhead','Over-head'],['rf','R/F'],['drf','DRF'],['deposit','Deposit']]){
+        const head=summary.sub_head_totals?.find(row=>row.value===value);
+        cards.push([label+' collected',head?exactMoney(head.amount):'Unavailable',head?head.transactions+' confirmed payments':'Deploy backend update',value]);
+      }
+      if(summary.unclassified?.transactions)cards.push(['Unclassified collected',exactMoney(summary.unclassified.amount),summary.unclassified.transactions+' payments without a SUB-HEAD','unclassified']);
       const renderCards=()=>{root.querySelector('[data-overview-kpis]').innerHTML=cards.map(([label,value,note,kind])=>`<article class="source-overview-card source-kpi source-kpi-${kind}"><div class="source-label">${escapeHtml(label)}</div><div class="source-value">${escapeHtml(value)}</div><div class="source-label">${escapeHtml(note)}</div></article>`).join('');};renderCards();
       root.querySelector('[data-overview-alert-count]').textContent=String(alerts.open);
       let angle=0;const chartRows=['pos','bank_transfer','bank_teller','ussd','cash','online'].map(channel=>({channel,amount:Number(row(channel)?.amount||0)}));
