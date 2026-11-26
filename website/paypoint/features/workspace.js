@@ -315,9 +315,10 @@ async function enhancedRecordPaymentPreview(capture) {
     form = content.querySelector('[data-rp-form]'),
     el = name => form.elements.namedItem(name),
     details = entries => `<dl class="record-detail-list">${entries.map(([label, value]) => `<div><dt>${label}</dt><dd>${escapeHtml(value || 'Not supplied')}</dd></div>`).join('')}</dl>`,
-    total = () => {const cents=Math.round(Number(el('paid').value||0)*100);return (cents-(el('category').value==='self_pay'?0:Math.round(cents*0.10)))/100;};
+    total = () => {const cents=Math.round(Number(el('paid').value||0)*100);return (cents-(el('sub_head').value==='deposit'||el('category').value==='self_pay'?0:Math.round(cents*0.10)))/100;};
   const fees = () => {
     const gross=Number(el('paid').value||0),net=total(),discount=Math.round((gross-net)*100)/100;
+    if(el('sub_head').value==='deposit'){content.querySelector('[data-rp-price-summary]').textContent=`Deposit amount: ${money(gross)}. Recorded exactly as entered toward the named service.`;return;}
     content.querySelector('[data-rp-price-summary]').textContent=`Full amount: ${money(gross)} · Discount (${el('category').value==='self_pay'?'0':'10'}%): ${money(discount)} · Amount to pay: ${money(net)}.`;
   };
   if(!capture.manual_service_entry)content.querySelector('[data-rp-message]').textContent='The backend must be updated before manual services and patient-type discounts can be recorded.';
@@ -345,7 +346,11 @@ async function enhancedRecordPaymentPreview(capture) {
     configuredServices=services.filter(row=>String(row.department_id)===el('department').value);
     const field=root.querySelector('[data-rp-service-field]');
     rfDepartmentField.hidden=!rfMode();el('rf_department').disabled=!rfMode();el('rf_department').required=rfMode();
+    const deposit=el('sub_head').value==='deposit';
+    const paidLabel=el('paid').parentElement;paidLabel.firstChild.textContent=deposit?'Amount of deposit (₦)':'Full service amount (₦)';
+    el('paid').placeholder=deposit?'Enter deposit amount':'Enter full amount before discount';
     basketPicker=null;field.classList.toggle('overhead-service-field',basketMode());el('paid').readOnly=basketMode();
+    if(deposit){configuredServices=[];service=null;field.innerHTML='<label>Service making deposit for<input name="service" required maxlength="200" placeholder="Enter service for this deposit"></label>';el('paid').value='';el('override_reason').value='';el('override_reason').required=false;el('service').addEventListener('input',chooseService);fees();clearReceipt();return;}
     if(basketMode()){
       configuredServices=[];service={name:rfMode()?'R/F departmental services':drfMode()?'DRF pharmacy items':'Over-head services'};
       field.innerHTML='<span>Service paid for</span><input type="hidden" name="service" value="Catalogue items"><div data-overhead-picker></div>';

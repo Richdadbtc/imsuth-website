@@ -104,7 +104,7 @@ class RecordedPayment(TimeStampedModel):
     rf_breakdown = models.JSONField(default=dict, blank=True)
     drf_breakdown = models.JSONField(default=dict, blank=True)
     overhead_breakdown = models.JSONField(default=dict, blank=True)
-    SUB_HEAD_CHOICES = [('overhead','Over-head'),('rf','R/F'),('drf','DRF')]
+    SUB_HEAD_CHOICES = [('overhead','Over-head'),('rf','R/F'),('drf','DRF'),('deposit','Deposit')]
     sub_head = models.CharField(max_length=16, choices=SUB_HEAD_CHOICES, blank=True, default='')
     patient_type = models.CharField(max_length=16, default='regular', choices=[('regular','Regular'),('nhis','NHIS'),('imshia','IMSHIA')])
     base_total = models.DecimalField(max_digits=19, decimal_places=2, null=True, blank=True)

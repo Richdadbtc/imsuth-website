@@ -48,6 +48,7 @@ class CaptureInput(serializers.Serializer):
         if data['sub_head']=='rf' and (data['rf_department'] or data['rf_items']):
             if not department_catalogue(data['rf_department']) or not data['rf_items'] or data['service'] or data['quantity']!=1:raise serializers.ValidationError({'rf_items':'Select an R/F service department and its services.'})
         elif data['sub_head']!='rf' and (data['rf_items'] or data['rf_department']):raise serializers.ValidationError({'rf_items':'These services apply only to R/F.'})
+        if data['sub_head']=='deposit' and (data['service'] or data['quantity']!=1 or not data['service_description'].strip() or 'base_amount' not in data):raise serializers.ValidationError({'service_description':'Enter the service and deposit amount. Deposits use quantity 1.'})
         return data
 
     rf_department = serializers.CharField(required=False,default='',allow_blank=True,max_length=100)
@@ -140,6 +141,7 @@ class RecordPaymentView(APIView):
                 basket_mode=data['sub_head'] in {'overhead','drf'} or (data['sub_head']=='rf' and bool(data['rf_items']))
                 drf=data['sub_head']=='drf';rf=data['sub_head']=='rf' and bool(data['rf_items'])
                 breakdown=(price_drf(data['drf_items'],data['patient_type']) if drf else price_basket(data['rf_items'] if rf else data['overhead_items'],data['patient_type'],department_catalogue(data['rf_department']) if rf else OVERHEAD_CATALOGUE)) if basket_mode else None
+                deposit=data['sub_head']=='deposit'
                 manual=not data['service']
                 if basket_mode:
                     service=None;base=Decimal(breakdown['base_total'])
@@ -155,10 +157,10 @@ class RecordPaymentView(APIView):
                     tariff=TariffVersion.objects.filter(service=service,is_approved=True,currency='NGN',effective_from__lte=now).filter(Q(effective_until__isnull=True)|Q(effective_until__gt=now)).order_by('-effective_from').first()
                     if not tariff:raise ValidationError('No approved current NGN tariff for this service.')
                     base=tariff.amount*data['quantity']
-                discount=(base*Decimal('0.10')).quantize(Decimal('0.01'),rounding=ROUND_HALF_UP) if data['patient_type']!='regular' else Decimal('0.00')
+                discount=(base*Decimal('0.10')).quantize(Decimal('0.01'),rounding=ROUND_HALF_UP) if data['patient_type']!='regular' and not deposit else Decimal('0.00')
                 approved=base-discount
                 if approved<=0:raise ValidationError('The discounted amount must be positive.')
-                if manual and data['amount']!=approved:raise ValidationError({'amount':'Amount must equal the full entered price less the applicable 10% discount.'})
+                if manual and data['amount']!=approved:raise ValidationError({'amount':'The payment amount must match the entered deposit amount.' if deposit else 'Amount must equal the full entered price less the applicable 10% discount.'})
                 order=None
                 if data['cash_order']:
                     if data['channel']!='cash':raise ValidationError({'cash_order':'Standing orders may be linked only to cash payments.'})
@@ -170,7 +172,7 @@ class RecordPaymentView(APIView):
                     if basket_mode:
                         for row in breakdown['items']:
                             InvoiceItem.objects.create(invoice=invoice,is_manual=True,service_code=('RF-' if rf else 'DRF-' if drf else 'OH-')+row['code'],description=row['description'],quantity=1,unit_amount=Decimal(row['net_amount']),currency='NGN')
-                    else:InvoiceItem.objects.create(invoice=invoice,is_manual=True,service_code='MANUAL',description=data['service_description'].strip(),quantity=1,unit_amount=approved,currency='NGN')
+                    else:InvoiceItem.objects.create(invoice=invoice,is_manual=True,service_code='DEPOSIT' if deposit else 'MANUAL',description=('Deposit toward: ' if deposit else '')+data['service_description'].strip(),quantity=1,unit_amount=approved,currency='NGN')
                 else:
                     if data['amount']!=approved and len(data['override_reason'].strip())<5:raise ValidationError('A price override requires a reason of at least five characters.')
                     invoice=Invoice.create_from_items(patient=patient,patient_name=patient_name,department=department,item_requests=[{'service':service,'quantity':data['quantity']}],created_by=request.user,idempotency_key='record:'+str(data['idempotency_key']),capture_total=data['amount'],capture_reason=data['override_reason'] or ('Patient type discount: '+data['patient_type'] if discount else ''))
@@ -186,7 +188,7 @@ class RecordPaymentView(APIView):
                 payment.cash_receiver=data['cash_receiver'];payment.submitted_reference=data['submitted_reference'];payment.reported_paid_at=data['reported_paid_at'];payment.remarks=data['remarks'];payment.save(update_fields=['cash_receiver','submitted_reference','reported_paid_at','remarks','updated_at'])
                 context=RecordedPayment.objects.create(idempotency_key=str(data['idempotency_key']),fingerprint=fingerprint,created_by=request.user,cash_point=point,cash_order=order,payment=payment,rf_breakdown=breakdown if rf else {},drf_breakdown=breakdown if drf else {},overhead_breakdown=breakdown if basket_mode and not drf and not rf else {},sub_head=data['sub_head'],patient_type=data['patient_type'],base_total=base,discount_total=discount,approved_total=approved,entered_total=data['amount'],override_reason=data['override_reason'])
                 AuditEvent.record('payment.recorded_at_point',actor=request.user,obj=payment,request=request,metadata={'sub_head':context.sub_head,'rf_breakdown':context.rf_breakdown,'drf_breakdown':context.drf_breakdown,'overhead_breakdown':context.overhead_breakdown,'cash_receiver':payment.cash_receiver,'cash_point':str(point.pk),'cash_order':str(order.pk) if order else None,'patient_type':data['patient_type'],'base_total':str(base),'discount_total':str(discount),'manual_service':manual,'service_description':data['service_description'] if manual else service.name,'approved_total':str(approved),'entered_total':str(data['amount']),'override_reason':data['override_reason']})
-                if (manual and not basket_mode) or (basket_mode and any(row.get('kind')=='editable' for row in breakdown['items'])) or approved!=data['amount']:
+                if (manual and not basket_mode and not deposit) or (basket_mode and any(row.get('kind')=='editable' for row in breakdown['items'])) or approved!=data['amount']:
                     Alert.objects.create(department=department,alert_type='service_price_change',severity='medium',description='Manual service and officer-entered full price require review.' if manual else 'Recorded payment differs from the approved tariff; review the recorded reason.',related_type='payments.Payment',related_id=str(payment.pk))
                 if data['payment_received']:
                     # The authenticated collection officer explicitly attests receipt of funds.

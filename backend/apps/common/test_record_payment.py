@@ -24,7 +24,7 @@ class RecordPaymentTests(TestCase):
     def test_sub_head_choices_are_required_validated_and_saved(self):
         from apps.auditlog.models import AuditEvent
         self.assertEqual(self.client.get('/api/v1/record-payment/').data['sub_heads'],[
-            {'value':'overhead','label':'Over-head'},{'value':'rf','label':'R/F'},{'value':'drf','label':'DRF'}])
+            {'value':'overhead','label':'Over-head'},{'value':'rf','label':'R/F'},{'value':'drf','label':'DRF'},{'value':'deposit','label':'Deposit'}])
         self.data.pop('sub_head')
         self.assertEqual(self.post().status_code,400)
         self.data['sub_head']='other';self.assertEqual(self.post().status_code,400)
