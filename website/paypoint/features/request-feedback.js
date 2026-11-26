@@ -31,14 +31,14 @@ export function showAccountCreated(host,account,{signal,refreshFailed=false}={})
   signal?.addEventListener('abort',close,{once:true});host.append(dialog);dialog.showModal();dialog.querySelector('button').focus();
 }
 
-export function showRequestError(host,{message,status}={}){
+export function showRequestError(host,{message,status,title}={}){
   let dialog=host.querySelector('[data-request-error-dialog]');
-  if(dialog){dialog.querySelector('[data-error-message]').textContent=message;return;}
+  if(dialog){dialog.querySelector('[data-error-message]').textContent=message;dialog.querySelector('h2').textContent=status===401?'Please sign in again':title||'Unable to complete request';return;}
   dialog=document.createElement('dialog');dialog.className='imsuth-account-created imsuth-request-error';dialog.dataset.requestErrorDialog='';
   dialog.setAttribute('aria-labelledby','request-error-title');dialog.setAttribute('aria-describedby','request-error-description');
   dialog.innerHTML='<span class="imsuth-error-icon" aria-hidden="true">!</span><h2 id="request-error-title">Unable to complete request</h2><p id="request-error-description" data-error-message></p><button type="button" class="button button-primary">Close</button>';
   dialog.querySelector('[data-error-message]').textContent=message||'Please try again.';
-  if(status===401)dialog.querySelector('h2').textContent='Please sign in again';
+  dialog.querySelector('h2').textContent=status===401?'Please sign in again':title||'Unable to complete request';
   const previous=document.activeElement;
   const close=()=>{if(dialog.open)dialog.close();dialog.remove();if(previous?.isConnected)previous.focus();};
   dialog.querySelector('button').addEventListener('click',close);
@@ -75,4 +75,25 @@ export function showPasswordReset(host,account,{reset,signal}={}){
     finally{busy=false;if(form.isConnected){form.removeAttribute('aria-busy');form.querySelectorAll('input').forEach(input=>input.readOnly=false);buttons.forEach(button=>button.disabled=false);buttons[0].textContent='Reset password';}}
   });
   host.append(dialog);dialog.showModal();form.elements.new_password.focus();
+}
+
+// Native form validation runs before submit; collect its errors in the same modal.
+export function bindFormErrorModal(form,showError,{signal}={}){
+  let queued=false;
+  const invalid=event=>{
+    event.preventDefault();if(queued)return;queued=true;
+    queueMicrotask(()=>{
+      queued=false;if(signal?.aborted||!form.isConnected)return;
+      const fields=[...form.elements].filter(field=>field.willValidate&&!field.validity.valid);
+      if(!fields.length)return;
+      fields[0].focus();
+      showError(fields.map(field=>{
+        const label=field.labels?.[0];
+        const name=label?.childNodes?[...label.childNodes].filter(node=>node.nodeType===3||node.nodeName==='SPAN').map(node=>node.textContent).join('').trim():label?.textContent?.trim();
+        return `${name||field.name||'Field'}: ${field.validationMessage}`;
+      }).join('\n'));
+    });
+  };
+  form.addEventListener('invalid',invalid,{capture:true,signal});
+  return()=>form.removeEventListener('invalid',invalid,true);
 }

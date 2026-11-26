@@ -1,7 +1,7 @@
 import {mountManualDrugPicker} from './manual-drug-picker.js';
 import {mountOverheadPicker} from './overhead-picker.js';
 import {beginRequest} from '../lib/request-state.js';
-import {logoLoadingMarkup,showAccountCreated,showPasswordReset} from './request-feedback.js';
+import {logoLoadingMarkup,showAccountCreated,showPasswordReset,showRequestError,bindFormErrorModal} from './request-feedback.js';
 import {mountReceiptPreview} from './receipt-preview.js';
 import {referenceRule,isSlipChannel,normalizeSlipReference,formatTransferReference} from '../lib/slip-reference.js';
 import {mountHospitalCatalogueSetup} from './catalogue-setup.js';
@@ -1783,20 +1783,25 @@ async function usersAndAudit() {
     form.reset();
     form.elements.namedItem('full_name').focus();
   });
+  const accountError=(message,status)=>{
+    q('[data-ua-message]').textContent=message;
+    showRequestError(document.body,{message,status,title:editing?'Unable to update account':'Unable to create account'});
+  };
+  bindFormErrorModal(form,accountError,{signal:abort.signal});
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const v = Object.fromEntries(new FormData(form));
     for (const key of ['full_name', 'username', 'email', 'phone']) v[key] = (v[key] || '').trim();
     const msg = q('[data-ua-message]');
     if (!v.full_name || !v.username || !v.email || !roles[v.role]) {
-      msg.textContent = 'Complete the required fields.';
+      accountError('Complete the required fields.');
       return;
     }
     if (users.some(u => u.id !== editing && (u.username.toLowerCase() === v.username.toLowerCase() || u.email.toLowerCase() === v.email.toLowerCase()))) {
-      msg.textContent = 'A user already has that username or email.';
+      accountError('A user already has that username or email.');
       return;
     }
-    if ((!editing&&!v.password)||v.password!==v.password_confirm) {msg.textContent='Enter a password and matching confirmation. When editing, leave both blank to keep the existing password.';return;}
+    if ((!editing&&!v.password)||v.password!==v.password_confirm) {accountError('Enter a password and matching confirmation. When editing, leave both blank to keep the existing password.');return;}
     const existing = users.find(u => u.id === editing),
       record = {
         full_name: v.full_name,
@@ -1838,7 +1843,7 @@ async function usersAndAudit() {
         if(creating&&!abort.signal.aborted)showAccountCreated(content,{...saved,username:saved?.username||body.username,full_name:saved?.full_name||v.full_name},{signal:abort.signal,refreshFailed});
         else if(refreshFailed&&msg.isConnected)msg.textContent='Account saved, but the list could not refresh. Reload to see the changes.';
       } catch (error) {
-        msg.textContent = error.message;
+        if(!abort.signal.aborted)accountError(error.message,error.status);
       } finally {
         button.disabled = false;button.textContent=buttonLabel;form.removeAttribute('aria-busy');finishAccount();
       }
