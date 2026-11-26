@@ -39,7 +39,7 @@ if(unsafe&&!csrfRetried&&response.status===403&&/^CSRF Failed:/i.test(body?.deta
 export async function api(path,options={}) {
   const method=(options.method||'GET').toUpperCase(),writing=!['GET','HEAD','OPTIONS'].includes(method);
   const account=/^users\/(?:[0-9]+\/)?$/.test(path);
-  const finish=beginRequest(account&&writing?(method==='POST'?'Creating account…':'Updating account…'):writing?'Saving changes…':'Waiting for server response…',writing?1:0);
+  const finish=beginRequest(/^users\/\d+\/reset-password\/$/.test(path)?'Resetting password…':account&&writing?(method==='POST'?'Creating account…':'Updating account…'):writing?'Saving changes…':'Waiting for server response…',writing?1:0);
   try{
   return await withDeadline(async signal=>{
   const response=await request(path,{...options,signal});

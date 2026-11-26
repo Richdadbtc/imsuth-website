@@ -478,6 +478,30 @@ class UsersViewSet(StaffViewSet):
         AuditEvent.record('user.unbanned',actor=request.user,obj=target,request=request)
         return Response(self.get_serializer(target).data)
 
+    @action(detail=True,methods=['post'],url_path='reset-password')
+    @transaction.atomic
+    def reset_password(self,request,pk=None):
+        from django.contrib.auth.password_validation import validate_password
+        from django.core.exceptions import ValidationError as PasswordError
+        from apps.accounts.lifecycle import revoke_sessions
+        target=self.get_object()
+        if target.pk==request.user.pk:raise ValidationError('Use Change Password to change your own password.')
+        class ResetInput(serializers.Serializer):
+            new_password=serializers.CharField(write_only=True,max_length=4096,trim_whitespace=False)
+            confirm_password=serializers.CharField(write_only=True,max_length=4096,trim_whitespace=False)
+        data=ResetInput(data=request.data);data.is_valid(raise_exception=True)
+        password=data.validated_data['new_password']
+        if password!=data.validated_data['confirm_password']:raise ValidationError({'confirm_password':'Passwords do not match.'})
+        target=User.objects.select_for_update().get(pk=target.pk)
+        if target.deleted_at:raise ValidationError('Deleted accounts cannot be changed.')
+        try:validate_password(password,target)
+        except PasswordError as error:raise ValidationError({'new_password':error.messages}) from error
+        target.set_password(password);target.must_change_password=True
+        target.save(update_fields=['password','must_change_password'])
+        revoke_sessions(target)
+        AuditEvent.record('user.password_reset',actor=request.user,obj=target,request=request)
+        return Response({'id':target.pk,'username':target.username,'detail':'Password reset successfully.'})
+
     @transaction.atomic
     def perform_update(self,serializer):
         before=serializer.instance.role

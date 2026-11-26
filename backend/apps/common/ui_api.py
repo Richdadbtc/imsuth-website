@@ -107,7 +107,7 @@ class StaffSerializer(serializers.ModelSerializer):
             instance.must_change_password = True
         user=super().update(instance, data)
         if profile is not None:AccountProfile.objects.update_or_create(user=user,defaults=profile)
-        if not user.is_active or previous_access!=(user.role,user.page_access):revoke_sessions(user)
+        if password or not user.is_active or previous_access!=(user.role,user.page_access):revoke_sessions(user)
         return user
 
 
