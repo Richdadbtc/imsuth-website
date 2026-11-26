@@ -1,19 +1,33 @@
 /* Same-origin vanilla ES6 helpers. Financial totals come from the server. */
 import {api} from '../lib/api.js';
+import {defaultOverviewDates,overviewDateQuery} from '../lib/overview-dates.js';
 export const requestKey = () => crypto.randomUUID();
 export async function submitJSON(path, body, method='POST') {
   return api(path,{method,body:JSON.stringify(body)});
 }
-export async function refreshOverview(root,escapeHtml,moneyWhole) {
-  const select=root.querySelector('[data-overview-period]');let sequence=0;
+export async function refreshOverview(root,escapeHtml,moneyWhole,user={}) {
+  const select=root.querySelector('[data-overview-period]'),filters=root.querySelector('[data-overview-dates]');let sequence=0,controller;
+  const resetDates=()=>{if(filters){const dates=defaultOverviewDates();filters.elements.date_from.value=dates.date_from;filters.elements.date_to.value=dates.date_to;}};resetDates();
   const names={pos:'POS/card',bank_transfer:'POS transfer',bank_teller:'Bank teller',ussd:'USSD',cash:'Cash',online:'Online gateway'};
   const colours={pos:'var(--source-pos)',bank_transfer:'var(--source-transfer)',bank_teller:'var(--source-teller)',ussd:'var(--source-ussd)',cash:'var(--source-cash)',online:'#7089a6'};
   const refresh=async()=>{
-    const current=++sequence,period=select.value==='1'?'today':select.value,query='?period='+encodeURIComponent(period);
+    let query;
+    try{query=filters?'?'+overviewDateQuery({date_from:filters.elements.date_from.value,date_to:filters.elements.date_to.value}):'?period='+encodeURIComponent(select.value==='1'?'today':select.value);if(filters)filters.querySelector('[data-overview-date-error]').textContent='';}
+    catch(error){filters.querySelector('[data-overview-date-error]').textContent=error.message;window.dispatchEvent(new CustomEvent('paypoint-request-error',{detail:{message:error.message}}));return;}
+    const current=++sequence;controller?.abort();controller=new AbortController();const options={signal:controller.signal};
     const active=()=>current===sequence&&root.isConnected;
     root.querySelector('[data-overview-kpis]').textContent='Loading collection summary…';
+    const staffMoney=value=>Number(value).toLocaleString('en-NG',{style:'currency',currency:'NGN',minimumFractionDigits:2,maximumFractionDigits:2});
+    const staffHolder=root.querySelector('[data-overview-staff]');
+    if(staffHolder&&['super_admin','auditor'].includes(user.role)){
+      staffHolder.textContent='Loading staff collections…';
+      api('dashboard/collections-by-staff/'+query,options).then(data=>{
+        if(!active())return;
+        staffHolder.innerHTML=`<div class="table-wrap"><table class="overview-staff-table"><caption>Collections from ${escapeHtml(data.period.start||'the beginning')} to ${escapeHtml(data.period.end)} (Africa/Lagos, inclusive)</caption><thead><tr><th>Staff</th><th>Username</th><th>Payments</th><th>Cash</th><th>POS/card</th><th>POS transfer</th><th>Other channels</th><th>Total received</th></tr></thead><tbody>${data.staff.map(row=>`<tr><td>${escapeHtml(row.name)}</td><td>${escapeHtml(row.username)}</td><td>${row.transactions}</td><td>${staffMoney(row.channels.cash||0)}</td><td>${staffMoney(row.channels.pos||0)}</td><td>${staffMoney(row.channels.bank_transfer||0)}</td><td>${staffMoney(row.other_amount)}</td><td><strong>${staffMoney(row.amount)}</strong></td></tr>`).join('')||'<tr><td colspan="8">No staff collections found.</td></tr>'}</tbody><tfoot><tr><th colspan="2">Total</th><td>${data.transactions}</td><td colspan="4"></td><th>${staffMoney(data.amount)}</th></tr></tfoot></table></div><p>${escapeHtml(data.note)}</p>`;
+      }).catch(error=>{if(active())staffHolder.textContent='Staff collections unavailable: '+error.message;});
+    }
     try{
-      const [summary,channels,departments,alerts]=await Promise.all(['summary','collections-by-channel','collections-by-department','alerts-summary'].map(metric=>api('dashboard/'+metric+'/'+query)));
+      const [summary,channels,departments,alerts]=await Promise.all(['summary','collections-by-channel','collections-by-department','alerts-summary'].map(metric=>api('dashboard/'+metric+'/'+query,options)));
       if(!active())return;
       const total=Number(summary.verified_collections),percent=amount=>(total?Number(amount)/total*100:0).toFixed(1)+'%';
       const row=channel=>channels.find(r=>r.channel===channel);
@@ -26,7 +40,7 @@ export async function refreshOverview(root,escapeHtml,moneyWhole) {
       const maximum=Math.max(1,...departments.map(r=>Number(r.amount)));
       root.querySelector('[data-overview-departments]').innerHTML=departments.slice(0,8).map(r=>`<div class="source-department"><div><span>${escapeHtml(r.invoice__department__name)}</span><span>${moneyWhole(r.amount)}</span></div><div class="source-bar"><i data-chart-width="${Number(r.amount)/maximum*100}%" data-chart-background="var(--source-accent)"></i></div></div>`).join('')||'<p>No confirmed departmental collections in this period.</p>';
       try{
-        const coverage=await api('dashboard/overview-coverage/'+query);if(!active())return;
+        const coverage=await api('dashboard/overview-coverage/'+query,options);if(!active())return;
         const reconciled=coverage.reconciliation;
         cards[8]=['Unmatched',moneyWhole(reconciled.unmatched_amount),(reconciled.unmatched+reconciled.pending)+' statement rows','unmatched'];renderCards();
         root.querySelector('[data-overview-reconciliation]').innerHTML=[['Matched',reconciled.matched,'var(--source-transfer)'],['Pending',reconciled.pending,'var(--source-cash)'],['Unmatched',reconciled.unmatched,'var(--source-bad)']].map(([label,count,colour])=>`<div class="source-reconciliation"><div><span>${label}</span><span>${count} of ${reconciled.total}</span></div><progress value="${count}" max="${Math.max(1,reconciled.total)}" aria-label="${label}" data-chart-colour="${colour}"></progress></div>`).join('')+`<p class="source-label">${reconciled.aged_unmatched} unresolved statement rows are older than 1 day.</p>`;
@@ -38,7 +52,7 @@ export async function refreshOverview(root,escapeHtml,moneyWhole) {
       }catch(error){if(!active())return;cards[8][1]='Unavailable';renderCards();root.querySelector('[data-overview-daily]').textContent='Daily collections unavailable: '+error.message;root.querySelector('[data-overview-reconciliation]').textContent='Reconciliation unavailable: '+error.message;}
     }catch(error){if(active()){root.querySelector('[data-overview-kpis]').textContent='Collection data unavailable.';root.querySelector('.overview-preview-note').textContent=error.message;}}
   };
-  select.addEventListener('change',refresh);await refresh();
+  if(filters){filters.addEventListener('submit',event=>{event.preventDefault();refresh();});filters.querySelector('[data-overview-reset]').addEventListener('click',()=>{resetDates();refresh();});}else select.addEventListener('change',refresh);await refresh();
 }
 
 export function watchPaymentStatus(id, isActive, onChange, holder) {

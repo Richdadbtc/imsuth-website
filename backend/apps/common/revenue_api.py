@@ -382,6 +382,21 @@ class DepartmentDeskViewSet(viewsets.GenericViewSet):
 class RevenueDashboardView(APIView):
     permission_classes=[permissions.IsAuthenticated]
     def get(self,request,metric='summary'):
+        if metric=='collections-by-staff':
+            if request.user.role not in {'super_admin','auditor'}:
+                raise PermissionDenied('Only administrators and auditors may view collections by staff.')
+            payments=dated(Payment.objects.filter(currency='NGN',status='confirmed'),request.query_params,'confirmed_at')
+            grouped=list(payments.values('initiated_by_id','channel').annotate(amount=Sum('amount'),transactions=Count('pk')).order_by('initiated_by_id','channel'))
+            totals={}
+            for row in grouped:
+                staff=totals.setdefault(row['initiated_by_id'],{'amount':Decimal('0'),'transactions':0,'channels':{}})
+                staff['amount']+=row['amount'];staff['transactions']+=row['transactions'];staff['channels'][row['channel']]=row['amount']
+            users=User.objects.filter(Q(role='cashier',deleted_at__isnull=True)|Q(pk__in=totals)).order_by('first_name','last_name','username')
+            rows=[{'id':user.pk,'name':user.get_full_name() or user.username,'username':user.username,**totals.get(user.pk,{'amount':Decimal('0'),'transactions':0,'channels':{}})} for user in users]
+            for row in rows:row['other_amount']=sum((amount for channel,amount in row['channels'].items() if channel not in {'cash','pos','bank_transfer'}),Decimal('0'))
+            rows.sort(key=lambda row:row['amount'],reverse=True)
+            start,end=date_range(request.query_params)
+            return Response({'currency':'NGN','period':{'start':start,'end':end},'staff':rows,'amount':sum((row['amount'] for row in rows),Decimal('0')),'transactions':sum(row['transactions'] for row in rows),'note':'Confirmed NGN payments by collection officer and confirmation date (Africa/Lagos). Includes deposits; excludes pending, failed, refunded and reversed payments.'})
         if metric=='cashier':
             if request.user.role not in {'cashier','finance','super_admin'}:
                 raise PermissionDenied('Only cashiers and finance administrators can view this dashboard.')
