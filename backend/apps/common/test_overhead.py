@@ -20,7 +20,7 @@ class OverheadPaymentTests(TestCase):
 
     def test_catalogue_fixed_prices_multiple_lines_zero_item_and_idempotency(self):
         setup=self.client.get('/api/v1/record-payment/').data
-        self.assertEqual(len(setup['overhead_catalogue']['items']),57)
+        self.assertEqual(len(setup['overhead_catalogue']['items']),59)
         self.data.update(overhead_items=[{'code':'consultation'},{'code':'folder'},{'code':'report_staff'}],amount='2500')
         result=self.post();self.assertEqual(result.status_code,201,result.data)
         context=RecordedPayment.objects.get();items=list(context.payment.invoice.items.all())
@@ -89,3 +89,15 @@ class OverheadPaymentTests(TestCase):
         for row in [{'code':'operation_others'},{'code':'operation_others','unit_amount':'0'},{'code':'operation_others','unit_amount':'-1'}]:
             self.data.update(overhead_items=[row],idempotency_key=str(uuid4()))
             self.assertEqual(self.post().status_code,400)
+
+    def test_anc_registration_packages_have_correct_totals_and_receipt_breakdowns(self):
+        for code,total,parts in [('anc_registration_new','5250',['ANC NGN 2750','Consultation NGN 1000','Folder NGN 1000','DDM NGN 500']),('anc_registration_old','4250',['ANC NGN 2750','Consultation NGN 1000','DDM NGN 500'])]:
+            self.data.update(overhead_items=[{'code':code}],amount=total,idempotency_key=str(uuid4()))
+            response=self.post();self.assertEqual(response.status_code,201,response.data)
+            context=RecordedPayment.objects.get(payment_id=response.data['payment']['id'])
+            self.assertEqual(context.payment.amount,Decimal(total))
+            printed=self.client.get(f'/api/v1/receipts/{context.payment.receipt.pk}/print/')
+            for part in parts:self.assertContains(printed,part)
+            if code.endswith('_old'):self.assertNotContains(printed,'Folder NGN 1000')
+        self.data.update(patient_type='nhis',overhead_items=[{'code':'anc_registration_new'}],amount='4725',idempotency_key=str(uuid4()))
+        response=self.post();self.assertEqual(response.status_code,201,response.data)

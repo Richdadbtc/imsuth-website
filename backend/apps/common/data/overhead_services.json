@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-26.3",
+  "version": "2026-11-26.4",
   "items": [
     {
       "group": "Medical certificate",
@@ -376,6 +376,24 @@
       "kind": "fixed",
       "unit": "unit",
       "amount": "2750"
+    },
+    {
+      "group": "ANC registration",
+      "code": "anc_registration_new",
+      "name": "ANC registration \u2014 new patients",
+      "description": "ANC registration \u2014 new patients: ANC NGN 2750; Consultation NGN 1000; Folder NGN 1000; DDM NGN 500",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "5250"
+    },
+    {
+      "group": "ANC registration",
+      "code": "anc_registration_old",
+      "name": "ANC registration \u2014 old patients",
+      "description": "ANC registration \u2014 old patients: ANC NGN 2750; Consultation NGN 1000; DDM NGN 500",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "4250"
     },
     {
       "group": "Admission fee",

@@ -34,7 +34,7 @@ def price_basket(selections,patient_type,catalogue=CATALOGUE):
             if 'unit_amount' in selection and selection['unit_amount']!=unit:raise serializers.ValidationError(f'Fixed {label} prices cannot be changed.')
         amount=unit*quantity
         if item['kind']=='tiered':amount=unit+Decimal(item['subsequent_amount'])*(quantity-1)
-        description=item['name']+(f" — {quantity} {item['unit']}{'s' if quantity!=1 else ''}" if quantity>1 or item['unit']!='unit' else '')
+        description=item.get('description',item['name'])+(f" — {quantity} {item['unit']}{'s' if quantity!=1 else ''}" if quantity>1 or item['unit']!='unit' else '')
         if item['kind']=='tiered':description+=f" (first day {unit}; subsequent {item['subsequent_amount']})"
         lines.append({'code':code,'kind':item['kind'],'name':item['name'],'description':description,'source_rate':item.get('source_rate'),'source_number':item.get('source_number'),'quantity':quantity,'unit':item['unit'],'unit_amount':str(unit),'gross_amount':str(amount.quantize(CENT))})
     if not lines:raise serializers.ValidationError({error_field:f'Add at least one {label} item.'})
