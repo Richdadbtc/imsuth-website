@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-24.2",
+  "version": "2026-11-26.1",
   "items": [
     {
       "group": "Medical certificate",
@@ -230,10 +230,10 @@
     {
       "group": "Admission fee",
       "code": "admission_utility",
-      "name": "Utility",
+      "name": "Utility general ward",
       "kind": "fixed",
       "unit": "unit",
-      "amount": "1500"
+      "amount": "200"
     },
     {
       "group": "Admission fee",
@@ -273,7 +273,7 @@
       "name": "Dr. Care ward",
       "kind": "fixed",
       "unit": "unit",
-      "amount": "1000"
+      "amount": "2000"
     },
     {
       "group": "Admission fee",
@@ -299,6 +299,14 @@
       "unit": "day",
       "amount": "6000",
       "subsequent_amount": "3000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "nursing_ward",
+      "name": "Nursing care ward",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "1500"
     },
     {
       "group": "Admission fee",
@@ -354,7 +362,7 @@
       "name": "ANC",
       "kind": "fixed",
       "unit": "unit",
-      "amount": "5250"
+      "amount": "2750"
     },
     {
       "group": "Admission fee",
@@ -426,6 +434,14 @@
       "kind": "fixed",
       "unit": "unit",
       "amount": "3000"
+    },
+    {
+      "group": "Admission fee",
+      "code": "ddm",
+      "name": "DDM",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "500"
     }
   ]
 }
