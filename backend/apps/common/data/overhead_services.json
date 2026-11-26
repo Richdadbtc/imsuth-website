@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-26.1",
+  "version": "2026-11-26.2",
   "items": [
     {
       "group": "Medical certificate",
@@ -149,43 +149,49 @@
       "group": "Operation fees",
       "code": "operation_minor",
       "name": "Operation fee \u2014 minor",
-      "kind": "editable",
-      "unit": "unit"
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "20600"
     },
     {
       "group": "Operation fees",
       "code": "operation_intermediate",
       "name": "Operation fee \u2014 intermediate",
-      "kind": "editable",
-      "unit": "unit"
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "40600"
     },
     {
       "group": "Operation fees",
       "code": "operation_major",
       "name": "Operation fee \u2014 major",
-      "kind": "editable",
-      "unit": "unit"
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "75000"
     },
     {
       "group": "Operation fees",
       "code": "operation_super_major",
       "name": "Operation fee \u2014 super major",
-      "kind": "editable",
-      "unit": "unit"
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "95000"
     },
     {
       "group": "Operation fees",
       "code": "operation_elective",
-      "name": "Operation fee \u2014 elective",
-      "kind": "editable",
-      "unit": "unit"
+      "name": "C/S booked",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "75000"
     },
     {
       "group": "Operation fees",
       "code": "operation_unbooked",
-      "name": "Operation fee \u2014 unbooked",
-      "kind": "editable",
-      "unit": "unit"
+      "name": "C/S unbooked",
+      "kind": "fixed",
+      "unit": "unit",
+      "amount": "95000"
     },
     {
       "group": "Admission fee",
