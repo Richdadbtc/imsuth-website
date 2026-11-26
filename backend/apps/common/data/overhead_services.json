@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-26.2",
+  "version": "2026-11-26.3",
   "items": [
     {
       "group": "Medical certificate",
@@ -192,6 +192,13 @@
       "kind": "fixed",
       "unit": "unit",
       "amount": "95000"
+    },
+    {
+      "group": "Operation fees",
+      "code": "operation_others",
+      "name": "Operation fee \u2014 OTHERS",
+      "kind": "editable",
+      "unit": "unit"
     },
     {
       "group": "Admission fee",

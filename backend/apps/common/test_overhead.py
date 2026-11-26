@@ -20,7 +20,7 @@ class OverheadPaymentTests(TestCase):
 
     def test_catalogue_fixed_prices_multiple_lines_zero_item_and_idempotency(self):
         setup=self.client.get('/api/v1/record-payment/').data
-        self.assertEqual(len(setup['overhead_catalogue']['items']),56)
+        self.assertEqual(len(setup['overhead_catalogue']['items']),57)
         self.data.update(overhead_items=[{'code':'consultation'},{'code':'folder'},{'code':'report_staff'}],amount='2500')
         result=self.post();self.assertEqual(result.status_code,201,result.data)
         context=RecordedPayment.objects.get();items=list(context.payment.invoice.items.all())
@@ -78,3 +78,14 @@ class OverheadPaymentTests(TestCase):
         self.assertContains(printed,'C/S booked');self.assertContains(printed,'C/S unbooked');self.assertContains(printed,'20600')
         self.data.update(overhead_items=[{'code':'operation_minor','unit_amount':'1'}],amount='1',idempotency_key=str(uuid4()))
         self.assertEqual(self.post().status_code,400)
+
+    def test_other_operation_accepts_entered_price_and_receipts_it(self):
+        self.data.update(overhead_items=[{'code':'operation_others','unit_amount':'12345.67'}],amount='12345.67')
+        result=self.post();self.assertEqual(result.status_code,201,result.data)
+        context=RecordedPayment.objects.get()
+        self.assertEqual(context.payment.amount,Decimal('12345.67'))
+        printed=self.client.get(f'/api/v1/receipts/{context.payment.receipt.pk}/print/')
+        self.assertContains(printed,'Operation fee — OTHERS');self.assertContains(printed,'12345.67')
+        for row in [{'code':'operation_others'},{'code':'operation_others','unit_amount':'0'},{'code':'operation_others','unit_amount':'-1'}]:
+            self.data.update(overhead_items=[row],idempotency_key=str(uuid4()))
+            self.assertEqual(self.post().status_code,400)
