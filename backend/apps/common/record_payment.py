@@ -19,7 +19,7 @@ from apps.payments.models import Payment, Receipt
 from apps.payments.serializers import PaymentSerializer
 from apps.auditlog.models import AuditEvent
 from .rf import CATALOGUE as RF_CATALOGUE, department_catalogue
-from .drf import CATALOGUE as DRF_CATALOGUE
+from .drf import CATALOGUE as DRF_CATALOGUE, DRFSelection, price_drf
 from .overhead import CATALOGUE as OVERHEAD_CATALOGUE, OverheadSelection, price_basket
 from .models import Sequence, CashPoint, CashOrder, RecordedPayment, Alert
 from .revenue_api import scoped_cash_points, scoped_cash_orders, scoped, scoped_receipts
@@ -43,7 +43,7 @@ class CaptureInput(serializers.Serializer):
             if not data['overhead_items'] or data['service'] or data['quantity']!=1:raise serializers.ValidationError({'overhead_items':'Select Over-head services from the list.'})
         elif data['overhead_items']:raise serializers.ValidationError({'overhead_items':'These services apply only to Over-head.'})
         if data['sub_head']=='drf':
-            if not data['drf_items'] or data['service'] or data['quantity']!=1:raise serializers.ValidationError({'drf_items':'Select DRF pharmacy items from the list.'})
+            if not data['drf_items'] or data['service'] or data['quantity']!=1:raise serializers.ValidationError({'drf_items':'Enter drug names and prices.'})
         elif data['drf_items']:raise serializers.ValidationError({'drf_items':'These items apply only to DRF.'})
         if data['sub_head']=='rf' and (data['rf_department'] or data['rf_items']):
             if not department_catalogue(data['rf_department']) or not data['rf_items'] or data['service'] or data['quantity']!=1:raise serializers.ValidationError({'rf_items':'Select an R/F service department and its services.'})
@@ -52,7 +52,7 @@ class CaptureInput(serializers.Serializer):
 
     rf_department = serializers.CharField(required=False,default='',allow_blank=True,max_length=100)
     rf_items = OverheadSelection(many=True,required=False,default=list,allow_empty=True,max_length=250)
-    drf_items = OverheadSelection(many=True,required=False,default=list,allow_empty=True,max_length=322)
+    drf_items = DRFSelection(many=True,required=False,default=list,allow_empty=True,max_length=322)
     overhead_items = OverheadSelection(many=True,required=False,default=list,allow_empty=True,max_length=100)
     payment_received = serializers.BooleanField(default=False)
     patient = serializers.UUIDField(required=False,allow_null=True,default=None)
@@ -139,7 +139,7 @@ class RecordPaymentView(APIView):
                 patient_name=str(patient) if patient else data['patient_name'].strip()
                 basket_mode=data['sub_head'] in {'overhead','drf'} or (data['sub_head']=='rf' and bool(data['rf_items']))
                 drf=data['sub_head']=='drf';rf=data['sub_head']=='rf' and bool(data['rf_items'])
-                breakdown=price_basket(data['rf_items'] if rf else data['drf_items'] if drf else data['overhead_items'],data['patient_type'],department_catalogue(data['rf_department']) if rf else DRF_CATALOGUE if drf else OVERHEAD_CATALOGUE) if basket_mode else None
+                breakdown=(price_drf(data['drf_items'],data['patient_type']) if drf else price_basket(data['rf_items'] if rf else data['overhead_items'],data['patient_type'],department_catalogue(data['rf_department']) if rf else OVERHEAD_CATALOGUE)) if basket_mode else None
                 manual=not data['service']
                 if basket_mode:
                     service=None;base=Decimal(breakdown['base_total'])

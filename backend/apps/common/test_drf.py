@@ -51,3 +51,19 @@ class DRFPaymentTests(TestCase):
         self.assertEqual(context.drf_breakdown['items'][0]['unit_amount'],'250.50')
         self.assertEqual(context.payment.amount,Decimal('751.50'))
         self.assertEqual(context.drf_breakdown['items'][0]['gross_amount'],'751.50')
+
+    def test_typed_drug_names_prices_discount_and_receipt(self):
+        self.data.update(drf_items=[{'name':'Officer entered drug 500mg','quantity':2,'unit_amount':'1000.25'}],patient_type='nhis',amount='1800.45')
+        result=self.post();self.assertEqual(result.status_code,201,result.data)
+        context=RecordedPayment.objects.get();row=context.drf_breakdown['items'][0]
+        self.assertEqual(row['name'],'Officer entered drug 500mg')
+        self.assertEqual(row['gross_amount'],'2000.50');self.assertEqual(row['net_amount'],'1800.45')
+        printed=self.client.get(f'/api/v1/receipts/{context.payment.receipt.pk}/print/')
+        self.assertContains(printed,'Officer entered drug 500mg')
+        self.assertEqual(self.post().data['payment']['id'],result.data['payment']['id'])
+
+    def test_invalid_typed_drugs_cannot_create_payment(self):
+        before=Invoice.objects.count()
+        for items in [[{'name':' ','unit_amount':'1'}],[{'name':'X'*201,'unit_amount':'1'}],[{'name':'Drug','unit_amount':'0'}],[{'name':'Drug'}],[{'name':'Drug','code':'pharmacy_001','unit_amount':'1'}],[{'name':'Drug','unit_amount':'1'},{'name':'drug','unit_amount':'1'}]]:
+            self.data.update(drf_items=items,idempotency_key=str(uuid4()))
+            result=self.post();self.assertEqual(result.status_code,400,result.data);self.assertEqual(Invoice.objects.count(),before)

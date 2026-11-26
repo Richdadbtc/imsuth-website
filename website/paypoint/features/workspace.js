@@ -1,3 +1,4 @@
+import {mountManualDrugPicker} from './manual-drug-picker.js';
 import {mountOverheadPicker} from './overhead-picker.js';
 import {beginRequest} from '../lib/request-state.js';
 import {logoLoadingMarkup,showAccountCreated} from './request-feedback.js';
@@ -351,7 +352,7 @@ async function enhancedRecordPaymentPreview(capture) {
       if(rfMode()&&!el('rf_department').value){field.querySelector('[data-overhead-picker]').textContent='Select an R/F service department to see its services and prices.';el('paid').value='';fees();clearReceipt();return;}
       const rfDepartment=capture.rf_catalogue?.departments.find(d=>d.code===el('rf_department').value);
       const rfCatalogue=rfDepartment?{...capture.rf_catalogue,label:'R/F — '+rfDepartment.name,items:capture.rf_catalogue.items.filter(i=>i.department===rfDepartment.code)}:null;
-      basketPicker=mountOverheadPicker(field.querySelector('[data-overhead-picker]'),{catalogue:rfMode()?rfCatalogue:drfMode()?capture.drf_catalogue:capture.overhead_catalogue,escapeHtml,money,getPatientType:()=>el('category').value==='self_pay'?'regular':el('category').value,onChange:state=>{delete form.dataset.requestKey;delete form.dataset.lastPayment;el('paid').value=state.valid?(state.baseCents/100).toFixed(2):'';fees();clearReceipt();}});
+      basketPicker=(drfMode()?mountManualDrugPicker:mountOverheadPicker)(field.querySelector('[data-overhead-picker]'),{catalogue:rfMode()?rfCatalogue:drfMode()?capture.drf_catalogue:capture.overhead_catalogue,escapeHtml,money,getPatientType:()=>el('category').value==='self_pay'?'regular':el('category').value,onChange:state=>{delete form.dataset.requestKey;delete form.dataset.lastPayment;el('paid').value=state.valid?(state.baseCents/100).toFixed(2):'';fees();clearReceipt();}});
       return;
     }
     field.innerHTML='<label>Service paid for'+(configuredServices.length?`<select name="service" required><option value="">Select service</option>${configuredServices.map(row=>`<option value="${escapeHtml(row.id)}" ${row.amount==null?'disabled':''}>${escapeHtml(row.name)} — ${row.amount==null?'No approved price':money(row.amount)}</option>`).join('')}</select>`:`<input name="service" required maxlength="200" placeholder="${el('department').value?'Enter service paid for':'Select department first'}" ${el('department').value?'':'disabled'}>`)+'</label>';
@@ -381,7 +382,7 @@ async function enhancedRecordPaymentPreview(capture) {
   updateServiceField();
   el('rf_department').addEventListener('change',()=>{delete form.dataset.requestKey;delete form.dataset.lastPayment;updateServiceField();});
   el('sub_head').addEventListener('change',()=>{el('rf_department').value='';updateServiceField();});
-  el('category').addEventListener('change',()=>{fees();clearReceipt();});
+  el('category').addEventListener('change',()=>{basketPicker?.refresh?.();fees();clearReceipt();});
   el('quantity').addEventListener('input', () => {
     fees();
     el('override_reason').required=false;
