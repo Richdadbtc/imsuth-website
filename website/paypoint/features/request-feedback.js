@@ -6,12 +6,14 @@ export function mountRequestFeedback(host=document.body){
   panel.setAttribute('role','status');panel.setAttribute('aria-live','polite');panel.setAttribute('aria-atomic','true');
   panel.innerHTML=logoLoadingMarkup+'<span data-request-label></span>';host.append(panel);
   let timer=null;
+  const showError=event=>showRequestError(host,event.detail);
+  window.addEventListener('paypoint-request-error',showError);
   const stop=subscribeRequests(state=>{
     if(!state.pending){clearTimeout(timer);timer=null;panel.hidden=true;return;}
     panel.querySelector('[data-request-label]').textContent=state.label;
-    if(timer===null&&panel.hidden)timer=setTimeout(()=>{timer=null;panel.hidden=false;},180);
+    if(timer===null&&panel.hidden)timer=setTimeout(()=>{timer=null;panel.hidden=false;},0);
   });
-  return()=>{stop();clearTimeout(timer);panel.remove();};
+  return()=>{stop();clearTimeout(timer);window.removeEventListener('paypoint-request-error',showError);host.querySelector('[data-request-error-dialog]')?.remove();panel.remove();};
 }
 
 export function showAccountCreated(host,account,{signal,refreshFailed=false}={}){
@@ -27,4 +29,19 @@ export function showAccountCreated(host,account,{signal,refreshFailed=false}={})
   dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
   if(signal?.aborted)return;
   signal?.addEventListener('abort',close,{once:true});host.append(dialog);dialog.showModal();dialog.querySelector('button').focus();
+}
+
+export function showRequestError(host,{message,status}={}){
+  let dialog=host.querySelector('[data-request-error-dialog]');
+  if(dialog){dialog.querySelector('[data-error-message]').textContent=message;return;}
+  dialog=document.createElement('dialog');dialog.className='imsuth-account-created imsuth-request-error';dialog.dataset.requestErrorDialog='';
+  dialog.setAttribute('aria-labelledby','request-error-title');dialog.setAttribute('aria-describedby','request-error-description');
+  dialog.innerHTML='<span class="imsuth-error-icon" aria-hidden="true">!</span><h2 id="request-error-title">Unable to complete request</h2><p id="request-error-description" data-error-message></p><button type="button" class="button button-primary">Close</button>';
+  dialog.querySelector('[data-error-message]').textContent=message||'Please try again.';
+  if(status===401)dialog.querySelector('h2').textContent='Please sign in again';
+  const previous=document.activeElement;
+  const close=()=>{if(dialog.open)dialog.close();dialog.remove();if(previous?.isConnected)previous.focus();};
+  dialog.querySelector('button').addEventListener('click',close);
+  dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
+  host.append(dialog);dialog.showModal();dialog.querySelector('button').focus();
 }

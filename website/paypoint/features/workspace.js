@@ -2019,6 +2019,7 @@ const pages = {
 };
 
 async function render(page) {
+  setBusy();
   if(page==='dashboard'&&!canAccessPage(user,page)){navigate(firstAccessiblePage(user));return;}
   try {
     const fresh=await api('session/?page='+encodeURIComponent(page));
@@ -2027,7 +2028,6 @@ async function render(page) {
   if(!canAccessPage(user,page)){showError({status:403,message:'Your administrator has not granted access to this page.'});return;}
 
   if (!pages[page]) {content.innerHTML='<div class="api-error"><h1>Page not found</h1><p>Select a page from the navigation.</p></div>';return;}
-  setBusy();
   try {await pages[page]();} catch(error) {if(!abort.signal.aborted)showError(error);}
 }
 content.addEventListener('click', event=>{

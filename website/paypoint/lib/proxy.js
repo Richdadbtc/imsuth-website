@@ -1,6 +1,9 @@
-import {request as httpRequest} from 'node:http';
-import {request as httpsRequest} from 'node:https';
+import {Agent as HttpAgent,request as httpRequest} from 'node:http';
+import {Agent as HttpsAgent,request as httpsRequest} from 'node:https';
 import {Readable} from 'node:stream';
+
+const httpAgent=new HttpAgent({keepAlive:true,maxSockets:32,maxFreeSockets:8,timeout:30000});
+const httpsAgent=new HttpsAgent({keepAlive:true,maxSockets:32,maxFreeSockets:8,timeout:30000});
 
 // Stream responses and preserve individual cookies through the server-side proxy.
 export function nodeTransport(url,options) {
@@ -8,7 +11,7 @@ export function nodeTransport(url,options) {
     const parsed=new URL(url),send=parsed.protocol==='https:'?httpsRequest:httpRequest;
     const headersOut=Object.fromEntries(options.headers);
     if(!['GET','HEAD'].includes(options.method))headersOut['Content-Length']=String(options.body?.byteLength??0);
-    const upstream=send(parsed,{method:options.method,headers:headersOut,signal:options.signal},incoming=>{
+    const upstream=send(parsed,{method:options.method,headers:headersOut,signal:options.signal,agent:parsed.protocol==='https:'?httpsAgent:httpAgent},incoming=>{
       const headers=new Headers();
       for(let i=0;i<incoming.rawHeaders.length;i+=2)headers.append(incoming.rawHeaders[i],incoming.rawHeaders[i+1]);
       const status=incoming.statusCode;
