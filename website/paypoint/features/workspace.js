@@ -1,5 +1,6 @@
 import {mountManualDrugPicker} from './manual-drug-picker.js';
 import {mountOverheadPicker} from './overhead-picker.js';
+import {loadAuditPage} from '../lib/audit-pages.js';
 import {beginRequest} from '../lib/request-state.js';
 import {logoLoadingMarkup,showAccountCreated,showPasswordReset,showRequestError,bindFormErrorModal} from './request-feedback.js';
 import {mountReceiptPreview} from './receipt-preview.js';
@@ -13,7 +14,7 @@ import {navigationPage,canAccessPage,firstAccessiblePage} from '../lib/navigatio
 export function mountWorkspace(content, {user,navigate,onSignedOut,onProfileSaved,onUnreadCount}) {
 const abort = new AbortController();
 mountReceiptPreview(content,abort.signal);
-const api = (path, options={}) => request(path, {...options, signal:abort.signal});
+const api = (path, options={}) => request(path, {...options, signal:options.signal?AbortSignal.any([abort.signal,options.signal]):abort.signal});
 const session = {authenticated:true,user:{...user,permissions:{...user.permissions}}};
 let activeRows=[];
 const chartAttributes = {'data-chart-background':'background','data-chart-colour':'--department-colour','data-chart-width':'width','data-chart-height':'height'};
@@ -1518,7 +1519,7 @@ async function alertsPage() {
       items = [],
       page = 1;
     do {
-      data = await api(`${resource}/?period=all&page=${page++}`);
+      data = await api(`${resource}/?period=all&page_size=100&page=${page++}`);
       items.push(...list(data));
     } while (data.next);
     return items;
@@ -1708,14 +1709,10 @@ async function usersAndAudit() {
     } while (data.next);
     return rows;
   };
-  const users = (await loadAll('users')).map((u, i) => ({
-    ...u,
-    username: u.username || `staff${i + 1}`
-  }));
-  const logs = await loadAll('audit-logs');
-  const roles = Object.fromEntries(list(await api('users/role_choices/')).map(r=>[r.value,r.label]));
-  const pageChoices=await api('users/page_choices/');
-  const departmentRecords = await loadAll('departments');
+  const [userRows,roleRows,pageChoices,departmentRecords]=await Promise.all([loadAll('users'),api('users/role_choices/'),api('users/page_choices/'),loadAll('departments')]);
+  const users=userRows.map((u,i)=>({...u,username:u.username||`staff${i+1}`}));
+  const roles=Object.fromEntries(list(roleRows).map(r=>[r.value,r.label]));
+  let logs=[],auditPage=1,auditCount=null,auditNext=false,auditPrevious=false,auditLoading=true,auditError='',auditSequence=0,auditController;
   const departments = departmentRecords.map(d => String(d.id));
   const departmentName = v => departmentRecords.find(d => String(d.id) === String(v))?.name || v || '—';
   let editing = null,
@@ -1749,24 +1746,23 @@ async function usersAndAudit() {
   q('[data-ua-access-clear]').onclick=()=>{form.elements.page_access_mode.value='custom';drawPageChoices([]);};
   drawPageChoices();
   const filtered = () => users.filter(u => (!filters.search || [u.full_name, u.email, u.username].join(' ').toLowerCase().includes(filters.search.toLowerCase())) && (!filters.role || u.role === filters.role) && (!filters.status || (filters.status==='banned'?Boolean(u.banned_at):filters.status==='restricted'?u.is_active&&u.page_access!==null&&u.page_access!==undefined:u.is_active===(filters.status==='active'))));
-  const periodLogs = () => {
-    const today = new Date().toLocaleDateString('en-CA', {
-        timeZone: 'Africa/Lagos'
-      }),
-      cut = new Date(today + 'T00:00:00+01:00');
-    cut.setDate(cut.getDate() - (Number(days) - 1));
-    return logs.filter(l => days === 'all' || new Date(l.created_at) >= cut);
-  };
+  const periodLogs=()=>logs;
   function render() {
     const found = filtered(),
       audit = periodLogs();
     page = Math.min(page, Math.ceil(found.length / 10) || 1);
-    q('[data-ua-kpis]').innerHTML = [['Total Users', users.length, 'blue'], ['Active Users', users.filter(u => u.is_active).length, 'green'], ['Roles', Object.keys(roles).length, 'orange'], ['Total Audit Logs', audit.length, 'purple']].map(([name, n, c]) => `<article><i class="${c}"><img src="static/paypoint/user-audit-${c}.svg" alt=""></i><div><span>${name}</span><strong>${n}</strong><small>${name === 'Total Audit Logs' ? 'Selected period' : 'Current directory'}</small></div></article>`).join('');
+    q('[data-ua-kpis]').innerHTML = [['Total Users', users.length, 'blue'], ['Active Users', users.filter(u => u.is_active).length, 'green'], ['Roles', Object.keys(roles).length, 'orange'], ['Total Audit Logs', auditLoading?'…':auditCount??'Unavailable', 'purple']].map(([name, n, c]) => `<article><i class="${c}"><img src="static/paypoint/user-audit-${c}.svg" alt=""></i><div><span>${name}</span><strong>${n}</strong><small>${name === 'Total Audit Logs' ? 'Selected period' : 'Current directory'}</small></div></article>`).join('');
     q('[data-ua-users]').innerHTML = `<div class="table-wrap"><table class="data-table finance-data-table"><thead><tr>${['#', 'Name', 'Username', 'Email', 'Role', 'Department', 'Status', 'Last Login', 'Actions'].map(v => `<th>${v}</th>`).join('')}</tr></thead><tbody>${found.slice((page - 1) * 10, page * 10).map((u, i) => `<tr><td>${(page - 1) * 10 + i + 1}</td><td>${esc(u.full_name)}</td><td>${esc(u.username)}</td><td>${esc(u.email)}</td><td><span class="ua-role ua-${esc(u.role)}">${esc(roles[u.role] || u.role)}</span></td><td>${esc(departmentName(u.department))}</td><td><span class="staff-status ${u.is_active ? 'staff-active' : 'staff-inactive'}">${u.banned_at?'Banned':u.is_active?(u.page_access!==null&&u.page_access!==undefined?'Restricted':'Active'):'Inactive'}</span></td><td>${esc(date(u.last_login))}</td><td><div class="ua-account-actions"><button type="button" class="pending-outline" data-ua-password-reset="${esc(u.id)}" ${String(u.id)===String(user.id)?'disabled':''}>Reset password</button><button class="pending-outline" data-ua-edit="${esc(u.id)}" aria-label="Edit ${esc(u.full_name)}">Edit</button> <button type="button" class="pending-outline" data-ua-restrict="${esc(u.id)}" ${String(u.id)===String(user.id)?'disabled':''}>Restrict</button> <button type="button" class="pending-outline" data-ua-account="${esc(u.id)}" data-action="${u.banned_at?'unban':'ban'}" ${String(u.id)===String(user.id)?'disabled':''}>${u.banned_at?'Unban':'Ban'}</button> <button type="button" class="pending-outline" data-ua-account="${esc(u.id)}" data-action="delete" ${String(u.id)===String(user.id)?'disabled':''}>Delete</button></div></td></tr>`).join('') || '<tr><td colspan="9">No users available.</td></tr>'}</tbody></table></div>`;
     q('[data-ua-count]').textContent = `Showing ${found.length ? (page - 1) * 10 + 1 : 0} to ${Math.min(page * 10, found.length)} of ${found.length} users`;
     q('[data-ua-pages]').innerHTML = `<button class="pending-outline" data-ua-page="${page - 1}" ${page === 1 ? 'disabled' : ''}>Previous</button> <span>${page} / ${Math.ceil(found.length / 10) || 1}</span> <button class="pending-outline" data-ua-page="${page + 1}" ${page * 10 >= found.length ? 'disabled' : ''}>Next</button>`;
-    q('[data-ua-logs]').innerHTML = `<div class="table-wrap"><table class="data-table finance-data-table ua-log-table"><thead><tr><th>#</th><th>Date & Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody>${audit.slice(0, allLogs ? audit.length : 10).map((l, i) => `<tr><td>${i + 1}</td><td>${esc(date(l.created_at))}</td><td>${esc(l.user)}</td><td>${esc(l.action)}</td><td>${esc(l.description)}</td></tr>`).join('') || '<tr><td colspan="5">No audit activity in this period.</td></tr>'}</tbody></table></div><p class="ua-log-note">Read-only activity · ${audit.length} records in selected period</p>`;
-    q('[data-ua-all]').textContent = allLogs ? 'Show Recent' : 'View All';
+    q('[data-ua-logs]').innerHTML = `<div class="table-wrap"><table class="data-table finance-data-table ua-log-table"><thead><tr><th>#</th><th>Date & Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody>${audit.map((l, i) => `<tr><td>${(auditPage-1)*(allLogs?25:10)+i+1}</td><td>${esc(date(l.created_at))}</td><td>${esc(l.user)}</td><td>${esc(l.action)}</td><td>${esc(l.description)}</td></tr>`).join('') || `<tr><td colspan="5">${auditLoading?'Loading audit activity…':auditError?'Audit activity unavailable.':'No audit activity in this period.'}</td></tr>`}</tbody></table></div><p class="ua-log-note">${auditLoading?'Loading audit activity…':auditError?esc(auditError):`Read-only activity · ${auditCount} records in selected period · Page ${auditPage}`}</p><div class="pending-pagination"><button type="button" class="pending-outline" data-ua-audit-page="${auditPage-1}" ${auditLoading||!auditPrevious?'disabled':''}>Previous</button><button type="button" class="pending-outline" data-ua-audit-page="${auditPage+1}" ${auditLoading||!auditNext?'disabled':''}>Next</button>${auditError?'<button type="button" class="pending-outline" data-ua-audit-retry>Retry audit logs</button>':''}</div>`;
+    q('[data-ua-all]').textContent = allLogs ? 'Show Recent' : 'Browse Logs';q('[data-ua-all]').disabled=auditLoading;
+  }
+  async function loadAudit(){
+    const sequence=++auditSequence;auditController?.abort();auditController=new AbortController();auditLoading=true;auditError='';logs=[];auditCount=null;auditNext=false;auditPrevious=false;render();
+    try{const data=await loadAuditPage(path=>api(path,{signal:auditController.signal}),{period:String(days),page:auditPage,pageSize:allLogs?25:10});if(sequence!==auditSequence||!root.isConnected||abort.signal.aborted)return;logs=data.rows;auditCount=data.count;auditNext=data.next;auditPrevious=data.previous;}
+    catch(error){if(sequence!==auditSequence||!root.isConnected||abort.signal.aborted)return;auditError='Audit logs could not load. User management is still available. '+error.message;}
+    finally{if(sequence===auditSequence&&root.isConnected&&!abort.signal.aborted){auditLoading=false;render();}}
   }
   function clear() {
     editing = null;
@@ -1867,13 +1863,16 @@ async function usersAndAudit() {
   });
   q('[data-ua-period]').addEventListener('change', e => {
     days = e.target.value;
-    render();
+    auditPage=1;loadAudit();
   });
   q('[data-ua-all]').addEventListener('click', () => {
     allLogs = !allLogs;
-    render();
+    auditPage=1;loadAudit();
   });
   root.addEventListener('click', async e => {
+    const auditPager=e.target.closest('[data-ua-audit-page]'),auditRetry=e.target.closest('[data-ua-audit-retry]');
+    if(auditPager&&!auditPager.disabled){auditPage=Number(auditPager.dataset.uaAuditPage);loadAudit();return;}
+    if(auditRetry){loadAudit();return;}
     const reset=e.target.closest('[data-ua-password-reset]');
     if(reset){
       const target=users.find(u=>String(u.id)===reset.dataset.uaPasswordReset);
@@ -1918,6 +1917,7 @@ async function usersAndAudit() {
     }
   });
   render();
+  void loadAudit();
 }
 async function notificationInbox() {
   let page = 1;

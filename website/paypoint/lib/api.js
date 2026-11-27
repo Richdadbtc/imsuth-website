@@ -29,7 +29,7 @@ async function request(path,options={},csrfRetried=false) {
   }
   if(!response.ok){let body;try{body=await response.json();}catch{}
 if(unsafe&&!csrfRetried&&response.status===403&&/^CSRF Failed:/i.test(body?.detail||'')){sessionCsrf='';await getSession({signal:options.signal});return request(path,options,true);}
-        const error=new Error([describe(body?.detail),describe(body?.errors||(body?.detail?null:body))].filter(Boolean).join(' ')||`Request failed (${response.status}).`);
+        const error=new Error([describe(body?.detail),describe(body?.errors||(body?.detail?null:body))].filter(Boolean).join(' ')||({503:'The server is temporarily busy or unavailable. Please try again shortly.',502:'The API server could not be reached. Please try again shortly.',504:'The server took too long to respond. Please try again shortly.'}[response.status]||`Request failed (${response.status}).`));
     error.status=response.status;error.method=method;error.path=apiPath(path);
     if(response.status===401||(response.status===403&&body?.detail==='Authentication credentials were not provided.'))window.dispatchEvent(new Event('paypoint-session-expired'));
     throw error;

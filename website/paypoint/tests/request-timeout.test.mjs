@@ -46,3 +46,13 @@ test('invalid server replies become readable errors and release loading',async()
    assert.equal(getRequestState().pending,0);
  }finally{globalThis.fetch=previous;}
 });
+
+test('503 gateway replies give an actionable message and release loading without retrying',async()=>{
+ const previous=globalThis.fetch;let attempts=0;
+ const {api}=await import('../lib/api.js?gateway-503');
+ try{
+   globalThis.fetch=async()=>{attempts++;return new Response('Service Unavailable',{status:503,headers:{'content-type':'text/html'}});};
+   await assert.rejects(api('audit-logs/?page=1'),error=>error.status===503&&/temporarily busy or unavailable/.test(error.message));
+   assert.equal(attempts,1);assert.equal(getRequestState().pending,0);
+ }finally{globalThis.fetch=previous;}
+});
