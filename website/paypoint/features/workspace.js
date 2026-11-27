@@ -1,5 +1,6 @@
 import {mountManualDrugPicker} from './manual-drug-picker.js';
 import {mountOverheadPicker} from './overhead-picker.js';
+import {departmentDeskState} from '../lib/department-desk.js';
 import {loadAuditPage} from '../lib/audit-pages.js';
 import {beginRequest} from '../lib/request-state.js';
 import {logoLoadingMarkup,showAccountCreated,showPasswordReset,showRequestError,bindFormErrorModal} from './request-feedback.js';
@@ -276,8 +277,6 @@ async function recordPaymentPreview() {
   await enhancedRecordPaymentPreview(capture);
 }
 async function departmentDesk() {
-  try {await api('record-payment/');}
-  catch(error){if(error.status!==404)throw error;await legacyDepartmentDesk();return;}
   await enhancedDepartmentDesk();
 }
 
@@ -525,16 +524,24 @@ async function enhancedRecordPaymentPreview(capture) {
   recent();
 }
 async function enhancedDepartmentDesk() {
-  const departments=[];let url='departments/?page_size=100';
-  for(let page=1;url;page++){const data=await api('departments/?page_size=100&page='+page);departments.push(...list(data).filter(d=>d.is_active!==false));url=data.next;}
-  content.innerHTML=`<div class="department-desk-page"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><label>Period<select data-desk-period><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="today">Today</option><option value="all">All records</option></select></label></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment">Record payment</a><a href="#patients" aria-current="page">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit">Users and audit</a></nav><div class="desk-check-layout"><section class="finance-card"><h2>Department desk: check a receipt before giving a service</h2><form data-desk-search><label>Department you are at<select name="department"><option value="">All departments (shared)</option>${departments.map(d=>`<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join('')}</select></label><label>Receipt number<input name="receipt" required maxlength="120" placeholder="Enter official receipt number"></label><button class="pending-verify" type="submit" ${departments.length?'':'disabled'}>Check receipt</button><p>Only receipts for the selected department can be checked here. A receipt can be printed again, but each service can only be marked delivered once.</p></form><p data-desk-message role="status"></p></section><section class="finance-card" data-desk-result aria-live="polite"><h2>Receipt check</h2><p>Check a receipt to see patient, payment and service details.</p></section></div><section class="finance-card"><h2 data-desk-title>Department receipts</h2><div data-desk-list></div><div class="pending-pagination"><span data-desk-count></span><div><button class="pending-outline" data-desk-prev>Previous</button><span data-desk-page></span><button class="pending-outline" data-desk-next>Next</button></div></div></section></div>`;
+  const records=[];let url='departments/?page_size=100';
+  for(let page=1;url;page++){const data=await api('departments/?page_size=100&page='+page);records.push(...list(data));url=data.next;}
+  const desk=departmentDeskState(records,user),departments=desk.departments;
+  content.innerHTML=`<div class="department-desk-page"><header class="overview-preview-brand"><img src="/paypoint/images/hospital%20logo.png" alt="IMSUTH crest"><div><h1>IMSUTH Central Pay Point</h1><p>Imo State Teaching Hospital, Orlu: all payments in one place</p></div><label>Period<select data-desk-period><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="today">Today</option><option value="all">All records</option></select></label></header><nav class="overview-preview-tabs" aria-label="Revenue control shortcuts"><a href="#dashboard-overview-preview">Overview</a><a href="#dashboard-record-payment">Record payment</a><a href="#patients" aria-current="page">Department desk</a><a href="#admin-departments">Departments</a><a href="#admin-services">Services and prices</a><a href="#cash-points">Cash points and orders</a><a href="#alerts">Alerts</a><a href="#users-audit">Users and audit</a></nav><div class="desk-check-layout"><section class="finance-card"><h2>Department desk: check a receipt before giving a service</h2><form data-desk-search><label>Department you are at<select name="department"><option value="">Select department</option>${departments.map(d=>`<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join('')}</select></label><label>Receipt number<input name="receipt" required maxlength="120" placeholder="Enter official receipt number"></label><button class="pending-verify" type="submit" ${departments.length?'':'disabled'}>Check receipt</button><p>Only receipts for the selected department can be checked here. A receipt can be printed again, but each service can only be marked delivered once.</p></form><p data-desk-message role="status"></p></section><section class="finance-card" data-desk-result aria-live="polite"><h2>Receipt check</h2><p>Check a receipt to see patient, payment and service details.</p></section></div><section class="finance-card"><h2 data-desk-title>Department receipts</h2><div data-desk-list></div><div class="pending-pagination"><span data-desk-count></span><div><button class="pending-outline" data-desk-prev>Previous</button><span data-desk-page></span><button class="pending-outline" data-desk-next>Next</button></div></div></section></div>`;
   const root=content.querySelector('.department-desk-page'),form=root.querySelector('[data-desk-search]'),department=form.elements.department,period=root.querySelector('[data-desk-period]'),result=root.querySelector('[data-desk-result]'),message=text=>root.querySelector('[data-desk-message]').textContent=text;
+  department.value=desk.selected;department.disabled=desk.locked||!departments.length;
   let page=1,listVersion=0,checkVersion=0,selected=null,hasNext=false,hasPrevious=false;
   const query=()=>'?department='+encodeURIComponent(department.value);
   const details=entries=>`<dl class="record-detail-list">${entries.map(([key,value])=>`<div><dt>${escapeHtml(key)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}</dl>`;
   const load=async()=>{
     const version=++listVersion;
-    if(!department.value){message('No active departments are available to this account.');return;}
+    if(!department.value){
+      message(desk.notice||'Select a department to view its receipts.');
+      root.querySelector('[data-desk-list]').textContent=desk.notice||'Select a department to view its receipts.';
+      root.querySelector('[data-desk-count]').textContent='0 receipts';
+      root.querySelector('[data-desk-prev]').disabled=true;root.querySelector('[data-desk-next]').disabled=true;
+      return;
+    }
     root.querySelector('[data-desk-title]').textContent='Receipts for '+(departments.find(d=>String(d.id)===department.value)?.name||'selected department');
     root.querySelector('[data-desk-list]').textContent='Loading department receipts…';
     try{
@@ -575,7 +582,7 @@ async function enhancedDepartmentDesk() {
         for(const id of items)await api('department-desk/service-items/'+encodeURIComponent(id)+'/deliver/?department='+encodeURIComponent(chosenDepartment),{method:'POST',body:JSON.stringify({receipt:snapshot.id,notes})});
         if(version===checkVersion&&root.isConnected){await check(snapshot.receipt_number);message('Service delivery recorded. Used services cannot be delivered again.');await load();}
       }catch(error){if(root.isConnected&&version===checkVersion){await check(snapshot.receipt_number);message('Delivery update: '+error.message);await load();}}
-      finally{department.disabled=false;}
+      finally{department.disabled=desk.locked||!departments.length;}
     }
   });
   await load();
