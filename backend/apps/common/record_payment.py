@@ -25,6 +25,12 @@ from .models import Sequence, CashPoint, CashOrder, RecordedPayment, Alert
 from .revenue_api import scoped_cash_points, scoped_cash_orders, scoped, scoped_receipts
 
 
+def verified_deposit(request, reference):
+    receipt=scoped_receipts(Receipt.objects.select_related('payment__recorded_context','invoice__department'),request.user).filter(receipt_number__iexact=reference.strip(),payment__status='confirmed',payment__currency='NGN',payment__recorded_context__sub_head='deposit').first()
+    if not receipt:raise ValidationError({'deposit_reference':'No confirmed deposit receipt is available for this reference within your access.'})
+    return receipt
+
+
 class CaptureInput(serializers.Serializer):
     def validate(self,data):
         from apps.payments.slip_reference import validate_slip_reference
@@ -49,8 +55,13 @@ class CaptureInput(serializers.Serializer):
             if not department_catalogue(data['rf_department']) or not data['rf_items'] or data['service'] or data['quantity']!=1:raise serializers.ValidationError({'rf_items':'Select an R/F service department and its services.'})
         elif data['sub_head']!='rf' and (data['rf_items'] or data['rf_department']):raise serializers.ValidationError({'rf_items':'These services apply only to R/F.'})
         if data['sub_head']=='deposit' and (data['service'] or data['quantity']!=1 or not data['service_description'].strip() or 'base_amount' not in data):raise serializers.ValidationError({'service_description':'Enter the service and deposit amount. Deposits use quantity 1.'})
+        if data['override_reason'].casefold()=='initial deposit':
+            if not data['deposit_reference']:raise serializers.ValidationError({'deposit_reference':'Enter the initial deposit receipt reference.'})
+            verified_deposit(self.context['request'],data['deposit_reference'])
+        elif data['deposit_reference']:raise serializers.ValidationError({'deposit_reference':'Select Initial deposit to link a deposit receipt.'})
         return data
 
+    deposit_reference = serializers.CharField(max_length=120,allow_blank=True,default='')
     rf_department = serializers.CharField(required=False,default='',allow_blank=True,max_length=100)
     rf_items = OverheadSelection(many=True,required=False,default=list,allow_empty=True,max_length=250)
     drf_items = DRFSelection(many=True,required=False,default=list,allow_empty=True,max_length=322)
@@ -89,6 +100,11 @@ class RecordPaymentView(APIView):
     permission_classes=[permissions.IsAuthenticated]
 
     def get(self,request):
+        if 'deposit_reference' in request.query_params:
+            receipt=verified_deposit(request,request.query_params['deposit_reference'])
+            response=Response({'receipt_number':receipt.receipt_number,'amount':receipt.amount,'currency':'NGN','patient_name':receipt.invoice.patient_display_name,'department':receipt.invoice.department.name,'status':'confirmed'})
+            response['Cache-Control']='no-store'
+            return response
         points=scoped_cash_points(CashPoint.objects.filter(is_active=True),request.user)
         orders=scoped_cash_orders(CashOrder.objects.filter(status='approved',cash_point__is_active=True),request.user)
         receipts=scoped_receipts(Receipt.objects.select_related('payment','invoice__patient','invoice__department').prefetch_related('invoice__items__delivery'),request.user).order_by('-issued_at')[:10]
@@ -186,7 +202,7 @@ class RecordPaymentView(APIView):
                     if point.daily_limit is not None and used+data['amount']>point.daily_limit:raise ValidationError({'cash_point':'This cash point daily collection limit would be exceeded.'})
                 payment=Payment.create_intent(invoice=invoice,channel=data['channel'],initiated_by=request.user,idempotency_key='record:'+str(data['idempotency_key']))
                 payment.cash_receiver=data['cash_receiver'];payment.submitted_reference=data['submitted_reference'];payment.reported_paid_at=data['reported_paid_at'];payment.remarks=data['remarks'];payment.save(update_fields=['cash_receiver','submitted_reference','reported_paid_at','remarks','updated_at'])
-                context=RecordedPayment.objects.create(idempotency_key=str(data['idempotency_key']),fingerprint=fingerprint,created_by=request.user,cash_point=point,cash_order=order,payment=payment,rf_breakdown=breakdown if rf else {},drf_breakdown=breakdown if drf else {},overhead_breakdown=breakdown if basket_mode and not drf and not rf else {},sub_head=data['sub_head'],patient_type=data['patient_type'],base_total=base,discount_total=discount,approved_total=approved,entered_total=data['amount'],override_reason=data['override_reason'])
+                context=RecordedPayment.objects.create(idempotency_key=str(data['idempotency_key']),fingerprint=fingerprint,created_by=request.user,cash_point=point,cash_order=order,payment=payment,rf_breakdown=breakdown if rf else {},drf_breakdown=breakdown if drf else {},overhead_breakdown=breakdown if basket_mode and not drf and not rf else {},sub_head=data['sub_head'],patient_type=data['patient_type'],base_total=base,discount_total=discount,approved_total=approved,entered_total=data['amount'],override_reason=data['override_reason'],deposit_receipt=verified_deposit(request,data['deposit_reference']) if data['deposit_reference'] else None)
                 AuditEvent.record('payment.recorded_at_point',actor=request.user,obj=payment,request=request,metadata={'sub_head':context.sub_head,'rf_breakdown':context.rf_breakdown,'drf_breakdown':context.drf_breakdown,'overhead_breakdown':context.overhead_breakdown,'cash_receiver':payment.cash_receiver,'cash_point':str(point.pk),'cash_order':str(order.pk) if order else None,'patient_type':data['patient_type'],'base_total':str(base),'discount_total':str(discount),'manual_service':manual,'service_description':data['service_description'] if manual else service.name,'approved_total':str(approved),'entered_total':str(data['amount']),'override_reason':data['override_reason']})
                 if (manual and not basket_mode and not deposit) or (basket_mode and any(row.get('kind')=='editable' for row in breakdown['items'])) or approved!=data['amount']:
                     Alert.objects.create(department=department,alert_type='service_price_change',severity='medium',description='Manual service and officer-entered full price require review.' if manual else 'Recorded payment differs from the approved tariff; review the recorded reason.',related_type='payments.Payment',related_id=str(payment.pk))

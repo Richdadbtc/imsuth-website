@@ -111,4 +111,5 @@ class RecordedPayment(TimeStampedModel):
     discount_total = models.DecimalField(max_digits=19, decimal_places=2, default=0)
     approved_total = models.DecimalField(max_digits=19, decimal_places=2)
     entered_total = models.DecimalField(max_digits=19, decimal_places=2)
+    deposit_receipt = models.ForeignKey('payments.Receipt',null=True,blank=True,on_delete=models.PROTECT,related_name='linked_deposit_payments')
     override_reason = models.CharField(max_length=500, blank=True)
