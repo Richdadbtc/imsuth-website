@@ -7,6 +7,7 @@ from collections import defaultdict
 from django.db.models import Sum, Count
 from django.http import HttpResponse
 from django.utils import timezone
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
@@ -21,6 +22,19 @@ from apps.payments.serializers import PaymentSerializer
 from apps.billing.serializers import InvoiceSerializer
 from .serializers import PatientSerializer
 from apps.operations.serializers import ReconciliationItemSerializer
+
+
+class CollectionReportSerializer(PaymentSerializer):
+    sub_head = serializers.SerializerMethodField()
+    cash_point = serializers.SerializerMethodField()
+    def get_sub_head(self, obj):
+        context = getattr(obj, 'recorded_context', None)
+        return context.get_sub_head_display() if context else 'Unclassified'
+    def get_cash_point(self, obj):
+        context = getattr(obj, 'recorded_context', None)
+        return context.cash_point.name if context else ''
+    class Meta(PaymentSerializer.Meta):
+        fields = PaymentSerializer.Meta.fields + ('sub_head', 'cash_point')
 
 
 class ReportView(APIView):
@@ -50,7 +64,7 @@ class ReportView(APIView):
         summary={}
         groups=[]
         if report in {'revenue','collections','departments','cashiers','channels'}:
-            qs=Payment.objects.select_related('invoice__department','invoice__patient','initiated_by','receipt').prefetch_related('invoice__items').filter(created_at__date__gte=start,created_at__date__lte=end,currency='NGN')
+            qs=Payment.objects.select_related('invoice__department','invoice__patient','initiated_by','receipt','recorded_context__cash_point').prefetch_related('invoice__items').filter(created_at__date__gte=start,created_at__date__lte=end,currency='NGN')
             if params.get('department'):qs=qs.filter(invoice__department_id=fk(params['department']))
             if params.get('channel'):qs=qs.filter(channel=params['channel'])
             if params.get('provider'):qs=qs.filter(provider=params['provider'])
@@ -61,11 +75,15 @@ class ReportView(APIView):
             if params.get('service'):
                 # Balance allocation is explicit; do not count full invoices as service revenue.
                 raise ValidationError('Service allocation is available through invoice line items; this payment report does not accept a service filter.')
+            if params.get('sub_head'):
+                from .revenue_models import RecordedPayment
+                if params['sub_head'] not in dict(RecordedPayment.SUB_HEAD_CHOICES):raise ValidationError('Invalid SUB-HEAD.')
+                qs=qs.filter(recorded_context__sub_head=params['sub_head'])
             total=qs.count();success=qs.filter(status='confirmed');failed=qs.filter(status__in=['failed','rejected','expired'])
             summary={'transactions':total,'collected':success.aggregate(amount=Sum('amount'))['amount'] or 0,'failed_amount':failed.aggregate(amount=Sum('amount'))['amount'] or 0,'successful_transactions':success.count(),'failed_transactions':failed.count(),'success_rate':str(round(Decimal(success.count())*100/total,2)) if total else '0','currency':'NGN','scope':'payments created in selected period'}
             key={'departments':'invoice__department__name','cashiers':'initiated_by__username','channels':'channel'}.get(report,'channel')
             groups=list(success.values(key).annotate(amount=Sum('amount'),transactions=Count('pk')).order_by('-amount'))
-            serializer=PaymentSerializer
+            serializer=CollectionReportSerializer
         elif report=='outstanding':
             qs=Invoice.objects.select_related('patient','department').prefetch_related('items').filter(issued_at__date__gte=start,issued_at__date__lte=end,status__in=['issued','partially_paid'],currency='NGN')
             if params.get('department'):qs=qs.filter(department_id=fk(params['department']))
@@ -112,7 +130,20 @@ class ReportView(APIView):
         else:
             raise ValidationError('Unknown report type.')
         qs=qs.order_by('pk')
-        if params.get('format')=='csv' or params.get('export')=='csv':
+        if params.get('export')=='print':
+            from django.utils.html import escape
+            if qs.count()>10000:raise ValidationError('Limit printed reports to 10,000 rows by narrowing the date range.')
+            rows=serializer(qs,many=True).data
+            keys=([key for key in ('receipt_number','confirmed_at','patient_name','department','sub_head','cash_point','collected_by_name','service_summary','channel','amount','status') if key in rows[0]] if serializer is CollectionReportSerializer else list(rows[0])) if rows else []
+            def cells(values,tag):return ''.join(f'<{tag}>{escape(str(value if value is not None else ""))}</{tag}>' for value in values)
+            body='<h1>IMSUTH Central Pay Point</h1><h2>'+escape(report.title())+' Report</h2><p>'+escape(str(start))+' to '+escape(str(end))+'</p>'
+            body+='<p>'+escape(str(dict(params.items())))+'</p>'
+            body+='<dl>'+''.join('<dt>'+escape(str(k))+'</dt><dd>'+escape(str(v))+'</dd>' for k,v in summary.items())+'</dl>'
+            body+='<table><thead><tr>'+cells(keys,'th')+'</tr></thead><tbody>'+''.join('<tr>'+cells([row.get(k) for k in keys],'td')+'</tr>' for row in rows)+'</tbody></table>'
+            response=HttpResponse('<!doctype html><html><head><meta charset="utf-8"><title>IMSUTH Report</title><style>body{font:12px sans-serif}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:5px;overflow-wrap:anywhere}thead{display:table-header-group}@media print{button{display:none}@page{size:landscape}}</style></head><body><button onclick="window.print()">Print report</button>'+body+'</body></html>',content_type='text/html; charset=utf-8')
+            response['Cache-Control']='no-store'
+            return response
+        if params.get('format')=='csv'  or params.get('export')=='csv':
             if qs.count()>10000:
                 raise ValidationError('Limit exports to 10,000 rows by narrowing the date range.')
             rows=serializer(qs,many=True).data

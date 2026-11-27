@@ -163,3 +163,23 @@ class ScreenApiTests(TestCase):
         self.assertEqual(response.status_code,201,response.data)
         self.assertEqual(self.post('settlements',{'provider':'Bank','settlement_reference':'TEST-SET-1','settlement_date':str(timezone.localdate()),'amount':'1200'}).status_code,400)
         self.assertEqual(self.client.get(self.url('reports/settlements')).data['summary']['records'],1)
+
+    def test_sub_head_report_filter_and_complete_print(self):
+        from apps.common.revenue_models import RecordedPayment, CashPoint
+        point=CashPoint.objects.create(name='Report point',location='Hospital')
+        context=RecordedPayment.objects.create(payment=self.payment,cash_point=point,created_by=self.staff,idempotency_key='report',fingerprint='test',approved_total=1000,entered_total=1000,sub_head='drf')
+        for head in ['drf','rf','overhead','deposit']:
+            context.sub_head=head;context.save()
+            response=self.client.get(self.url('reports/revenue'),{'sub_head':head})
+            self.assertEqual(response.status_code,200)
+            self.assertEqual(response.data['count'],1)
+            self.assertEqual(Decimal(str(response.data['summary']['collected'])),Decimal('1000'))
+            self.assertEqual(response.data['results'][0]['cash_point'],'Report point')
+            printed=self.client.get(self.url('reports/revenue'),{'sub_head':head,'export':'print'})
+            self.assertContains(printed,'Report point')
+            self.assertContains(printed,'Print report')
+            other='rf' if head!='rf' else 'drf'
+            self.assertEqual(self.client.get(self.url('reports/revenue'),{'sub_head':other}).data['count'],0)
+        self.assertEqual(self.client.get(self.url('reports/revenue'),{'sub_head':'invalid'}).status_code,400)
+        self.client.force_authenticate(self.staff)
+        self.assertEqual(self.client.get(self.url('reports/revenue'),{'export':'print'}).status_code,403)
