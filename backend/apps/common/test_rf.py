@@ -14,9 +14,9 @@ class RFPaymentTests(TestCase):
         self.data.update(sub_head='rf',rf_department='ophthalmology',rf_items=[{'code':'rf_02_001','quantity':2},{'code':'rf_02_002','quantity':1}],amount='23000')
     def test_complete_source_catalogue(self):
         catalogue=self.client.get('/api/v1/record-payment/').data['rf_catalogue']
-        self.assertEqual(len(catalogue['departments']),7)
-        self.assertEqual(len(catalogue['items']),238)
-        self.assertEqual(sum(i['available'] for i in catalogue['items']),219)
+        self.assertEqual(len(catalogue['departments']),9)
+        self.assertEqual(len(catalogue['items']),271)
+        self.assertEqual(sum(i['available'] for i in catalogue['items']),252)
     def test_multiple_items_discounts_receipt_and_idempotency(self):
         self.data.update(patient_type='nhis',amount='20700')
         response=self.post();self.assertEqual(response.status_code,201,response.data)
@@ -45,3 +45,26 @@ class RFPaymentTests(TestCase):
             if item['available']:continue
             with self.subTest(code=item['code']),self.assertRaises(ValidationError):
                 price_basket([{'code':item['code'],'quantity':1}],'regular',department_catalogue(item['department']))
+
+    def test_nutrition_and_paediatric_prices_and_units(self):
+        from .rf import department_catalogue
+        from .overhead import price_basket
+        nutrition=department_catalogue('nutrition_and_dietetics')
+        paediatric=department_catalogue('paediatric_emergency')
+        self.assertEqual(len(nutrition['items']),9)
+        self.assertEqual(len(paediatric['items']),24)
+        normal=nutrition['items'][0]
+        self.assertEqual((normal['amount'],normal['unit']),('4000','day'))
+        result=price_basket([{'code':normal['code'],'quantity':3}], 'regular',nutrition)
+        self.assertEqual(result['net_total'],'12000.00')
+        oxygen=paediatric['items'][9]
+        self.assertEqual((oxygen['amount'],oxygen['unit']),('2500','hour'))
+        result=price_basket([{'code':oxygen['code'],'quantity':2}], 'regular',paediatric)
+        self.assertEqual(result['net_total'],'5000.00')
+        drinks=nutrition['items'][8]
+        self.assertEqual(drinks['kind'],'editable')
+        result=price_basket([{'code':drinks['code'],'quantity':2,'unit_amount':Decimal('1800')}], 'regular',nutrition)
+        self.assertEqual(result['net_total'],'3600.00')
+        from rest_framework.exceptions import ValidationError
+        with self.assertRaises(ValidationError):
+            price_basket([{'code':drinks['code'],'quantity':1}], 'regular',nutrition)
