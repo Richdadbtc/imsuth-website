@@ -15,8 +15,8 @@ class RFPaymentTests(TestCase):
     def test_complete_source_catalogue(self):
         catalogue=self.client.get('/api/v1/record-payment/').data['rf_catalogue']
         self.assertEqual(len(catalogue['departments']),9)
-        self.assertEqual(len(catalogue['items']),271)
-        self.assertEqual(sum(i['available'] for i in catalogue['items']),252)
+        self.assertEqual(len(catalogue['items']),280)
+        self.assertEqual(sum(i['available'] for i in catalogue['items']),261)
     def test_multiple_items_discounts_receipt_and_idempotency(self):
         self.data.update(patient_type='nhis',amount='20700')
         response=self.post();self.assertEqual(response.status_code,201,response.data)
@@ -51,8 +51,8 @@ class RFPaymentTests(TestCase):
         from .overhead import price_basket
         nutrition=department_catalogue('nutrition_and_dietetics')
         paediatric=department_catalogue('paediatric_emergency')
-        self.assertEqual(len(nutrition['items']),9)
-        self.assertEqual(len(paediatric['items']),24)
+        self.assertEqual(len(nutrition['items']),10)
+        self.assertEqual(len(paediatric['items']),25)
         normal=nutrition['items'][0]
         self.assertEqual((normal['amount'],normal['unit']),('4000','day'))
         result=price_basket([{'code':normal['code'],'quantity':3}], 'regular',nutrition)
@@ -68,3 +68,16 @@ class RFPaymentTests(TestCase):
         from rest_framework.exceptions import ValidationError
         with self.assertRaises(ValidationError):
             price_basket([{'code':drinks['code'],'quantity':1}], 'regular',nutrition)
+
+    def test_ddm_adjustable_price_in_every_rf_department(self):
+        from .rf import department_catalogue
+        from .overhead import price_basket
+        from rest_framework.exceptions import ValidationError
+        for department in CATALOGUE['departments']:
+            catalogue=department_catalogue(department['code'])
+            item=next(i for i in catalogue['items'] if i['name']=='DDM')
+            self.assertEqual(item['kind'],'editable')
+            selection={'code':item['code'],'quantity':1}
+            with self.assertRaises(ValidationError):price_basket([selection],'regular',catalogue)
+            result=price_basket([{**selection,'unit_amount':Decimal('750')}],'regular',catalogue)
+            self.assertEqual(result['net_total'],'750.00')

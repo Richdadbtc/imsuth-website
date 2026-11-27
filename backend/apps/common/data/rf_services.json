@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-27.1",
+  "version": "2026-11-27.2",
   "label": "R/F",
   "error_field": "rf_items",
   "source_sha256": "56783a0c07c15c0efadf3c0417b07654cece04b12aac2d21a1f7b9279c890588",
@@ -3296,6 +3296,105 @@
       "unit": "day",
       "available": true,
       "source_rate": "NGN 2000 per day"
+    },
+    {
+      "code": "rf_ddm_rehabilitation_services_department_unconfirmed",
+      "department": "rehabilitation_services_department_unconfirmed",
+      "name": "DDM",
+      "group": "Rehabilitation services (department unconfirmed)",
+      "amount": "0",
+      "kind": "editable",
+      "unit": "service",
+      "available": true,
+      "source_rate": "Adjustable amount entered by the paypoint user"
+    },
+    {
+      "code": "rf_ddm_ophthalmology",
+      "department": "ophthalmology",
+      "name": "DDM",
+      "group": "Ophthalmology",
+      "amount": "0",
+      "kind": "editable",
+      "unit": "service",
+      "available": true,
+      "source_rate": "Adjustable amount entered by the paypoint user"
+    },
+    {
+      "code": "rf_ddm_chemical_pathology",
+      "department": "chemical_pathology",
+      "name": "DDM",
+      "group": "Chemical Pathology",
+      "amount": "0",
+      "kind": "editable",
+      "unit": "service",
+      "available": true,
+      "source_rate": "Adjustable amount entered by the paypoint user"
+    },
+    {
+      "code": "rf_ddm_accident_and_emergency",
+      "department": "accident_and_emergency",
+      "name": "DDM",
+      "group": "Accident and Emergency",
+      "amount": "0",
+      "kind": "editable",
+      "unit": "service",
+      "available": true,
+      "source_rate": "Adjustable amount entered by the paypoint user"
+    },
+    {
+      "code": "rf_ddm_microbiology",
+      "department": "microbiology",
+      "name": "DDM",
+      "group": "Microbiology",
+      "amount": "0",
+      "kind": "editable",
+      "unit": "service",
+      "available": true,
+      "source_rate": "Adjustable amount entered by the paypoint user"
+    },
+    {
+      "code": "rf_ddm_radiology",
+      "department": "radiology",
+      "name": "DDM",
+      "group": "Radiology",
+      "amount": "0",
+      "kind": "editable",
+      "unit": "service",
+      "available": true,
+      "source_rate": "Adjustable amount entered by the paypoint user"
+    },
+    {
+      "code": "rf_ddm_haematology",
+      "department": "haematology",
+      "name": "DDM",
+      "group": "Haematology",
+      "amount": "0",
+      "kind": "editable",
+      "unit": "service",
+      "available": true,
+      "source_rate": "Adjustable amount entered by the paypoint user"
+    },
+    {
+      "code": "rf_ddm_nutrition_and_dietetics",
+      "department": "nutrition_and_dietetics",
+      "name": "DDM",
+      "group": "Nutrition and Dietetics Department",
+      "amount": "0",
+      "kind": "editable",
+      "unit": "service",
+      "available": true,
+      "source_rate": "Adjustable amount entered by the paypoint user"
+    },
+    {
+      "code": "rf_ddm_paediatric_emergency",
+      "department": "paediatric_emergency",
+      "name": "DDM",
+      "group": "Paediatric Emergency Unit",
+      "amount": "0",
+      "kind": "editable",
+      "unit": "service",
+      "available": true,
+      "source_rate": "Adjustable amount entered by the paypoint user"
     }
   ]
 }
